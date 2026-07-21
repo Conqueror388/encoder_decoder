@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4:2 Encoder Lab — Quantum Void Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
+  <h1>4:2 PRIORITY <span>ENCODER</span></h1>
+  <p class="sub">Isolated logic workspace for a 4-to-2 line priority encoder circuit. Inputs are compressed into a 2-bit binary code representing the highest priority input active.</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
+  <button class="active" onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
+  <button onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
+  <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+  
+  <span class="eyebrow-num">Encoder Lab 02</span>
+  <h2 class="section-title">4:2 Encoder Simulator</h2>
+  <p class="lead">Select input lines to observe how the binary outputs change. Pin Y₃ is the highest priority select line. V represents code validity.</p>
+
+  <div class="grid-2">
+    <!-- Simulator Panel -->
+    <div class="panel">
+      <h4>Interactive Simulator (Priority Input)</h4>
+      <p class="mono" style="font-size: 12px; margin-top: 0; color: var(--text-dim);">Toggle input lines (Y₃ is highest priority):</p>
+      <div class="led-row">
+        <button id="sw-enc42-y0" class="led-btn" onclick="toggleEnc42(0)">
+          <span class="bulb"></span>
+          <span>Y₀</span>
+        </button>
+        <button id="sw-enc42-y1" class="led-btn" onclick="toggleEnc42(1)">
+          <span class="bulb"></span>
+          <span>Y₁</span>
+        </button>
+        <button id="sw-enc42-y2" class="led-btn" onclick="toggleEnc42(2)">
+          <span class="bulb"></span>
+          <span>Y₂</span>
+        </button>
+        <button id="sw-enc42-y3" class="led-btn" onclick="toggleEnc42(3)">
+          <span class="bulb"></span>
+          <span>Y₃</span>
+        </button>
+      </div>
+      <div class="led-row">
+        <div class="led-btn" disabled>
+          <span id="led-enc42-a1" class="bulb"></span>
+          <span>Output A₁</span>
+        </div>
+        <div class="led-btn" disabled>
+          <span id="led-enc42-a0" class="bulb"></span>
+          <span>Output A₀</span>
+        </div>
+        <div class="led-btn" disabled>
+          <span id="led-enc42-v" class="bulb amber"></span>
+          <span>Valid (V)</span>
+        </div>
+      </div>
+      <div class="output-readout">
+        <span>Encoded State</span>
+        <span id="readout-enc42" class="val">A₁ A₀ = 0 0 | V = 0</span>
+      </div>
+    </div>
+
+    <!-- Block Diagram -->
+    <div class="panel">
+      <h4>Pinout &amp; Block Diagram</h4>
+      <svg class="diagram" viewBox="0 0 240 160">
+        <rect x="60" y="15" width="120" height="130" rx="10" class="gate-body" />
+        <text x="120" y="84" class="gate-label" text-anchor="middle" font-weight="bold" fill="var(--copper)">4:2 ENCODER</text>
+        <!-- Inputs -->
+        <path id="bd-enc42-w-y0" d="M 20 35 H 60" class="wire" />
+        <text x="15" y="39" class="gate-label" style="font-size:10px;">Y₀</text>
+        <path id="bd-enc42-w-y1" d="M 20 65 H 60" class="wire" />
+        <text x="15" y="69" class="gate-label" style="font-size:10px;">Y₁</text>
+        <path id="bd-enc42-w-y2" d="M 20 95 H 60" class="wire" />
+        <text x="15" y="99" class="gate-label" style="font-size:10px;">Y₂</text>
+        <path id="bd-enc42-w-y3" d="M 20 125 H 60" class="wire" />
+        <text x="15" y="129" class="gate-label" style="font-size:10px;">Y₃ (P)</text>
+        <!-- Outputs -->
+        <path id="bd-enc42-w-a1" d="M 180 40 H 220" class="wire" />
+        <text x="225" y="44" class="gate-label">A₁</text>
+        <path id="bd-enc42-w-a0" d="M 180 80 H 220" class="wire" />
+        <text x="225" y="84" class="gate-label">A₀</text>
+        <path id="bd-enc42-w-v" d="M 180 120 H 220" class="wire" />
+        <text x="225" y="124" class="gate-label">V</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Truth Table -->
+    <div class="panel">
+      <h4>Truth Table &amp; Equations</h4>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Y₃</th><th>Y₂</th><th>Y₁</th><th>Y₀</th><th>A₁</th><th>A₀</th><th>V</th></tr>
+          </thead>
+          <tbody id="table-enc42">
+            <tr data-row="0"><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr data-row="1"><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr data-row="2"><td>0</td><td>0</td><td>1</td><td>X</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr data-row="3"><td>0</td><td>1</td><td>X</td><td>X</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr data-row="4"><td>1</td><td>X</td><td>X</td><td>X</td><td>1</td><td>1</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="logic-expressions">
+        <h5>Logical Expressions</h5>
+        <div class="expr-item">A₁ = Y₃ + Y₂</div>
+        <div class="expr-item">A₀ = Y₃ + <span class="overline">Y₂</span> &middot; Y₁</div>
+        <div class="expr-item">V = Y₃ + Y₂ + Y₁ + Y₀</div>
+      </div>
+    </div>
+
+    <!-- Logic Diagram -->
+    <div class="panel">
+      <h4>Interactive Logic Schematic</h4>
+      <svg class="diagram" viewBox="0 0 540 280">
+        <!-- Inputs -->
+        <text x="15" y="35" class="gate-label">Y₃</text>
+        <text x="15" y="95" class="gate-label">Y₂</text>
+        <text x="15" y="165" class="gate-label">Y₁</text>
+        <text x="15" y="235" class="gate-label">Y₀</text>
+
+        <path id="diag-enc42-w-y3" d="M 40 30 H 320" class="wire" />
+        <path id="diag-enc42-w-y2" d="M 40 90 H 120" class="wire" />
+        <path id="diag-enc42-w-y1" d="M 40 160 H 200" class="wire" />
+        <path id="diag-enc42-w-y0" d="M 40 230 H 260" class="wire" />
+
+        <!-- NOT Gate on Y2 -->
+        <path id="diag-enc42-w-y2-not-in" d="M 100 90 V 110 H 120" class="wire" />
+        <path id="diag-enc42-gate-not" d="M 120 100 L 135 110 L 120 120 Z" class="gate-body" />
+        <circle cx="138" cy="110" r="2.5" class="gate-body" />
+        <path id="diag-enc42-w-y2-not-out" d="M 141 110 H 200" class="wire" />
+
+        <!-- AND Gate (Y2' * Y1) -->
+        <path id="diag-enc42-gate-and" d="M 200 115 H 215 A 10 10 0 0 1 215 135 H 200 Z" class="gate-body" />
+        <path id="diag-enc42-w-and-in-y2" d="M 200 120 H 200" class="wire" />
+        <path id="diag-enc42-w-and-in-y1" d="M 160 160 V 130 H 200" class="wire" />
+        <path id="diag-enc42-w-and-out" d="M 225 125 H 320" class="wire" />
+
+        <!-- OR Gate 1 (A1 = Y3 + Y2) -->
+        <path id="diag-enc42-w-a1-in1" d="M 280 30 V 45 H 320" class="wire" />
+        <path id="diag-enc42-w-a1-in2" d="M 280 90 V 55 H 320" class="wire" />
+        <path id="diag-enc42-gate-or-a1" d="M 320 40 q 8 10 0 20 q 15 0 20 -10 q -5 -10 -20 -10" class="gate-body" />
+        <path id="diag-enc42-w-a1-out" d="M 340 50 H 450" class="wire" />
+        <circle id="diag-enc42-led-a1" cx="465" cy="50" r="6.5" fill="var(--led-off)" stroke="#070d0a" stroke-width="1.5" />
+        <text x="480" y="54" class="gate-label">A₁</text>
+
+        <!-- OR Gate 2 (A0 = Y3 + Y2'Y1) -->
+        <path id="diag-enc42-w-a0-in1" d="M 300 30 V 110 H 320" class="wire" />
+        <path id="diag-enc42-w-a0-in2" d="M 300 125 H 320" class="wire" />
+        <path id="diag-enc42-gate-or-a0" d="M 320 105 q 8 10 0 20 q 15 0 20 -10 q -5 -10 -20 -10" class="gate-body" />
+        <path id="diag-enc42-w-a0-out" d="M 340 115 H 450" class="wire" />
+        <circle id="diag-enc42-led-a0" cx="465" cy="115" r="6.5" fill="var(--led-off)" stroke="#070d0a" stroke-width="1.5" />
+        <text x="480" y="119" class="gate-label">A₀</text>
+
+        <!-- OR Gate 3 (V = Y3 + Y2 + Y1 + Y0) -->
+        <path id="diag-enc42-w-v-in-y3" d="M 260 30 V 175 H 320" class="wire" />
+        <path id="diag-enc42-w-v-in-y2" d="M 260 90 V 180 H 320" class="wire" />
+        <path id="diag-enc42-w-v-in-y1" d="M 260 160 V 185 H 320" class="wire" />
+        <path id="diag-enc42-w-v-in-y0" d="M 260 230 V 190 H 320" class="wire" />
+        <path id="diag-enc42-gate-or-v" d="M 320 170 q 8 12 0 24 q 18 0 25 -12 q -7 -12 -25 -12" class="gate-body" />
+        <path id="diag-enc42-w-v-out" d="M 345 182 H 450" class="wire" />
+        <circle id="diag-enc42-led-v" cx="465" cy="182" r="6.5" fill="var(--led-off)" stroke="#070d0a" stroke-width="1.5" />
+        <text x="480" y="186" class="gate-label">V</text>
+
+        <!-- Dots -->
+        <circle id="diag-enc42-dot-y3-a1" cx="280" cy="30" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y3-a0" cx="300" cy="30" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y3-v" cx="260" cy="30" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y2-a1" cx="280" cy="90" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y2-v" cx="260" cy="90" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y2-n" cx="100" cy="90" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y1-and" cx="160" cy="160" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y1-v" cx="260" cy="160" r="2.5" class="conn-dot" />
+        <circle id="diag-enc42-dot-y0-v" cx="260" cy="230" r="2.5" class="conn-dot" />
+      </svg>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; 4:2 Encoder
+</footer>
+
+<script>
+const stateEnc42 = [0, 0, 0, 0];
+
+function toggleEnc42(pin) {
+  stateEnc42[pin] = stateEnc42[pin] ? 0 : 1;
+  const btn = document.getElementById(`sw-enc42-y${pin}`);
+  btn.classList.toggle('on', stateEnc42[pin] === 1);
+  renderEnc42();
+}
+
+function renderEnc42() {
+  let a1 = 0, a0 = 0, v = 0;
+  let activeRow = 0;
+
+  if (stateEnc42[3] === 1) {
+    a1 = 1; a0 = 1; v = 1;
+    activeRow = 4;
+  } else if (stateEnc42[2] === 1) {
+    a1 = 1; a0 = 0; v = 1;
+    activeRow = 3;
+  } else if (stateEnc42[1] === 1) {
+    a1 = 0; a0 = 1; v = 1;
+    activeRow = 2;
+  } else if (stateEnc42[0] === 1) {
+    a1 = 0; a0 = 0; v = 1;
+    activeRow = 1;
+  } else {
+    a1 = 0; a0 = 0; v = 0;
+    activeRow = 0;
+  }
+
+  // LEDs
+  document.getElementById('led-enc42-a1').parentElement.classList.toggle('on', a1 === 1 && v === 1);
+  document.getElementById('led-enc42-a0').parentElement.classList.toggle('on', a0 === 1 && v === 1);
+  document.getElementById('led-enc42-v').parentElement.classList.toggle('on', v === 1);
+
+  // Readout text
+  document.getElementById('readout-enc42').textContent = `A₁ A₀ = ${v ? (a1 + ' ' + a0) : 'X X'} | V = ${v}`;
+
+  // Table Row Highlight
+  document.querySelectorAll('#table-enc42 tr').forEach(tr => {
+    tr.classList.toggle('active-row', tr.dataset.row == activeRow);
+  });
+
+  // Block Diagram Wires
+  document.getElementById('bd-enc42-w-y0').className.baseVal = `wire ${stateEnc42[0] ? 'hot' : ''}`;
+  document.getElementById('bd-enc42-w-y1').className.baseVal = `wire ${stateEnc42[1] ? 'hot' : ''}`;
+  document.getElementById('bd-enc42-w-y2').className.baseVal = `wire ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('bd-enc42-w-y3').className.baseVal = `wire ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('bd-enc42-w-a1').className.baseVal = `wire ${(a1 && v) ? 'hot' : ''}`;
+  document.getElementById('bd-enc42-w-a0').className.baseVal = `wire ${(a0 && v) ? 'hot' : ''}`;
+  document.getElementById('bd-enc42-w-v').className.baseVal = `wire ${v ? 'hot' : ''}`;
+
+  // Logic Diagram Signal Paths
+  document.getElementById('diag-enc42-w-y3').className.baseVal = `wire ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-y2').className.baseVal = `wire ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-y1').className.baseVal = `wire ${stateEnc42[1] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-y0').className.baseVal = `wire ${stateEnc42[0] ? 'hot' : ''}`;
+
+  // NOT gate on Y2
+  document.getElementById('diag-enc42-w-y2-not-in').className.baseVal = `wire ${stateEnc42[2] ? 'hot' : ''}`;
+  const y2not = stateEnc42[2] === 0 ? 1 : 0;
+  document.getElementById('diag-enc42-gate-not').className.baseVal = `gate-body ${y2not ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-y2-not-out').className.baseVal = `wire ${y2not ? 'hot' : ''}`;
+
+  // AND gate (Y2' * Y1)
+  const andOut = y2not && stateEnc42[1] ? 1 : 0;
+  document.getElementById('diag-enc42-w-and-in-y2').className.baseVal = `wire ${y2not ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-and-in-y1').className.baseVal = `wire ${stateEnc42[1] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-gate-and').className.baseVal = `gate-body ${andOut ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-and-out').className.baseVal = `wire ${andOut ? 'hot' : ''}`;
+
+  // OR Gate A1 (Y3 + Y2)
+  document.getElementById('diag-enc42-w-a1-in1').className.baseVal = `wire ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-a1-in2').className.baseVal = `wire ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-gate-or-a1').className.baseVal = `gate-body ${(a1 && v) ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-a1-out').className.baseVal = `wire ${(a1 && v) ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-led-a1').setAttribute('fill', (a1 && v) ? 'var(--led-on)' : 'var(--led-off)');
+
+  // OR Gate A0 (Y3 + Y2'Y1)
+  document.getElementById('diag-enc42-w-a0-in1').className.baseVal = `wire ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-a0-in2').className.baseVal = `wire ${andOut ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-gate-or-a0').className.baseVal = `gate-body ${(a0 && v) ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-a0-out').className.baseVal = `wire ${(a0 && v) ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-led-a0').setAttribute('fill', (a0 && v) ? 'var(--led-on)' : 'var(--led-off)');
+
+  // OR Gate V (Y3 + Y2 + Y1 + Y0)
+  document.getElementById('diag-enc42-w-v-in-y3').className.baseVal = `wire ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-v-in-y2').className.baseVal = `wire ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-v-in-y1').className.baseVal = `wire ${stateEnc42[1] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-v-in-y0').className.baseVal = `wire ${stateEnc42[0] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-gate-or-v').className.baseVal = `gate-body ${v ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-w-v-out').className.baseVal = `wire ${v ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-led-v').setAttribute('fill', v ? 'var(--led-on-amber)' : 'var(--led-off)');
+
+  // Dots
+  document.getElementById('diag-enc42-dot-y3-a1').className.baseVal = `conn-dot ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y3-a0').className.baseVal = `conn-dot ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y3-v').className.baseVal = `conn-dot ${stateEnc42[3] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y2-a1').className.baseVal = `conn-dot ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y2-v').className.baseVal = `conn-dot ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y2-n').className.baseVal = `conn-dot ${stateEnc42[2] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y1-and').className.baseVal = `conn-dot ${stateEnc42[1] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y1-v').className.baseVal = `conn-dot ${stateEnc42[1] ? 'hot' : ''}`;
+  document.getElementById('diag-enc42-dot-y0-v').className.baseVal = `conn-dot ${stateEnc42[0] ? 'hot' : ''}`;
+}
+
+window.addEventListener('load', renderEnc42);
+</script>
+</body>
+</html>

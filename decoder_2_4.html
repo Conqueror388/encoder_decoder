@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2:4 Decoder Lab — Quantum Void Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
+  <h1>2:4 <span>DECODER</span></h1>
+  <p class="sub">A 2-bit binary address (A1 A0) selects exactly one of four output lines, gated by a shared Enable line — the building block behind memory address decoding.</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button onclick="location.href='decoder_1_2.html'">1:2 Decoder</button>
+  <button class="active" onclick="location.href='decoder_2_4.html'">2:4 Decoder</button>
+  <button onclick="location.href='decoder_3_8.html'">3:8 Decoder</button>
+  <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+
+  <span class="eyebrow-num">Decoder Lab 02</span>
+  <h2 class="section-title">2:4 Decoder Simulator</h2>
+  <p class="lead">Toggle A1, A0 and Enable. Exactly one of D0–D3 lights up when Enable is on — the one whose index matches the binary value of A1 A0.</p>
+
+  <div class="grid-2">
+    <!-- Simulator Panel -->
+    <div class="panel">
+      <h4>Interactive Simulator</h4>
+      <div class="led-row" style="margin-bottom:20px;">
+        <div class="toggle"><div class="switch" id="sw-dec24-a1" onclick="toggleDec24('a1')"></div><span>A1</span></div>
+        <div class="toggle"><div class="switch" id="sw-dec24-a0" onclick="toggleDec24('a0')"></div><span>A0</span></div>
+        <div class="toggle"><div class="switch on" id="sw-dec24-e" onclick="toggleDec24('e')"></div><span>Enable (E)</span></div>
+      </div>
+      <div class="led-row">
+        <div class="led-btn" disabled><span id="led-dec24-d0" class="bulb"></span><span>D₀</span></div>
+        <div class="led-btn" disabled><span id="led-dec24-d1" class="bulb"></span><span>D₁</span></div>
+        <div class="led-btn" disabled><span id="led-dec24-d2" class="bulb"></span><span>D₂</span></div>
+        <div class="led-btn" disabled><span id="led-dec24-d3" class="bulb"></span><span>D₃</span></div>
+      </div>
+      <div class="output-readout">
+        <span>Decoded State</span>
+        <span id="readout-dec24" class="val">Active: none</span>
+      </div>
+    </div>
+
+    <!-- Block Diagram -->
+    <div class="panel">
+      <h4>Pinout &amp; Block Diagram</h4>
+      <svg class="diagram" viewBox="0 0 240 190">
+        <rect x="60" y="15" width="120" height="160" rx="10" class="gate-body" />
+        <text x="120" y="99" class="gate-label" text-anchor="middle" font-weight="bold" fill="var(--copper)">2:4 DEC</text>
+        <path id="bd-dec24-w-a1" d="M 20 40 H 60" class="wire" /><text x="12" y="44" class="gate-label" style="font-size:10px;">A1</text>
+        <path id="bd-dec24-w-a0" d="M 20 70 H 60" class="wire" /><text x="12" y="74" class="gate-label" style="font-size:10px;">A0</text>
+        <path id="bd-dec24-w-e" d="M 20 145 H 60" class="wire" /><text x="15" y="149" class="gate-label" style="font-size:10px;">E</text>
+        <path id="bd-dec24-w-d0" d="M 180 30 H 220" class="wire" /><text x="225" y="34" class="gate-label">D₀</text>
+        <path id="bd-dec24-w-d1" d="M 180 60 H 220" class="wire" /><text x="225" y="64" class="gate-label">D₁</text>
+        <path id="bd-dec24-w-d2" d="M 180 100 H 220" class="wire" /><text x="225" y="104" class="gate-label">D₂</text>
+        <path id="bd-dec24-w-d3" d="M 180 140 H 220" class="wire" /><text x="225" y="144" class="gate-label">D₃</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Truth Table -->
+    <div class="panel">
+      <h4>Truth Table &amp; Equations</h4>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>E</th><th>A1</th><th>A0</th><th>D₀</th><th>D₁</th><th>D₂</th><th>D₃</th></tr></thead>
+          <tbody id="table-dec24">
+            <tr data-row="dis"><td>0</td><td>X</td><td>X</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr data-row="0"><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr data-row="1"><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr data-row="2"><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+            <tr data-row="3"><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="logic-expressions">
+        <h5>Logical Expressions</h5>
+        <div class="expr-item">D₀ = E&middot;<span class="overline">A1</span>&middot;<span class="overline">A0</span></div>
+        <div class="expr-item">D₁ = E&middot;<span class="overline">A1</span>&middot;A0</div>
+        <div class="expr-item">D₂ = E&middot;A1&middot;<span class="overline">A0</span></div>
+        <div class="expr-item">D₃ = E&middot;A1&middot;A0</div>
+      </div>
+    </div>
+
+    <!-- Logic Diagram -->
+    <div class="panel">
+      <h4>Interactive Logic Schematic</h4>
+      <svg class="diagram" viewBox="0 0 560 330">
+        <text x="15" y="29" class="gate-label">A1</text>
+        <text x="15" y="179" class="gate-label">A0</text>
+        <text x="15" y="309" class="gate-label">E</text>
+
+        <path id="diag-dec24-w-a1" d="M 40 25 H 160" class="wire" />
+        <path id="diag-dec24-w-a0" d="M 40 175 H 210" class="wire" />
+        <path id="diag-dec24-w-e" d="M 40 305 H 260" class="wire" />
+
+        <!-- NOT A1 -->
+        <path id="diag-dec24-w-a1-not-in" d="M 100 25 V 55 H 120" class="wire" />
+        <path id="diag-dec24-gate-not-a1" d="M 120 40 L 120 70 L 140 55 Z" class="gate-body" />
+        <circle id="diag-dec24-dot-not-a1" cx="144" cy="55" r="3" class="gate-body" />
+        <path id="diag-dec24-w-a1-not-out" d="M 148 55 H 185" class="wire" />
+
+        <!-- NOT A0 -->
+        <path id="diag-dec24-w-a0-not-in" d="M 100 175 V 195 H 120" class="wire" />
+        <path id="diag-dec24-gate-not-a0" d="M 120 180 L 120 210 L 140 195 Z" class="gate-body" />
+        <circle id="diag-dec24-dot-not-a0" cx="144" cy="195" r="3" class="gate-body" />
+        <path id="diag-dec24-w-a0-not-out" d="M 148 195 H 235" class="wire" />
+
+        <!-- Bus trunks -->
+        <path id="diag-dec24-bus-a1" d="M 160 25 V 228" class="wire" />
+        <path id="diag-dec24-bus-a1p" d="M 185 48 V 108" class="wire" />
+        <path id="diag-dec24-bus-a0" d="M 210 117 V 237" class="wire" />
+        <path id="diag-dec24-bus-a0p" d="M 235 57 V 195" class="wire" />
+        <path id="diag-dec24-bus-e" d="M 260 66 V 305" class="wire" />
+
+        <!-- Branches into gate D0 (E.A1'.A0') -->
+        <path id="diag-dec24-br-d0-a1p" d="M 185 48 H 380" class="wire" />
+        <path id="diag-dec24-br-d0-a0p" d="M 235 57 H 380" class="wire" />
+        <path id="diag-dec24-br-d0-e" d="M 260 66 H 380" class="wire" />
+        <path id="diag-dec24-gate-d0" d="M380,40 H413 A17,17 0 0 1 413,74 H380 Z" class="gate-body" />
+        <path id="diag-dec24-w-d0-out" d="M 430 57 H 480" class="wire" />
+        <circle id="diag-dec24-led-d0" cx="495" cy="57" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="510" y="61" class="gate-label">D₀</text>
+
+        <!-- Branches into gate D1 (E.A1'.A0) -->
+        <path id="diag-dec24-br-d1-a1p" d="M 185 108 H 380" class="wire" />
+        <path id="diag-dec24-br-d1-a0" d="M 210 117 H 380" class="wire" />
+        <path id="diag-dec24-br-d1-e" d="M 260 126 H 380" class="wire" />
+        <path id="diag-dec24-gate-d1" d="M380,100 H413 A17,17 0 0 1 413,134 H380 Z" class="gate-body" />
+        <path id="diag-dec24-w-d1-out" d="M 430 117 H 480" class="wire" />
+        <circle id="diag-dec24-led-d1" cx="495" cy="117" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="510" y="121" class="gate-label">D₁</text>
+
+        <!-- Branches into gate D2 (E.A1.A0') -->
+        <path id="diag-dec24-br-d2-a1" d="M 160 168 H 380" class="wire" />
+        <path id="diag-dec24-br-d2-a0p" d="M 235 177 H 380" class="wire" />
+        <path id="diag-dec24-br-d2-e" d="M 260 186 H 380" class="wire" />
+        <path id="diag-dec24-gate-d2" d="M380,160 H413 A17,17 0 0 1 413,194 H380 Z" class="gate-body" />
+        <path id="diag-dec24-w-d2-out" d="M 430 177 H 480" class="wire" />
+        <circle id="diag-dec24-led-d2" cx="495" cy="177" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="510" y="181" class="gate-label">D₂</text>
+
+        <!-- Branches into gate D3 (E.A1.A0) -->
+        <path id="diag-dec24-br-d3-a1" d="M 160 228 H 380" class="wire" />
+        <path id="diag-dec24-br-d3-a0" d="M 210 237 H 380" class="wire" />
+        <path id="diag-dec24-br-d3-e" d="M 260 246 H 380" class="wire" />
+        <path id="diag-dec24-gate-d3" d="M380,220 H413 A17,17 0 0 1 413,254 H380 Z" class="gate-body" />
+        <path id="diag-dec24-w-d3-out" d="M 430 237 H 480" class="wire" />
+        <circle id="diag-dec24-led-d3" cx="495" cy="237" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="510" y="241" class="gate-label">D₃</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="note"><strong>Reading the schematic:</strong> A1 and A0 each split into their true and complemented (NOT) forms. Every output is a 3-input AND of one form of A1, one form of A0, and Enable — only one combination can be all-1 at a time.</div>
+
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; 2:4 Decoder
+</footer>
+
+<script>
+const stateDec24 = { a1: 0, a0: 0, e: 1 };
+
+function toggleDec24(pin){
+  stateDec24[pin] = stateDec24[pin] ? 0 : 1;
+  document.getElementById(`sw-dec24-${pin}`).classList.toggle('on', stateDec24[pin] === 1);
+  renderDec24();
+}
+
+function setHot(id, on){ document.getElementById(id).classList.toggle('hot', !!on); }
+function setLed(id, on){ document.getElementById(id).setAttribute('fill', on ? 'var(--led-on)' : 'var(--led-off)'); }
+
+function renderDec24(){
+  const { a1, a0, e } = stateDec24;
+  const a1p = a1 ? 0 : 1;
+  const a0p = a0 ? 0 : 1;
+  const d = [ e&&a1p&&a0p?1:0, e&&a1p&&a0?1:0, e&&a1&&a0p?1:0, e&&a1&&a0?1:0 ];
+  const activeIndex = e ? (a1<<1|a0) : -1;
+  const activeRow = e ? String(activeIndex) : 'dis';
+
+  ['d0','d1','d2','d3'].forEach((k,i)=>{
+    document.getElementById(`led-dec24-${k}`).parentElement.classList.toggle('on', d[i]===1);
+  });
+  document.getElementById('readout-dec24').textContent = e ? `Active: D${activeIndex}` : 'Active: none (disabled)';
+
+  document.querySelectorAll('#table-dec24 tr').forEach(tr => {
+    tr.classList.toggle('active-row', tr.dataset.row === activeRow);
+  });
+
+  // Block diagram
+  setHot('bd-dec24-w-a1', a1); setHot('bd-dec24-w-a0', a0); setHot('bd-dec24-w-e', e);
+  setHot('bd-dec24-w-d0', d[0]); setHot('bd-dec24-w-d1', d[1]); setHot('bd-dec24-w-d2', d[2]); setHot('bd-dec24-w-d3', d[3]);
+
+  // Logic diagram base wires
+  setHot('diag-dec24-w-a1', a1); setHot('diag-dec24-w-a0', a0); setHot('diag-dec24-w-e', e);
+  setHot('diag-dec24-w-a1-not-in', a1);
+  setHot('diag-dec24-gate-not-a1', a1p); setHot('diag-dec24-dot-not-a1', a1p); setHot('diag-dec24-w-a1-not-out', a1p);
+  setHot('diag-dec24-w-a0-not-in', a0);
+  setHot('diag-dec24-gate-not-a0', a0p); setHot('diag-dec24-dot-not-a0', a0p); setHot('diag-dec24-w-a0-not-out', a0p);
+
+  setHot('diag-dec24-bus-a1', a1); setHot('diag-dec24-bus-a1p', a1p);
+  setHot('diag-dec24-bus-a0', a0); setHot('diag-dec24-bus-a0p', a0p);
+  setHot('diag-dec24-bus-e', e);
+
+  setHot('diag-dec24-br-d0-a1p', a1p); setHot('diag-dec24-br-d0-a0p', a0p); setHot('diag-dec24-br-d0-e', e);
+  setHot('diag-dec24-gate-d0', d[0]); setHot('diag-dec24-w-d0-out', d[0]); setLed('diag-dec24-led-d0', d[0]);
+
+  setHot('diag-dec24-br-d1-a1p', a1p); setHot('diag-dec24-br-d1-a0', a0); setHot('diag-dec24-br-d1-e', e);
+  setHot('diag-dec24-gate-d1', d[1]); setHot('diag-dec24-w-d1-out', d[1]); setLed('diag-dec24-led-d1', d[1]);
+
+  setHot('diag-dec24-br-d2-a1', a1); setHot('diag-dec24-br-d2-a0p', a0p); setHot('diag-dec24-br-d2-e', e);
+  setHot('diag-dec24-gate-d2', d[2]); setHot('diag-dec24-w-d2-out', d[2]); setLed('diag-dec24-led-d2', d[2]);
+
+  setHot('diag-dec24-br-d3-a1', a1); setHot('diag-dec24-br-d3-a0', a0); setHot('diag-dec24-br-d3-e', e);
+  setHot('diag-dec24-gate-d3', d[3]); setHot('diag-dec24-w-d3-out', d[3]); setLed('diag-dec24-led-d3', d[3]);
+}
+
+window.addEventListener('load', renderDec24);
+</script>
+</body>
+</html>

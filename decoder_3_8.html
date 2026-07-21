@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3:8 Decoder Lab — Quantum Void Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+<style>
+  .expr-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  @media (max-width:520px){ .expr-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
+  <h1>3:8 <span>DECODER</span></h1>
+  <p class="sub">Three address bits (A2 A1 A0) select exactly one of eight output lines — scale this pattern up (4:16, 5:32...) and you get memory address decoding for real systems.</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button onclick="location.href='decoder_1_2.html'">1:2 Decoder</button>
+  <button onclick="location.href='decoder_2_4.html'">2:4 Decoder</button>
+  <button class="active" onclick="location.href='decoder_3_8.html'">3:8 Decoder</button>
+  <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+
+  <span class="eyebrow-num">Decoder Lab 03</span>
+  <h2 class="section-title">3:8 Decoder Simulator</h2>
+  <p class="lead">Toggle A2, A1, A0 and Enable. The binary value of A2 A1 A0 (0–7) picks which single output line among D0–D7 goes HIGH.</p>
+
+  <div class="grid-2">
+    <!-- Simulator Panel -->
+    <div class="panel">
+      <h4>Interactive Simulator</h4>
+      <div class="led-row" style="margin-bottom:20px;">
+        <div class="toggle"><div class="switch" id="sw-dec38-a2" onclick="toggleDec38('a2')"></div><span>A2</span></div>
+        <div class="toggle"><div class="switch" id="sw-dec38-a1" onclick="toggleDec38('a1')"></div><span>A1</span></div>
+        <div class="toggle"><div class="switch" id="sw-dec38-a0" onclick="toggleDec38('a0')"></div><span>A0</span></div>
+        <div class="toggle"><div class="switch on" id="sw-dec38-e" onclick="toggleDec38('e')"></div><span>Enable</span></div>
+      </div>
+      <div class="led-row" id="dec38-leds"></div>
+      <div class="output-readout">
+        <span>Decoded State</span>
+        <span id="readout-dec38" class="val">Active: none</span>
+      </div>
+    </div>
+
+    <!-- Block Diagram -->
+    <div class="panel">
+      <h4>Pinout &amp; Block Diagram</h4>
+      <svg class="diagram" viewBox="0 0 260 260">
+        <rect x="70" y="10" width="120" height="240" rx="10" class="gate-body" />
+        <text x="130" y="129" class="gate-label" text-anchor="middle" font-weight="bold" fill="var(--copper)">3:8 DEC</text>
+        <path id="bd-dec38-w-a2" d="M 20 35 H 70" class="wire" /><text x="10" y="39" class="gate-label" style="font-size:10px;">A2</text>
+        <path id="bd-dec38-w-a1" d="M 20 60 H 70" class="wire" /><text x="10" y="64" class="gate-label" style="font-size:10px;">A1</text>
+        <path id="bd-dec38-w-a0" d="M 20 85 H 70" class="wire" /><text x="10" y="89" class="gate-label" style="font-size:10px;">A0</text>
+        <path id="bd-dec38-w-e" d="M 20 220 H 70" class="wire" /><text x="15" y="224" class="gate-label" style="font-size:10px;">E</text>
+        <g id="bd-dec38-outputs"></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Truth Table -->
+    <div class="panel">
+      <h4>Truth Table &amp; Equations</h4>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>A2</th><th>A1</th><th>A0</th><th>Active Output</th></tr></thead>
+          <tbody id="table-dec38"></tbody>
+        </table>
+      </div>
+      <div class="logic-expressions">
+        <h5>Logical Expressions (E omitted, ANDed into every term)</h5>
+        <div class="expr-grid" id="expr-dec38"></div>
+      </div>
+    </div>
+
+    <!-- Logic Diagram -->
+    <div class="panel">
+      <h4>Interactive Logic Schematic</h4>
+      <svg class="diagram" id="diag-dec38" viewBox="0 0 480 300"></svg>
+    </div>
+  </div>
+
+  <div class="note"><strong>Why this matters:</strong> a 3:8 decoder is exactly how a CPU picks one of 8 memory chips or peripherals from a 3-bit address — only one chip's select line activates for any given address.</div>
+
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; 3:8 Decoder
+</footer>
+
+<script>
+const stateDec38 = { a2:0, a1:0, a0:0, e:1 };
+
+// Build static LED row, truth table, expressions and block-diagram outputs once
+(function initDec38(){
+  const ledRow = document.getElementById('dec38-leds');
+  for(let i=0;i<8;i++){
+    const div = document.createElement('div');
+    div.className = 'led-btn'; div.setAttribute('disabled','');
+    div.innerHTML = `<span id="led-dec38-d${i}" class="bulb"></span><span>D${i}</span>`;
+    ledRow.appendChild(div);
+  }
+  const tbody = document.getElementById('table-dec38');
+  for(let i=0;i<8;i++){
+    const c = [(i>>2)&1,(i>>1)&1,i&1];
+    const tr = document.createElement('tr');
+    tr.dataset.row = i;
+    tr.innerHTML = `<td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td>D${i}</td>`;
+    tbody.appendChild(tr);
+  }
+  const exprWrap = document.getElementById('expr-dec38');
+  for(let i=0;i<8;i++){
+    const c = [(i>>2)&1,(i>>1)&1,i&1];
+    const lit = (v,name)=> v? name : `${name}'`;
+    const div = document.createElement('div');
+    div.className = 'expr-item';
+    div.textContent = `D${i} = ${lit(c[0],'A2')}.${lit(c[1],'A1')}.${lit(c[2],'A0')}`;
+    exprWrap.appendChild(div);
+  }
+  const bdOut = document.getElementById('bd-dec38-outputs');
+  let bdHtml = '';
+  for(let i=0;i<8;i++){
+    const y = 20 + i*28;
+    bdHtml += `<path id="bd-dec38-w-d${i}" d="M 190 ${y} H 230" class="wire" /><text x="235" y="${y+4}" class="gate-label" font-size="10">D${i}</text>`;
+  }
+  bdOut.innerHTML = bdHtml;
+})();
+
+function toggleDec38(pin){
+  stateDec38[pin] = stateDec38[pin] ? 0 : 1;
+  document.getElementById(`sw-dec38-${pin}`).classList.toggle('on', stateDec38[pin] === 1);
+  renderDec38();
+}
+
+function renderDec38(){
+  const { a2, a1, a0, e } = stateDec38;
+  const activeIndex = (a2<<2)|(a1<<1)|a0;
+
+  document.getElementById('bd-dec38-w-a2').classList.toggle('hot', a2===1);
+  document.getElementById('bd-dec38-w-a1').classList.toggle('hot', a1===1);
+  document.getElementById('bd-dec38-w-a0').classList.toggle('hot', a0===1);
+  document.getElementById('bd-dec38-w-e').classList.toggle('hot', e===1);
+
+  document.querySelectorAll('#table-dec38 tr').forEach(tr=>{
+    tr.classList.toggle('active-row', e===1 && Number(tr.dataset.row) === activeIndex);
+  });
+
+  const gateW=56, gateH=32, gateX=300, r=gateH/2;
+  let svgHtml = '';
+  for(let i=0;i<8;i++){
+    const c = [(i>>2)&1,(i>>1)&1,i&1];
+    const outOn = e===1 && c[0]===a2 && c[1]===a1 && c[2]===a0;
+    document.getElementById(`led-dec38-d${i}`).parentElement.classList.toggle('on', outOn);
+    document.getElementById(`bd-dec38-w-d${i}`).classList.toggle('hot', outOn);
+
+    const gy = 8 + i*34;
+    const ys = [gy+5, gy+13, gy+21, gy+29];
+    const lits = [
+      { name: c[0] ? 'A2' : "A2'", on: c[0]===a2 },
+      { name: c[1] ? 'A1' : "A1'", on: c[1]===a1 },
+      { name: c[2] ? 'A0' : "A0'", on: c[2]===a0 },
+      { name: 'E', on: e===1 },
+    ];
+    lits.forEach((L,k)=>{
+      svgHtml += `<path d="M40,${ys[k]} H${gateX}" class="wire ${L.on?'hot':''}"/>`;
+      svgHtml += `<text x="6" y="${ys[k]+3}" class="gate-label" style="font-size:9px;">${L.name}</text>`;
+    });
+    const midY = gy + gateH/2;
+    svgHtml += `<path d="M${gateX},${gy} H${gateX+gateW-r} A${r},${r} 0 0 1 ${gateX+gateW-r},${gy+gateH} H${gateX} Z" class="gate-body ${outOn?'hot':''}"/>`;
+    svgHtml += `<path d="M${gateX+gateW},${midY} H${gateX+gateW+40}" class="wire ${outOn?'hot':''}"/>`;
+    svgHtml += `<circle cx="${gateX+gateW+55}" cy="${midY}" r="7" fill="${outOn?'var(--led-on)':'var(--led-off)'}" stroke="#05080c" stroke-width="1.5"/>`;
+    svgHtml += `<text x="${gateX+gateW+68}" y="${midY+3}" class="gate-label" style="font-size:10px;">D${i}</text>`;
+  }
+  document.getElementById('diag-dec38').innerHTML = svgHtml;
+
+  document.getElementById('readout-dec38').textContent = e ? `Active: D${activeIndex}` : 'Active: none (disabled)';
+}
+
+window.addEventListener('load', renderDec38);
+</script>
+</body>
+</html>

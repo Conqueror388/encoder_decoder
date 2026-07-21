@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Assessment — Encoders &amp; Decoders Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+<style>
+  .asm-shell{ max-width:760px; margin:0 auto; }
+  .asm-card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius);
+    padding:32px; box-shadow:0 4px 24px rgba(0,0,0,0.45);
+  }
+  .asm-topbar{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:22px; flex-wrap:wrap; }
+  .asm-timer{
+    font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; color:var(--trace);
+    border:1px solid var(--trace-dim); background:var(--bg-alt); padding:8px 14px; border-radius:8px;
+  }
+  .asm-timer.low{ color:var(--danger); border-color:var(--danger); animation:blink 1s infinite; }
+  .asm-progress-label{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); margin-bottom:6px; }
+  .asm-progress-track{ height:8px; border-radius:6px; background:var(--bg-alt); border:1px solid var(--panel-border); overflow:hidden; margin-bottom:26px; }
+  .asm-progress-fill{ height:100%; background:linear-gradient(90deg, var(--trace), var(--copper)); width:0%; transition:width .25s ease; }
+
+  .asm-topic-tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.08em; color:var(--copper); border:1px solid var(--copper-dim); padding:4px 10px; border-radius:999px;
+    margin-bottom:16px;
+  }
+  .asm-question{ font-size:19px; font-weight:600; margin:0 0 22px; color:var(--text); line-height:1.5; }
+  .asm-options{ display:flex; flex-direction:column; gap:12px; }
+  .asm-option{
+    text-align:left; font-family:'Work Sans',sans-serif; font-size:14.5px; color:var(--text);
+    background:var(--bg-alt); border:1px solid var(--panel-border); border-radius:8px;
+    padding:14px 16px; cursor:pointer; transition:all .15s ease; display:flex; gap:10px; align-items:flex-start;
+  }
+  .asm-option:hover:not(.locked){ border-color:var(--trace-dim); background:#0e1420; }
+  .asm-option .letter{
+    font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--text-dim);
+    width:22px; height:22px; border-radius:6px; border:1px solid var(--panel-border);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:12px;
+  }
+  .asm-option.correct{ border-color:var(--good); background:rgba(53,224,138,0.1); }
+  .asm-option.correct .letter{ border-color:var(--good); color:var(--good); }
+  .asm-option.wrong{ border-color:var(--danger); background:rgba(255,84,112,0.1); }
+  .asm-option.wrong .letter{ border-color:var(--danger); color:var(--danger); }
+  .asm-option.locked{ cursor:default; }
+
+  .asm-feedback{
+    margin-top:18px; padding:14px 16px; border-radius:8px; font-size:13.5px; display:none;
+    font-family:'Work Sans',sans-serif; border:1px solid var(--panel-border); background:var(--bg-alt); color:var(--text-dim);
+  }
+  .asm-feedback.show{ display:block; }
+  .asm-feedback strong{ display:block; margin-bottom:4px; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.05em; text-transform:uppercase; }
+  .asm-feedback.right strong{ color:var(--good); }
+  .asm-feedback.wrong strong{ color:var(--danger); }
+
+  .asm-actions{ display:flex; justify-content:flex-end; margin-top:24px; }
+  .asm-btn{
+    font-family:'JetBrains Mono',monospace; font-size:13px; text-transform:uppercase; letter-spacing:0.06em;
+    background:var(--trace); color:#031012; border:none; padding:12px 22px; border-radius:8px;
+    cursor:pointer; font-weight:700; transition:all .15s ease;
+  }
+  .asm-btn:hover{ filter:brightness(1.1); }
+  .asm-btn.ghost{ background:none; border:1px solid var(--trace-dim); color:var(--trace); }
+  .asm-btn:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .asm-start{ text-align:center; }
+  .asm-start h3{ font-size:22px; margin:0 0 12px; }
+  .asm-start p{ color:var(--text-dim); max-width:520px; margin:0 auto 26px; }
+  .asm-meta-row{ display:flex; justify-content:center; gap:26px; margin-bottom:30px; flex-wrap:wrap; }
+  .asm-meta{ text-align:center; }
+  .asm-meta .num{ font-family:'JetBrains Mono',monospace; font-size:24px; color:var(--trace); font-weight:800; }
+  .asm-meta .lbl{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .asm-result-score{ text-align:center; margin-bottom:30px; }
+  .asm-result-score .big{ font-family:'JetBrains Mono',monospace; font-size:56px; font-weight:800; color:var(--trace); text-shadow:0 0 20px rgba(0,240,255,0.3); }
+  .asm-result-score .pct{ font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--text-dim); }
+  .asm-badge{
+    display:inline-block; margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    color:#031012; background:var(--copper); padding:5px 12px; border-radius:999px; font-weight:700; letter-spacing:0.05em;
+  }
+  .asm-breakdown{ margin-bottom:28px; }
+  .asm-topic-row{ margin-bottom:14px; }
+  .asm-topic-row .row-top{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); margin-bottom:5px; }
+  .asm-bar-track{ height:9px; border-radius:6px; background:var(--bg-alt); border:1px solid var(--panel-border); overflow:hidden; }
+  .asm-bar-fill{ height:100%; background:linear-gradient(90deg, var(--trace), var(--good)); }
+  .asm-best{ text-align:center; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim); margin-bottom:26px; }
+  .asm-best strong{ color:var(--copper); }
+  .asm-result-actions{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Assessment</span>
+  <h1>TEST YOUR <span>LOGIC</span></h1>
+  <p class="sub">A question-by-question interactive assessment covering all six circuits in this lab. Answer, get instant feedback, and see a full topic breakdown at the end.</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button onclick="location.href='decoder_1_2.html'">1:2 Dec</button>
+  <button onclick="location.href='decoder_2_4.html'">2:4 Dec</button>
+  <button onclick="location.href='decoder_3_8.html'">3:8 Dec</button>
+  <button onclick="location.href='encoder_2_1.html'">2:1 Enc</button>
+  <button onclick="location.href='encoder_4_2.html'">4:2 Enc</button>
+  <button onclick="location.href='encoder_8_3.html'">8:3 Enc</button>
+  <button class="active" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+  <div class="asm-shell">
+
+    <!-- START SCREEN -->
+    <div class="asm-card asm-start" id="screenStart">
+      <h3>Ready to test yourself?</h3>
+      <p>20 questions across all six circuits — 1:2, 2:4 &amp; 3:8 decoders and 2:1, 4:2 &amp; 8:3 encoders. Each question gives instant feedback with a short explanation before you move on.</p>
+      <div class="asm-meta-row">
+        <div class="asm-meta"><div class="num">20</div><div class="lbl">Questions</div></div>
+        <div class="asm-meta"><div class="num">10:00</div><div class="lbl">Time Limit</div></div>
+        <div class="asm-meta"><div class="num">6</div><div class="lbl">Topics</div></div>
+      </div>
+      <button class="asm-btn" onclick="startAssessment()">Begin Assessment</button>
+      <div class="asm-best" id="bestPreview" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- QUESTION SCREEN -->
+    <div class="asm-card" id="screenQuiz" style="display:none;">
+      <div class="asm-topbar">
+        <div class="asm-progress-label" id="progressLabel">Question 1 of 20</div>
+        <div class="asm-timer" id="timerDisplay">10:00</div>
+      </div>
+      <div class="asm-progress-track"><div class="asm-progress-fill" id="progressFill"></div></div>
+
+      <div class="asm-topic-tag" id="topicTag">TOPIC</div>
+      <div class="asm-question" id="questionText">Question text</div>
+      <div class="asm-options" id="optionsWrap"></div>
+
+      <div class="asm-feedback" id="feedbackBox">
+        <strong id="feedbackTitle"></strong>
+        <span id="feedbackText"></span>
+      </div>
+
+      <div class="asm-actions">
+        <button class="asm-btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+      </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div class="asm-card" id="screenResults" style="display:none;">
+      <div class="asm-result-score">
+        <div class="big" id="scoreBig">0/20</div>
+        <div class="pct" id="scorePct">0%</div>
+        <div id="newBestBadge"></div>
+      </div>
+      <div class="asm-breakdown" id="breakdownWrap"></div>
+      <div class="asm-best" id="bestFinal"></div>
+      <div class="asm-result-actions">
+        <button class="asm-btn" onclick="startAssessment()">Retake Assessment</button>
+        <button class="asm-btn ghost" onclick="location.href='index.html'">Back to Hub</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; Interactive Assessment
+</footer>
+
+<script>
+const QUESTIONS = [
+  { topic:'dec12', label:'1:2 Decoder', q:'In a 1:2 decoder, how many output lines are active (HIGH) at any one time?', opts:['0','Exactly 1','2','Depends on Enable only'], correct:1, explain:'A decoder always activates exactly one output line — the one whose index matches the binary input code.' },
+  { topic:'dec12', label:'1:2 Decoder', q:'For a 1:2 decoder, if input A = 1, which output goes HIGH?', opts:['D0','D1','Both D0 and D1','Neither'], correct:1, explain:'D1 = A, so when A = 1, output D1 is HIGH and D0 (= A′) is LOW.' },
+  { topic:'dec12', label:'1:2 Decoder', q:'What is the Boolean expression for output D0 in a 1:2 decoder?', opts:['A', "A'", 'A + 1', 'A · A'], correct:1, explain:"D0 is HIGH only when A = 0, so D0 = A' (NOT A)." },
+
+  { topic:'dec24', label:'2:4 Decoder', q:'A 2:4 decoder has how many input and output lines?', opts:['4 inputs, 2 outputs','2 inputs, 4 outputs','2 inputs, 2 outputs','3 inputs, 4 outputs'], correct:1, explain:'A 2:4 decoder takes a 2-bit binary code (A1 A0) and drives one of 4 output lines (D0–D3).' },
+  { topic:'dec24', label:'2:4 Decoder', q:'If A1 A0 = 10 and Enable = 1 on a 2:4 decoder, which output activates?', opts:['D0','D1','D2','D3'], correct:2, explain:'A1A0 = 10 is binary for 2, so output D2 = E·A1·A0′ goes HIGH.' },
+  { topic:'dec24', label:'2:4 Decoder', q:'What happens to all outputs of a 2:4 decoder when Enable = 0?', opts:['All outputs go HIGH','Outputs stay at their last value','All outputs stay LOW regardless of A1 A0','Only D0 goes HIGH'], correct:2, explain:'Enable acts as a master gate — when E = 0, every AND gate output is forced LOW no matter what A1 A0 is.' },
+
+  { topic:'dec38', label:'3:8 Decoder', q:'A 3:8 decoder can uniquely activate how many distinct output lines?', opts:['3','6','8','16'], correct:2, explain:'3 address bits give 2³ = 8 possible codes, so there are 8 output lines (D0–D7).' },
+  { topic:'dec38', label:'3:8 Decoder', q:'For inputs A2 A1 A0 = 101 on a 3:8 decoder, which output is activated?', opts:['D3','D5','D6','D7'], correct:1, explain:'101 in binary equals 5, so output D5 = A2·A1′·A0 goes HIGH.' },
+  { topic:'dec38', label:'3:8 Decoder', q:'Which minterm expression correctly represents output D6 of a 3:8 decoder?', opts:["A2·A1·A0", "A2·A1·A0'", "A2'·A1·A0'", "A2·A1'·A0'"], correct:1, explain:"6 = 110 in binary, so D6 = A2·A1·A0' (A2 HIGH, A1 HIGH, A0 LOW)." },
+
+  { topic:'enc21', label:'2:1 Encoder', q:'A basic 2:1 encoder converts how many input lines into how many output bit(s)?', opts:['1 input → 2 outputs','2 inputs → 1 output','2 inputs → 2 outputs','4 inputs → 1 output'], correct:1, explain:'An encoder compresses 2ⁿ inputs into n bits — here 2 inputs (Y0, Y1) compress into 1 output bit (A).' },
+  { topic:'enc21', label:'2:1 Encoder', q:'In a basic 2:1 encoder, the single output A is equal to:', opts:['Y0', 'Y1', "Y0'", 'Y0 · Y1'], correct:1, explain:'Since only one input is valid at a time, output A simply follows Y1: A = Y1 (A = 1 when Y1 is the active line).' },
+  { topic:'enc21', label:'2:1 Encoder', q:'What is a key limitation of a basic (non-priority) encoder?', opts:['It needs a clock signal','Output is undefined/ambiguous if more than one input is active at once','It can only have 2 inputs','It cannot be built from logic gates'], correct:1, explain:'Basic encoders assume only one input is HIGH at a time — if two or more go HIGH together, the output code becomes ambiguous. Priority encoders exist to fix this.' },
+
+  { topic:'enc42', label:'4:2 Encoder', q:'In a 4:2 priority encoder, which input line is given the highest priority?', opts:['Y0','Y1','Y2','Y3'], correct:3, explain:'By convention, the highest-indexed input line, Y3, is treated as the highest priority in a standard priority encoder.' },
+  { topic:'enc42', label:'4:2 Encoder', q:'If Y3 = 1 and Y1 = 1 simultaneously on a 4:2 priority encoder, what does A1 A0 output?', opts:['00','01','10','11'], correct:3, explain:'Y3 has the highest priority, so it "wins" over Y1. Y3 active gives A1 A0 = 11.' },
+  { topic:'enc42', label:'4:2 Encoder', q:'What does the Valid (V) output indicate on a priority encoder?', opts:['That the clock is running','That at least one input is active, making the output code meaningful','That an error occurred','That all inputs are LOW'], correct:1, explain:'V = 1 tells downstream circuitry the output code is valid because at least one input line is currently active.' },
+
+  { topic:'enc83', label:'8:3 Encoder', q:'An 8:3 priority encoder compresses how many input lines into how many output bits?', opts:['3 inputs → 8 outputs','8 inputs → 3 outputs','8 inputs → 8 outputs','4 inputs → 3 outputs'], correct:1, explain:'8 = 2³, so 8 input lines (Y0–Y7) compress into a 3-bit binary output (A2 A1 A0).' },
+  { topic:'enc83', label:'8:3 Encoder', q:'If Y6 is the highest-priority active input on an 8:3 encoder, what is A2 A1 A0?', opts:['101','110','011','111'], correct:1, explain:'6 in binary is 110, so the encoded output is A2 A1 A0 = 110.' },
+  { topic:'enc83', label:'8:3 Encoder', q:'In a plain 8:3 encoder, the expression A0 = Y1+Y3+Y5+Y7 sums which inputs?', opts:['All even-indexed inputs','All inputs greater than 4','All odd-indexed inputs (those with LSB = 1)','Only the highest priority input'], correct:2, explain:'A0 is the least significant output bit, so it goes HIGH for any input whose index is odd — i.e. its binary form ends in 1.' },
+
+  { topic:'general', label:'General', q:'Which statement correctly distinguishes an encoder from a decoder?', opts:['Encoders expand n lines to 2ⁿ; decoders compress 2ⁿ lines to n', 'Encoders compress 2ⁿ lines to n; decoders expand n lines to 2ⁿ', 'Both perform the exact same function', 'Decoders require a clock, encoders do not'], correct:1, explain:'Encoders go many→few (compress), decoders go few→many (expand) — they are functional opposites of each other.' },
+  { topic:'general', label:'General', q:'Priority encoders are commonly used in real digital systems for:', opts:['Storing data long-term', 'Resolving which of several simultaneous interrupt/service requests gets handled first', 'Amplifying analog signals', 'Generating clock pulses'], correct:1, explain:'CPU interrupt controllers are a classic real-world use of priority encoders — when multiple devices request attention at once, the encoder picks the highest-priority request.' },
+];
+
+const TOTAL_TIME = 600; // 10 minutes in seconds
+const TOPIC_ORDER = [
+  {key:'dec12', label:'1:2 Decoder'},
+  {key:'dec24', label:'2:4 Decoder'},
+  {key:'dec38', label:'3:8 Decoder'},
+  {key:'enc21', label:'2:1 Encoder'},
+  {key:'enc42', label:'4:2 Encoder'},
+  {key:'enc83', label:'8:3 Encoder'},
+  {key:'general', label:'General Concepts'},
+];
+const BEST_KEY = 'ecd_assessment_best_v1';
+
+let order = [];
+let current = 0;
+let answers = [];
+let timeLeft = TOTAL_TIME;
+let timerHandle = null;
+let locked = false;
+
+function shuffledIndices(n){
+  const arr = Array.from({length:n}, (_,i)=>i);
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function fmtTime(s){
+  const m = Math.floor(s/60).toString().padStart(2,'0');
+  const sec = (s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function showBestPreview(){
+  const best = localStorage.getItem(BEST_KEY);
+  document.getElementById('bestPreview').textContent = best
+    ? `Your personal best on this device: ${best}/${QUESTIONS.length}`
+    : 'No attempts recorded yet on this device.';
+}
+showBestPreview();
+
+function startAssessment(){
+  order = shuffledIndices(QUESTIONS.length);
+  current = 0;
+  answers = new Array(QUESTIONS.length).fill(null); // null = unanswered
+  timeLeft = TOTAL_TIME;
+  document.getElementById('screenStart').style.display = 'none';
+  document.getElementById('screenResults').style.display = 'none';
+  document.getElementById('screenQuiz').style.display = 'block';
+  clearInterval(timerHandle);
+  timerHandle = setInterval(tick, 1000);
+  updateTimerDisplay();
+  renderQuestion();
+}
+
+function tick(){
+  timeLeft--;
+  updateTimerDisplay();
+  if(timeLeft <= 0){
+    clearInterval(timerHandle);
+    finishAssessment();
+  }
+}
+
+function updateTimerDisplay(){
+  const el = document.getElementById('timerDisplay');
+  el.textContent = fmtTime(Math.max(timeLeft,0));
+  el.classList.toggle('low', timeLeft <= 60);
+}
+
+function renderQuestion(){
+  locked = false;
+  const qi = order[current];
+  const item = QUESTIONS[qi];
+  document.getElementById('progressLabel').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
+  document.getElementById('progressFill').style.width = `${(current/QUESTIONS.length)*100}%`;
+  document.getElementById('topicTag').textContent = item.label;
+  document.getElementById('questionText').textContent = item.q;
+
+  const wrap = document.getElementById('optionsWrap');
+  wrap.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  item.opts.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'asm-option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    wrap.appendChild(btn);
+  });
+
+  document.getElementById('feedbackBox').className = 'asm-feedback';
+  document.getElementById('nextBtn').disabled = true;
+  document.getElementById('nextBtn').textContent = (current === QUESTIONS.length-1) ? 'Finish Assessment' : 'Next Question';
+}
+
+function selectAnswer(i){
+  if(locked) return;
+  locked = true;
+  const qi = order[current];
+  const item = QUESTIONS[qi];
+  answers[qi] = i;
+
+  const opts = document.querySelectorAll('.asm-option');
+  opts.forEach((el,idx)=>{
+    el.classList.add('locked');
+    if(idx === item.correct) el.classList.add('correct');
+    else if(idx === i) el.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedbackBox');
+  const isRight = i === item.correct;
+  fb.className = 'asm-feedback show ' + (isRight ? 'right' : 'wrong');
+  document.getElementById('feedbackTitle').textContent = isRight ? 'Correct' : 'Not quite';
+  document.getElementById('feedbackText').textContent = item.explain;
+
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function nextQuestion(){
+  if(current === QUESTIONS.length-1){
+    clearInterval(timerHandle);
+    finishAssessment();
+    return;
+  }
+  current++;
+  renderQuestion();
+}
+
+function finishAssessment(){
+  document.getElementById('screenQuiz').style.display = 'none';
+  document.getElementById('screenResults').style.display = 'block';
+
+  let score = 0;
+  const topicStats = {};
+  TOPIC_ORDER.forEach(t => topicStats[t.key] = {correct:0,total:0});
+
+  QUESTIONS.forEach((item,i)=>{
+    topicStats[item.topic].total++;
+    if(answers[i] === item.correct){
+      score++;
+      topicStats[item.topic].correct++;
+    }
+  });
+
+  const pct = Math.round((score/QUESTIONS.length)*100);
+  document.getElementById('scoreBig').textContent = `${score}/${QUESTIONS.length}`;
+  document.getElementById('scorePct').textContent = `${pct}% correct`;
+
+  const breakdown = document.getElementById('breakdownWrap');
+  breakdown.innerHTML = '<div class="asm-topic-row" style="margin-bottom:18px;"><strong style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;">Topic breakdown</strong></div>';
+  TOPIC_ORDER.forEach(t=>{
+    const s = topicStats[t.key];
+    if(s.total === 0) return;
+    const rowPct = Math.round((s.correct/s.total)*100);
+    const row = document.createElement('div');
+    row.className = 'asm-topic-row';
+    row.innerHTML = `
+      <div class="row-top"><span>${t.label}</span><span>${s.correct}/${s.total}</span></div>
+      <div class="asm-bar-track"><div class="asm-bar-fill" style="width:${rowPct}%;"></div></div>
+    `;
+    breakdown.appendChild(row);
+  });
+
+  const prevBest = parseInt(localStorage.getItem(BEST_KEY) || '0', 10);
+  const badge = document.getElementById('newBestBadge');
+  if(score > prevBest){
+    localStorage.setItem(BEST_KEY, String(score));
+    badge.innerHTML = '<div class="asm-badge">New personal best!</div>';
+  } else {
+    badge.innerHTML = '';
+  }
+  const best = Math.max(score, prevBest);
+  document.getElementById('bestFinal').innerHTML = `Personal best on this device: <strong>${best}/${QUESTIONS.length}</strong>`;
+}
+</script>
+</body>
+</html>

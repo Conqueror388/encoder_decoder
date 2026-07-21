@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8:3 Encoder Lab — Quantum Void Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
+  <h1>8:3 PRIORITY <span>ENCODER</span></h1>
+  <p class="sub">Eight input lines compress into a 3-bit binary code. Multiple inputs can be active at once — the highest-indexed line always wins, exactly like a real interrupt controller (e.g. the 74148 IC).</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
+  <button onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
+  <button class="active" onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
+  <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+
+  <span class="eyebrow-num">Encoder Lab 03</span>
+  <h2 class="section-title">8:3 Encoder Simulator</h2>
+  <p class="lead">Toggle any combination of Y0–Y7. Only the highest-priority active line (closest to Y7) determines the encoded output — watch the "P" indicator show which line actually wins.</p>
+
+  <div class="grid-2">
+    <!-- Simulator Panel -->
+    <div class="panel">
+      <h4>Interactive Simulator (Priority Input)</h4>
+      <p class="mono" style="font-size: 12px; margin-top: 0; color: var(--text-dim);">Toggle any lines — Y7 is highest priority:</p>
+      <div class="led-row" id="enc83-inputs"></div>
+      <div class="led-row">
+        <div class="led-btn" disabled><span id="led-enc83-a2" class="bulb"></span><span>A2</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-a1" class="bulb"></span><span>A1</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-a0" class="bulb"></span><span>A0</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-v" class="bulb amber"></span><span>Valid (V)</span></div>
+      </div>
+      <div class="output-readout">
+        <span>Encoded State</span>
+        <span id="readout-enc83" class="val">A2 A1 A0 = X X X | V = 0</span>
+      </div>
+    </div>
+
+    <!-- Block Diagram -->
+    <div class="panel">
+      <h4>Pinout &amp; Block Diagram</h4>
+      <svg class="diagram" viewBox="0 0 260 300">
+        <rect x="70" y="10" width="120" height="280" rx="10" class="gate-body" />
+        <text x="130" y="154" class="gate-label" text-anchor="middle" font-weight="bold" fill="var(--copper)">8:3 ENC</text>
+        <g id="bd-enc83-inputs"></g>
+        <path id="bd-enc83-w-a2" d="M 190 100 H 230" class="wire" /><text x="235" y="104" class="gate-label">A2</text>
+        <path id="bd-enc83-w-a1" d="M 190 150 H 230" class="wire" /><text x="235" y="154" class="gate-label">A1</text>
+        <path id="bd-enc83-w-a0" d="M 190 200 H 230" class="wire" /><text x="235" y="204" class="gate-label">A0</text>
+        <path id="bd-enc83-w-v" d="M 190 250 H 230" class="wire" /><text x="235" y="254" class="gate-label">V</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Truth Table -->
+    <div class="panel">
+      <h4>Truth Table &amp; Equations</h4>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Y7</th><th>Y6</th><th>Y5</th><th>Y4</th><th>Y3</th><th>Y2</th><th>Y1</th><th>Y0</th><th>A2</th><th>A1</th><th>A0</th><th>V</th></tr></thead>
+          <tbody id="table-enc83">
+            <tr data-row="none"><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr data-row="0"><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr data-row="1"><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>X</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr data-row="2"><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>X</td><td>X</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr data-row="3"><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>X</td><td>X</td><td>X</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr data-row="4"><td>0</td><td>0</td><td>0</td><td>1</td><td>X</td><td>X</td><td>X</td><td>X</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr data-row="5"><td>0</td><td>0</td><td>1</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr data-row="6"><td>0</td><td>1</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr data-row="7"><td>1</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="logic-expressions">
+        <h5>Logical Expressions (priority-reduced)</h5>
+        <div class="expr-item">A2 = Y7 + Y6 + Y5 + Y4</div>
+        <div class="expr-item">A1 = Y7 + Y6 + <span class="overline">Y5</span>&middot;<span class="overline">Y4</span>&middot;(Y3 + Y2)</div>
+        <div class="expr-item">A0 = Y7 + <span class="overline">Y6</span>&middot;Y5 + <span class="overline">Y6</span>&middot;<span class="overline">Y5</span>&middot;<span class="overline">Y4</span>&middot;Y3 + <span class="overline">Y6</span>&middot;<span class="overline">Y5</span>&middot;<span class="overline">Y4</span>&middot;<span class="overline">Y3</span>&middot;<span class="overline">Y2</span>&middot;Y1</div>
+        <div class="expr-item">V = Y7+Y6+Y5+Y4+Y3+Y2+Y1+Y0</div>
+      </div>
+    </div>
+
+    <!-- Logic Diagram -->
+    <div class="panel">
+      <h4>Interactive Logic Schematic</h4>
+      <svg class="diagram" id="diag-enc83" viewBox="0 0 820 300"></svg>
+    </div>
+  </div>
+
+  <div class="note"><strong>Why the expressions look complicated:</strong> unlike a plain encoder, a priority encoder must guarantee only the highest active line counts — each term for A1 and A0 includes NOT-conditions on every higher-priority line, which is exactly what the "P" priority-winner indicator in the diagram is doing for you visually.</div>
+
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; 8:3 Priority Encoder
+</footer>
+
+<script>
+const stateEnc83 = new Array(8).fill(0); // index = Yj
+
+(function initEnc83(){
+  const inputWrap = document.getElementById('enc83-inputs');
+  for(let j=7;j>=0;j--){
+    const btn = document.createElement('button');
+    btn.className = 'led-btn';
+    btn.id = `sw-enc83-y${j}`;
+    btn.innerHTML = `<span class="bulb"></span><span>Y${j}</span>`;
+    btn.onclick = () => { stateEnc83[j] = stateEnc83[j] ? 0 : 1; renderEnc83(); };
+    inputWrap.appendChild(btn);
+  }
+  const bdWrap = document.getElementById('bd-enc83-inputs');
+  let html = '';
+  for(let j=7;j>=0;j--){
+    const y = 25 + (7-j)*33;
+    html += `<path id="bd-enc83-w-y${j}" d="M 20 ${y} H 70" class="wire" /><text x="8" y="${y+4}" class="gate-label" style="font-size:9px;">Y${j}</text>`;
+  }
+  bdWrap.innerHTML = html;
+})();
+
+function orPath(x, minY, maxY){
+  const w = 55;
+  const mid = (minY+maxY)/2;
+  return `M${x},${minY} Q${x+w*0.3},${mid} ${x},${maxY} Q${x+w*0.65},${maxY} ${x+w},${mid} Q${x+w*0.65},${minY} ${x},${minY} Z`;
+}
+
+function renderEnc83(){
+  let winner = -1;
+  for(let j=7;j>=0;j--){ if(stateEnc83[j]===1){ winner=j; break; } }
+  const a2 = [4,5,6,7].includes(winner) ? 1 : 0;
+  const a1 = [2,3,6,7].includes(winner) ? 1 : 0;
+  const a0 = [1,3,5,7].includes(winner) ? 1 : 0;
+  const v = winner !== -1 ? 1 : 0;
+
+  for(let j=7;j>=0;j--){
+    document.getElementById(`sw-enc83-y${j}`).classList.toggle('on', stateEnc83[j]===1);
+    document.getElementById(`bd-enc83-w-y${j}`).classList.toggle('hot', stateEnc83[j]===1);
+  }
+  document.getElementById('led-enc83-a2').parentElement.classList.toggle('on', v===1 && a2===1);
+  document.getElementById('led-enc83-a1').parentElement.classList.toggle('on', v===1 && a1===1);
+  document.getElementById('led-enc83-a0').parentElement.classList.toggle('on', v===1 && a0===1);
+  document.getElementById('led-enc83-v').parentElement.classList.toggle('on', v===1);
+  document.getElementById('readout-enc83').textContent = v
+    ? `A2 A1 A0 = ${a2} ${a1} ${a0} | V = 1 (winner: Y${winner})`
+    : 'A2 A1 A0 = X X X | V = 0';
+
+  document.getElementById('bd-enc83-w-a2').classList.toggle('hot', v===1 && a2===1);
+  document.getElementById('bd-enc83-w-a1').classList.toggle('hot', v===1 && a1===1);
+  document.getElementById('bd-enc83-w-a0').classList.toggle('hot', v===1 && a0===1);
+  document.getElementById('bd-enc83-w-v').classList.toggle('hot', v===1);
+
+  const rowKey = winner === -1 ? 'none' : String(winner);
+  document.querySelectorAll('#table-enc83 tr').forEach(tr=>{
+    tr.classList.toggle('active-row', tr.dataset.row === rowKey);
+  });
+
+  // ---- Logic diagram ----
+  const groups = { A2:[4,5,6,7], A1:[2,3,6,7], A0:[1,3,5,7], V:[0,1,2,3,4,5,6,7] };
+  const gateX  = { A2:300, A1:430, A0:560, V:690 };
+  const outVal = { A2:a2, A1:a1, A0:a0, V:v };
+  const rowY = {};
+  for(let j=7;j>=0;j--){ rowY[j] = 12 + (7-j)*34 + 15; }
+
+  let svg = '';
+  for(let j=7;j>=0;j--){
+    const on = stateEnc83[j]===1;
+    const isWinner = winner===j;
+    const y = rowY[j];
+    svg += `<path d="M40,${y} H120" class="wire ${on?'hot':''}"/>`;
+    svg += `<text x="6" y="${y+4}" class="gate-label" style="font-size:10px;">Y${j}</text>`;
+    svg += `<circle cx="130" cy="${y}" r="5" fill="${isWinner?'var(--led-on)':'var(--led-off)'}" stroke="#05080c" stroke-width="1.2"/>`;
+    svg += `<text x="141" y="${y+3}" class="gate-label" style="font-size:8px;" fill="${isWinner?'var(--trace)':'var(--text-dim)'}">P${j}</text>`;
+    svg += `<path d="M136,${y} H160" class="wire ${on?'hot':''}"/>`;
+    Object.keys(groups).forEach(g=>{
+      if(groups[g].includes(j)){
+        svg += `<path d="M160,${y} H${gateX[g]}" class="wire ${isWinner?'hot':''}"/>`;
+      }
+    });
+  }
+  Object.keys(groups).forEach(g=>{
+    const ys = groups[g].map(j=>rowY[j]);
+    const minY = Math.min(...ys)-16, maxY = Math.max(...ys)+16;
+    const mid = (minY+maxY)/2;
+    const x = gateX[g];
+    svg += `<path d="${orPath(x,minY,maxY)}" class="gate-body ${outVal[g]?'hot':''}"/>`;
+    svg += `<path d="M${x+55},${mid} H${x+90}" class="wire ${outVal[g]?'hot':''}"/>`;
+    svg += `<circle cx="${x+103}" cy="${mid}" r="7" fill="${outVal[g]?'var(--led-on)':'var(--led-off)'}" stroke="#05080c" stroke-width="1.5"/>`;
+    svg += `<text x="${x+116}" y="${mid+4}" class="gate-label" style="font-size:10px;">${g}</text>`;
+  });
+  document.getElementById('diag-enc83').innerHTML = svg;
+}
+
+window.addEventListener('load', renderEnc83);
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1:2 Decoder Lab — Quantum Void Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
+  <h1>1:2 <span>DECODER</span></h1>
+  <p class="sub">The simplest decoder: one input line and one enable line select between two output lines. Every larger decoder (2:4, 3:8...) is built from this same idea, repeated.</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button class="active" onclick="location.href='decoder_1_2.html'">1:2 Decoder</button>
+  <button onclick="location.href='decoder_2_4.html'">2:4 Decoder</button>
+  <button onclick="location.href='decoder_3_8.html'">3:8 Decoder</button>
+  <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+
+  <span class="eyebrow-num">Decoder Lab 01</span>
+  <h2 class="section-title">1:2 Decoder Simulator</h2>
+  <p class="lead">Flip the A switch to pick an output line, and Enable to activate the circuit. With Enable off, both outputs stay LOW no matter what A is.</p>
+
+  <div class="grid-2">
+    <!-- Simulator Panel -->
+    <div class="panel">
+      <h4>Interactive Simulator</h4>
+      <div class="led-row" style="margin-bottom:20px;">
+        <div class="toggle">
+          <div class="switch" id="sw-dec12-a" onclick="toggleDec12('a')"></div>
+          <span>A</span>
+        </div>
+        <div class="toggle">
+          <div class="switch on" id="sw-dec12-e" onclick="toggleDec12('e')"></div>
+          <span>Enable (E)</span>
+        </div>
+      </div>
+      <div class="led-row">
+        <div class="led-btn" disabled>
+          <span id="led-dec12-d0" class="bulb"></span>
+          <span>Output D₀</span>
+        </div>
+        <div class="led-btn" disabled>
+          <span id="led-dec12-d1" class="bulb"></span>
+          <span>Output D₁</span>
+        </div>
+      </div>
+      <div class="output-readout">
+        <span>Decoded State</span>
+        <span id="readout-dec12" class="val">D₀ D₁ = 0 0</span>
+      </div>
+    </div>
+
+    <!-- Block Diagram -->
+    <div class="panel">
+      <h4>Pinout &amp; Block Diagram</h4>
+      <svg class="diagram" viewBox="0 0 240 160">
+        <rect x="60" y="30" width="120" height="100" rx="10" class="gate-body" />
+        <text x="120" y="84" class="gate-label" text-anchor="middle" font-weight="bold" fill="var(--copper)">1:2 DEC</text>
+        <path id="bd-dec12-w-a" d="M 20 55 H 60" class="wire" />
+        <text x="15" y="59" class="gate-label" style="font-size:10px;">A</text>
+        <path id="bd-dec12-w-e" d="M 20 105 H 60" class="wire" />
+        <text x="10" y="109" class="gate-label" style="font-size:10px;">E</text>
+        <path id="bd-dec12-w-d0" d="M 180 55 H 220" class="wire" />
+        <text x="225" y="59" class="gate-label">D₀</text>
+        <path id="bd-dec12-w-d1" d="M 180 105 H 220" class="wire" />
+        <text x="225" y="109" class="gate-label">D₁</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Truth Table -->
+    <div class="panel">
+      <h4>Truth Table &amp; Equations</h4>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>E</th><th>A</th><th>D₀</th><th>D₁</th></tr></thead>
+          <tbody id="table-dec12">
+            <tr data-row="dis"><td>0</td><td>X</td><td>0</td><td>0</td></tr>
+            <tr data-row="0"><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+            <tr data-row="1"><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="logic-expressions">
+        <h5>Logical Expressions</h5>
+        <div class="expr-item">D₀ = E &middot; <span class="overline">A</span></div>
+        <div class="expr-item">D₁ = E &middot; A</div>
+      </div>
+    </div>
+
+    <!-- Logic Diagram -->
+    <div class="panel">
+      <h4>Interactive Logic Schematic</h4>
+      <svg class="diagram" viewBox="0 0 480 200">
+        <text x="15" y="35" class="gate-label">A</text>
+        <text x="15" y="165" class="gate-label">E</text>
+
+        <path id="diag-dec12-w-a" d="M 40 30 H 320" class="wire" />
+        <path id="diag-dec12-w-e" d="M 40 160 H 100" class="wire" />
+
+        <!-- NOT gate on A -->
+        <path id="diag-dec12-w-a-not-in" d="M 40 30 V 70 H 120" class="wire" />
+        <path id="diag-dec12-gate-not" d="M 120 55 L 140 70 L 120 85 Z" class="gate-body" />
+        <circle id="diag-dec12-dot-not" cx="144" cy="70" r="3" class="gate-body" />
+        <path id="diag-dec12-w-a-not-out" d="M 148 70 H 200" class="wire" />
+
+        <!-- E fan to both AND gates -->
+        <path id="diag-dec12-w-e-up" d="M 100 160 V 90 H 200" class="wire" />
+        <path id="diag-dec12-w-e-down" d="M 100 160 H 200" class="wire" />
+
+        <!-- AND gate D0 = E . A' -->
+        <path id="diag-dec12-gate-and0" d="M 200 60 H 215 A 12 12 0 0 1 215 84 H 200 Z" class="gate-body" />
+        <path id="diag-dec12-w-and0-out" d="M 227 72 H 400" class="wire" />
+        <circle id="diag-dec12-led-d0" cx="415" cy="72" r="7" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="430" y="76" class="gate-label">D₀</text>
+
+        <!-- AND gate D1 = E . A -->
+        <path id="diag-dec12-w-a-in2" d="M 320 30 V 148 H 340" class="wire" />
+        <path id="diag-dec12-w-e-in2" d="M 100 160 H 340" class="wire" />
+        <path id="diag-dec12-gate-and1" d="M 340 136 H 355 A 12 12 0 0 1 355 160 H 340 Z" class="gate-body" />
+        <path id="diag-dec12-w-and1-out" d="M 367 148 H 400" class="wire" />
+        <circle id="diag-dec12-led-d1" cx="415" cy="148" r="7" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="430" y="152" class="gate-label">D₁</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="note"><strong>Building block:</strong> notice D₁ is just A gated by E, and D₀ is A′ gated by E. A 2:4 decoder is built by combining two of these ideas — one bit selects between an upper/lower pair, the other bit selects within that pair.</div>
+
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; 1:2 Decoder
+</footer>
+
+<script>
+const stateDec12 = { a: 0, e: 1 };
+
+function toggleDec12(pin){
+  stateDec12[pin] = stateDec12[pin] ? 0 : 1;
+  document.getElementById(`sw-dec12-${pin}`).classList.toggle('on', stateDec12[pin] === 1);
+  renderDec12();
+}
+
+function renderDec12(){
+  const { a, e } = stateDec12;
+  const d0 = e && !a ? 1 : 0;
+  const d1 = e && a ? 1 : 0;
+  const activeRow = !e ? 'dis' : String(a);
+
+  document.getElementById('led-dec12-d0').parentElement.classList.toggle('on', d0 === 1);
+  document.getElementById('led-dec12-d1').parentElement.classList.toggle('on', d1 === 1);
+  document.getElementById('readout-dec12').textContent = `D₀ D₁ = ${d0} ${d1}`;
+
+  document.querySelectorAll('#table-dec12 tr').forEach(tr => {
+    tr.classList.toggle('active-row', tr.dataset.row === activeRow);
+  });
+
+  // Block diagram
+  document.getElementById('bd-dec12-w-a').classList.toggle('hot', a === 1);
+  document.getElementById('bd-dec12-w-e').classList.toggle('hot', e === 1);
+  document.getElementById('bd-dec12-w-d0').classList.toggle('hot', d0 === 1);
+  document.getElementById('bd-dec12-w-d1').classList.toggle('hot', d1 === 1);
+
+  // Logic diagram
+  document.getElementById('diag-dec12-w-a').classList.toggle('hot', a === 1);
+  document.getElementById('diag-dec12-w-e').classList.toggle('hot', e === 1);
+  document.getElementById('diag-dec12-w-a-not-in').classList.toggle('hot', a === 1);
+  const notOut = a === 0 ? 1 : 0;
+  document.getElementById('diag-dec12-gate-not').classList.toggle('hot', notOut === 1);
+  document.getElementById('diag-dec12-dot-not').classList.toggle('hot', notOut === 1);
+  document.getElementById('diag-dec12-w-a-not-out').classList.toggle('hot', notOut === 1);
+  document.getElementById('diag-dec12-w-e-up').classList.toggle('hot', e === 1);
+  document.getElementById('diag-dec12-w-e-down').classList.toggle('hot', e === 1);
+  document.getElementById('diag-dec12-gate-and0').classList.toggle('hot', d0 === 1);
+  document.getElementById('diag-dec12-w-and0-out').classList.toggle('hot', d0 === 1);
+  document.getElementById('diag-dec12-led-d0').setAttribute('fill', d0 ? 'var(--led-on)' : 'var(--led-off)');
+
+  document.getElementById('diag-dec12-w-a-in2').classList.toggle('hot', a === 1);
+  document.getElementById('diag-dec12-w-e-in2').classList.toggle('hot', e === 1);
+  document.getElementById('diag-dec12-gate-and1').classList.toggle('hot', d1 === 1);
+  document.getElementById('diag-dec12-w-and1-out').classList.toggle('hot', d1 === 1);
+  document.getElementById('diag-dec12-led-d1').setAttribute('fill', d1 ? 'var(--led-on)' : 'var(--led-off)');
+}
+
+window.addEventListener('load', renderDec12);
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2:1 Encoder Lab — Quantum Void Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lab_style.css">
+</head>
+<body>
+<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
+  <h1>2:1 <span>ENCODER</span></h1>
+  <p class="sub">The simplest encoder: two input lines compress into a single output bit. It also shows, most clearly, why plain encoders break when more than one input is active at once.</p>
+</header>
+
+<nav class="tabs">
+  <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
+  <button class="active" onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
+  <button onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
+  <button onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
+  <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+</nav>
+
+<main>
+
+  <span class="eyebrow-num">Encoder Lab 01</span>
+  <h2 class="section-title">2:1 Encoder Simulator</h2>
+  <p class="lead">Toggle Y1 and Y0 independently. Output A always mirrors Y1. Valid (V) tells you whether the current input combination is meaningful — try setting both to 1 to see the ambiguity a plain encoder cannot resolve.</p>
+
+  <div class="grid-2">
+    <!-- Simulator Panel -->
+    <div class="panel">
+      <h4>Interactive Simulator</h4>
+      <div class="led-row" style="margin-bottom:20px;">
+        <div class="toggle"><div class="switch" id="sw-enc21-y0" onclick="toggleEnc21('y0')"></div><span>Y0</span></div>
+        <div class="toggle"><div class="switch" id="sw-enc21-y1" onclick="toggleEnc21('y1')"></div><span>Y1</span></div>
+      </div>
+      <div class="led-row">
+        <div class="led-btn" disabled><span id="led-enc21-a" class="bulb"></span><span>Output A</span></div>
+        <div class="led-btn" disabled><span id="led-enc21-v" class="bulb amber"></span><span>Valid (V)</span></div>
+      </div>
+      <div class="output-readout">
+        <span>Encoded State</span>
+        <span id="readout-enc21" class="val">A = 0 | V = 0</span>
+      </div>
+    </div>
+
+    <!-- Block Diagram -->
+    <div class="panel">
+      <h4>Pinout &amp; Block Diagram</h4>
+      <svg class="diagram" viewBox="0 0 240 160">
+        <rect x="60" y="30" width="120" height="100" rx="10" class="gate-body" />
+        <text x="120" y="84" class="gate-label" text-anchor="middle" font-weight="bold" fill="var(--copper)">2:1 ENC</text>
+        <path id="bd-enc21-w-y0" d="M 20 55 H 60" class="wire" /><text x="15" y="59" class="gate-label" style="font-size:10px;">Y0</text>
+        <path id="bd-enc21-w-y1" d="M 20 105 H 60" class="wire" /><text x="15" y="109" class="gate-label" style="font-size:10px;">Y1</text>
+        <path id="bd-enc21-w-a" d="M 180 55 H 220" class="wire" /><text x="225" y="59" class="gate-label">A</text>
+        <path id="bd-enc21-w-v" d="M 180 105 H 220" class="wire" /><text x="225" y="109" class="gate-label">V</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Truth Table -->
+    <div class="panel">
+      <h4>Truth Table &amp; Equations</h4>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Y1</th><th>Y0</th><th>A</th><th>V</th></tr></thead>
+          <tbody id="table-enc21">
+            <tr data-row="0"><td>0</td><td>0</td><td>X</td><td>0</td></tr>
+            <tr data-row="1"><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr data-row="2"><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+            <tr data-row="3"><td>1</td><td>1</td><td>1*</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mono" style="font-size:11.5px; color:var(--text-dim); margin-top:8px;">* Y1=Y0=1 is an invalid input for a plain encoder — the code is ambiguous. This is exactly the problem priority encoders solve.</p>
+      <div class="logic-expressions">
+        <h5>Logical Expressions</h5>
+        <div class="expr-item">A = Y1</div>
+        <div class="expr-item">V = Y1 + Y0</div>
+      </div>
+    </div>
+
+    <!-- Logic Diagram -->
+    <div class="panel">
+      <h4>Interactive Logic Schematic</h4>
+      <svg class="diagram" viewBox="0 0 480 200">
+        <text x="15" y="35" class="gate-label">Y1</text>
+        <text x="15" y="165" class="gate-label">Y0</text>
+
+        <path id="diag-enc21-w-y1" d="M 40 30 H 400" class="wire" />
+        <circle id="diag-enc21-led-a" cx="415" cy="30" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="430" y="34" class="gate-label">A</text>
+
+        <path id="diag-enc21-w-y1-or" d="M 40 30 V 60 H 220" class="wire" />
+        <path id="diag-enc21-w-y0-or" d="M 40 160 V 130 H 220" class="wire" />
+        <path id="diag-enc21-gate-or" d="M220,85 q10,20 0,40 q22,0 30,-20 q-8,-20 -30,-20" class="gate-body" />
+        <path id="diag-enc21-w-v-out" d="M 252 105 H 400" class="wire" />
+        <circle id="diag-enc21-led-v" cx="415" cy="105" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="430" y="109" class="gate-label">V</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="note"><strong>Notice:</strong> there's no gate needed for A — it's a direct wire from Y1. Real encoders rarely stay this simple; from 4 inputs upward you need OR gates (and eventually priority logic) to combine multiple lines into each output bit.</div>
+
+</main>
+
+<footer>
+  Digital Electronics Lab Workspace &bull; 2:1 Encoder
+</footer>
+
+<script>
+const stateEnc21 = { y0: 0, y1: 0 };
+
+function toggleEnc21(pin){
+  stateEnc21[pin] = stateEnc21[pin] ? 0 : 1;
+  document.getElementById(`sw-enc21-${pin}`).classList.toggle('on', stateEnc21[pin] === 1);
+  renderEnc21();
+}
+
+function renderEnc21(){
+  const { y0, y1 } = stateEnc21;
+  const a = y1;
+  const v = (y0 || y1) ? 1 : 0;
+  let row = '0';
+  if(y1===1 && y0===1) row = '3';
+  else if(y1===1) row = '2';
+  else if(y0===1) row = '1';
+
+  document.getElementById('led-enc21-a').parentElement.classList.toggle('on', v===1 && a===1);
+  document.getElementById('led-enc21-v').parentElement.classList.toggle('on', v===1);
+  document.getElementById('readout-enc21').textContent = v ? `A = ${a} | V = 1${(y0&&y1)?' (ambiguous input)':''}` : 'A = X | V = 0';
+
+  document.querySelectorAll('#table-enc21 tr').forEach(tr=>{
+    tr.classList.toggle('active-row', tr.dataset.row === row);
+  });
+
+  document.getElementById('bd-enc21-w-y0').classList.toggle('hot', y0===1);
+  document.getElementById('bd-enc21-w-y1').classList.toggle('hot', y1===1);
+  document.getElementById('bd-enc21-w-a').classList.toggle('hot', v===1 && a===1);
+  document.getElementById('bd-enc21-w-v').classList.toggle('hot', v===1);
+
+  document.getElementById('diag-enc21-w-y1').classList.toggle('hot', y1===1);
+  document.getElementById('diag-enc21-led-a').setAttribute('fill', a===1 ? 'var(--led-on)' : 'var(--led-off)');
+
+  document.getElementById('diag-enc21-w-y1-or').classList.toggle('hot', y1===1);
+  document.getElementById('diag-enc21-w-y0-or').classList.toggle('hot', y0===1);
+  document.getElementById('diag-enc21-gate-or').classList.toggle('hot', v===1);
+  document.getElementById('diag-enc21-w-v-out').classList.toggle('hot', v===1);
+  document.getElementById('diag-enc21-led-v').setAttribute('fill', v===1 ? 'var(--led-on-amber)' : 'var(--led-off)');
+}
+
+window.addEventListener('load', renderEnc21);
+</script>
+</body>
+</html>
