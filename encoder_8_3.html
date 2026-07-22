@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -185,7 +185,14 @@ function renderEnc83(){
     svg += `<path d="M136,${y} H160" class="wire ${on?'hot':''}"/>`;
     Object.keys(groups).forEach(g=>{
       if(groups[g].includes(j)){
-        svg += `<path d="M160,${y} H${gateX[g]}" class="wire ${isWinner?'hot':''}"/>`;
+        const members = groups[g];
+        const memberIdx = members.indexOf(j);
+        const memberYs = members.map(m => rowY[m]);
+        const gMinY = Math.min(...memberYs) - 16;
+        const gMaxY = Math.max(...memberYs) + 16;
+        const gRange = gMaxY - gMinY;
+        const gateInY = gMinY + (gRange * (memberIdx + 1)) / (members.length + 1);
+        svg += `<path d="M160,${y} H${gateX[g]-10} V${gateInY} H${gateX[g]}" class="wire ${on?'hot':''}"/>`;
       }
     });
   }
@@ -203,6 +210,24 @@ function renderEnc83(){
 }
 
 window.addEventListener('load', renderEnc83);
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'light' ? '🌙' : '☀';
+  try { localStorage.setItem('ecd_lab_theme', next); } catch(e){}
+}
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('ecd_lab_theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeToggle').textContent = '🌙';
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>

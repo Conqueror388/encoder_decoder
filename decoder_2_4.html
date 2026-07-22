@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -125,6 +125,15 @@
         <path id="diag-dec24-bus-a0p" d="M 235 57 V 195" class="wire" />
         <path id="diag-dec24-bus-e" d="M 260 66 V 305" class="wire" />
 
+        <!-- Junction dots -->
+        <circle cx="100" cy="25" r="2.5" class="conn-dot" />
+        <circle cx="100" cy="175" r="2.5" class="conn-dot" />
+        <circle cx="160" cy="25" r="2.5" class="conn-dot" />
+        <circle cx="185" cy="55" r="2.5" class="conn-dot" />
+        <circle cx="210" cy="175" r="2.5" class="conn-dot" />
+        <circle cx="235" cy="195" r="2.5" class="conn-dot" />
+        <circle cx="260" cy="305" r="2.5" class="conn-dot" />
+
         <!-- Branches into gate D0 (E.A1'.A0') -->
         <path id="diag-dec24-br-d0-a1p" d="M 185 48 H 380" class="wire" />
         <path id="diag-dec24-br-d0-a0p" d="M 235 57 H 380" class="wire" />
@@ -230,6 +239,24 @@ function renderDec24(){
 }
 
 window.addEventListener('load', renderDec24);
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'light' ? '🌙' : '☀';
+  try { localStorage.setItem('ecd_lab_theme', next); } catch(e){}
+}
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('ecd_lab_theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeToggle').textContent = '🌙';
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>

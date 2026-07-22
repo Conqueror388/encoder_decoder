@@ -92,7 +92,7 @@
 </style>
 </head>
 <body>
-<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Assessment</span>
@@ -376,6 +376,23 @@ function finishAssessment(){
   const best = Math.max(score, prevBest);
   document.getElementById('bestFinal').innerHTML = `Personal best on this device: <strong>${best}/${QUESTIONS.length}</strong>`;
 }
+function toggleTheme(){
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'light' ? '🌙' : '☀';
+  try { localStorage.setItem('ecd_lab_theme', next); } catch(e){}
+}
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('ecd_lab_theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeToggle').textContent = '🌙';
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>

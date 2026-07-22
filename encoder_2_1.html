@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -92,17 +92,28 @@
       <svg class="diagram" viewBox="0 0 480 200">
         <text x="15" y="35" class="gate-label">Y1</text>
         <text x="15" y="165" class="gate-label">Y0</text>
-
+      
+        <!-- Y1 direct wire to output A -->
         <path id="diag-enc21-w-y1" d="M 40 30 H 400" class="wire" />
         <circle id="diag-enc21-led-a" cx="415" cy="30" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
         <text x="430" y="34" class="gate-label">A</text>
-
-        <path id="diag-enc21-w-y1-or" d="M 40 30 V 60 H 220" class="wire" />
-        <path id="diag-enc21-w-y0-or" d="M 40 160 V 130 H 220" class="wire" />
-        <path id="diag-enc21-gate-or" d="M220,85 q10,20 0,40 q22,0 30,-20 q-8,-20 -30,-20" class="gate-body" />
-        <path id="diag-enc21-w-v-out" d="M 252 105 H 400" class="wire" />
-        <circle id="diag-enc21-led-v" cx="415" cy="105" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
-        <text x="430" y="109" class="gate-label">V</text>
+      
+        <!-- Junction dot where Y1 branches to OR gate -->
+        <circle cx="120" cy="30" r="3" class="conn-dot" id="diag-enc21-dot-y1-junc" />
+      
+        <!-- Y1 branch down to OR gate top input -->
+        <path id="diag-enc21-w-y1-or" d="M 120 30 V 75 H 220" class="wire" />
+        <!-- Y0 branch up to OR gate bottom input -->
+        <path id="diag-enc21-w-y0-or" d="M 40 160 V 115 H 220" class="wire" />
+      
+        <!-- OR gate (V = Y1 + Y0) - inputs at y=75 and y=115, centered at y=95 -->
+        <path id="diag-enc21-gate-or" d="M220,70 Q230,95 220,120 Q242,120 252,95 Q242,70 220,70" class="gate-body" />
+        <text x="228" y="99" class="gate-label" style="font-size:9px;fill:var(--copper);">OR</text>
+      
+        <!-- OR gate output wire -->
+        <path id="diag-enc21-w-v-out" d="M 252 95 H 400" class="wire" />
+        <circle id="diag-enc21-led-v" cx="415" cy="95" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="430" y="99" class="gate-label">V</text>
       </svg>
     </div>
   </div>
@@ -146,9 +157,11 @@ function renderEnc21(){
   document.getElementById('bd-enc21-w-a').classList.toggle('hot', v===1 && a===1);
   document.getElementById('bd-enc21-w-v').classList.toggle('hot', v===1);
 
+  // Logic diagram
   document.getElementById('diag-enc21-w-y1').classList.toggle('hot', y1===1);
   document.getElementById('diag-enc21-led-a').setAttribute('fill', a===1 ? 'var(--led-on)' : 'var(--led-off)');
 
+  document.getElementById('diag-enc21-dot-y1-junc').classList.toggle('hot', y1===1);
   document.getElementById('diag-enc21-w-y1-or').classList.toggle('hot', y1===1);
   document.getElementById('diag-enc21-w-y0-or').classList.toggle('hot', y0===1);
   document.getElementById('diag-enc21-gate-or').classList.toggle('hot', v===1);
@@ -157,6 +170,24 @@ function renderEnc21(){
 }
 
 window.addEventListener('load', renderEnc21);
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'light' ? '🌙' : '☀';
+  try { localStorage.setItem('ecd_lab_theme', next); } catch(e){}
+}
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('ecd_lab_theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeToggle').textContent = '🌙';
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>

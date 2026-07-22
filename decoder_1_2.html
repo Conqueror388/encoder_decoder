@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<script>try{if(sessionStorage.getItem("ecd_lab_authed")!=="1"){location.href="index.html";}}catch(e){}</script>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -119,12 +119,13 @@
         <!-- E fan to both AND gates -->
         <path id="diag-dec12-w-e-up" d="M 100 160 V 90 H 200" class="wire" />
         <path id="diag-dec12-w-e-down" d="M 100 160 H 200" class="wire" />
+        <circle cx="100" cy="160" r="3" class="conn-dot" />
 
         <!-- AND gate D0 = E . A' -->
-        <path id="diag-dec12-gate-and0" d="M 200 60 H 215 A 12 12 0 0 1 215 84 H 200 Z" class="gate-body" />
-        <path id="diag-dec12-w-and0-out" d="M 227 72 H 400" class="wire" />
-        <circle id="diag-dec12-led-d0" cx="415" cy="72" r="7" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
-        <text x="430" y="76" class="gate-label">D₀</text>
+        <path id="diag-dec12-gate-and0" d="M 200 62 H 218 A 14 14 0 0 1 218 90 H 200 Z" class="gate-body" />
+        <path id="diag-dec12-w-and0-out" d="M 232 76 H 400" class="wire" />
+        <circle id="diag-dec12-led-d0" cx="415" cy="76" r="7" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5" />
+        <text x="430" y="80" class="gate-label">D₀</text>
 
         <!-- AND gate D1 = E . A -->
         <path id="diag-dec12-w-a-in2" d="M 320 30 V 148 H 340" class="wire" />
@@ -196,6 +197,24 @@ function renderDec12(){
 }
 
 window.addEventListener('load', renderDec12);
+
+function toggleTheme(){
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'light' ? '🌙' : '☀';
+  try { localStorage.setItem('ecd_lab_theme', next); } catch(e){}
+}
+(function initTheme(){
+  try {
+    const saved = localStorage.getItem('ecd_lab_theme');
+    if(saved === 'light'){
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeToggle').textContent = '🌙';
+    }
+  } catch(e){}
+})();
 </script>
 </body>
 </html>
