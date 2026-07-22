@@ -303,14 +303,21 @@
       overflow-x:auto !important; -webkit-overflow-scrolling:touch;
       max-width:100%;
       /* visible scrollbar so it's obvious the view scrolls */
-      scrollbar-width:thin; scrollbar-color:var(--copper,#c77) transparent;
-      padding-bottom:14px; /* room for the scrollbar so it doesn't sit on the wiring */
+      scrollbar-width:auto; scrollbar-color:#ff8a2b #1a1f28;
+      padding-bottom:20px; /* room for the scrollbar so it doesn't sit on the wiring */
     }
-    .breadboard-container::-webkit-scrollbar{ height:10px; }
-    .breadboard-container::-webkit-scrollbar-track{ background:rgba(0,0,0,0.08); border-radius:6px; }
+    .breadboard-container::-webkit-scrollbar{ height:16px; }
+    .breadboard-container::-webkit-scrollbar-track{
+      background:#1a1f28; border-radius:8px; border:1px solid rgba(0,0,0,0.3);
+    }
     .breadboard-container::-webkit-scrollbar-thumb{
-      background:var(--copper,#c77); border-radius:6px;
+      background:#ff8a2b; border-radius:8px; border:2px solid #1a1f28;
+      box-shadow:0 0 6px rgba(255,138,43,0.7);
     }
+    .breadboard-container::-webkit-scrollbar-thumb:hover{ background:#ffa64d; }
+    /* Small text hint so the scroll affordance is unmissable even before
+       the user notices the bar itself */
+    .breadboard-container{ position:relative; }
 
     /* Tables scroll horizontally instead of squashing/overlapping */
     .table-wrapper{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
