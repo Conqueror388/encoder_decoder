@@ -110,6 +110,149 @@
   /* 3:8 decoder expression grid */
   .expr-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   @media(max-width:520px){ .expr-grid{grid-template-columns:1fr;} }
+
+  /* ══════════════════════════════════════════════════════════
+     PREMIUM THEME — fallback tokens (safe if lab_style.css ever
+     fails to load — same values already used across this file)
+     + full motion system: page transitions, hover physics,
+     reveal-on-scroll, ripples, glow pulses.
+     ══════════════════════════════════════════════════════════ */
+  :root{
+    --bg:#070a10; --bg-alt:#0d1119; --panel:#0f141d; --panel-border:#1e2634;
+    --text:#e7edf5; --text-dim:#8a97ab;
+    --trace:#00f0ff; --trace-dim:#0a5c66;
+    --copper:#ff9d00; --copper-dim:#7a5218;
+    --good:#35e08a; --danger:#ff5470;
+    --led-on:#00f0ff; --led-off:#25303f; --led-on-amber:#ff9d00;
+    --radius:16px;
+    --ease-premium:cubic-bezier(.22,1,.36,1);
+    --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  }
+
+  /* Aurora ambient background — slow drifting glow, never distracting */
+  body{ position:relative; }
+  body::before, body::after{
+    content:''; position:fixed; inset:-20%; z-index:-2; pointer-events:none;
+    background:
+      radial-gradient(38% 32% at 12% 8%,  rgba(0,240,255,.10), transparent 60%),
+      radial-gradient(30% 28% at 90% 15%, rgba(255,157,0,.08), transparent 60%),
+      radial-gradient(35% 35% at 50% 100%,rgba(53,224,138,.06), transparent 60%);
+    animation:auroraDrift 26s ease-in-out infinite alternate;
+    will-change:transform;
+  }
+  body::after{ animation-duration:34s; animation-direction:alternate-reverse; opacity:.55; }
+  @keyframes auroraDrift{
+    0%{ transform:translate3d(0,0,0) scale(1); }
+    50%{ transform:translate3d(2%,-3%,0) scale(1.06); }
+    100%{ transform:translate3d(-2%,2%,0) scale(1.02); }
+  }
+
+  /* Top page-transition progress bar */
+  #topLoader{
+    position:fixed; top:0; left:0; height:3px; width:0%; z-index:2000;
+    background:linear-gradient(90deg,var(--trace),var(--copper));
+    box-shadow:0 0 12px var(--trace), 0 0 24px rgba(0,240,255,.4);
+    transition:width .32s var(--ease-premium), opacity .25s ease; opacity:0;
+  }
+  #topLoader.active{ opacity:1; }
+
+  /* Section entrance motion (replays every navigation) */
+  .lab-section.active{ animation:sectionIn .55s var(--ease-premium) both; }
+  @keyframes sectionIn{
+    0%{ opacity:0; transform:translateY(16px) scale(.985); filter:blur(3px); }
+    100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+  }
+  .hero{ animation:heroIn .6s var(--ease-premium) both; }
+  @keyframes heroIn{ from{ opacity:0; transform:translateY(-12px); } to{ opacity:1; transform:translateY(0); } }
+
+  /* Panels & cards — premium lift on hover */
+  .panel, .lab-group, .asm-card, .login-card{
+    transition:transform .35s var(--ease-premium), box-shadow .35s var(--ease-premium), border-color .35s ease;
+  }
+  .panel:hover, .lab-group:hover{
+    transform:translateY(-4px);
+    border-color:var(--trace-dim);
+    box-shadow:0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(0,240,255,.06), 0 0 28px rgba(0,240,255,.07);
+  }
+
+  /* Scroll-reveal utility, applied dynamically via JS */
+  .reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s var(--ease-premium), transform .7s var(--ease-premium); }
+  .reveal.in-view{ opacity:1; transform:translateY(0); }
+
+  /* Dashboard cards — sweep shine + directional hover */
+  .card-item{ position:relative; overflow:hidden; transition:transform .3s var(--ease-premium), box-shadow .3s ease; }
+  .card-item::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(120deg,transparent,rgba(0,240,255,.10),transparent);
+    transform:translateX(-120%); transition:transform .6s var(--ease-premium);
+  }
+  .card-item:hover::before{ transform:translateX(120%); }
+  .card-item:hover{ transform:translateX(6px) translateY(-2px); box-shadow:0 10px 26px rgba(0,240,255,.12); }
+  .card-item .arrow{ display:inline-block; transition:transform .3s var(--ease-spring); }
+  .card-item:hover .arrow{ transform:translateX(5px); }
+
+  /* Buttons — lift, glow, press feedback (ripple span injected by JS) */
+  .hub-btn, .util-btn, .asm-btn, .login-btn, .nav-group button{
+    position:relative; overflow:hidden;
+    transition:transform .22s var(--ease-premium), box-shadow .25s ease, filter .2s ease, border-color .25s ease;
+  }
+  .hub-btn:hover, .util-btn:hover, .nav-group button:hover:not(.nav-locked){ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,240,255,.10); }
+  .asm-btn:hover, .login-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,240,255,.20); filter:brightness(1.08); }
+  .asm-btn:active, .login-btn:active, .hub-btn:active, .util-btn:active, .nav-group button:active{ transform:translateY(0) scale(.96); }
+  .ripple-el{ position:absolute; border-radius:50%; pointer-events:none; background:rgba(0,240,255,.35); transform:scale(0); animation:rippleAnim .65s ease-out forwards; }
+  @keyframes rippleAnim{ to{ transform:scale(2.8); opacity:0; } }
+
+  /* Nav active tab — glowing sliding underline */
+  .nav-group button{ position:relative; }
+  .nav-group button.active::after{
+    content:''; position:absolute; left:16%; right:16%; bottom:-3px; height:2px; border-radius:2px;
+    background:linear-gradient(90deg,var(--trace),var(--copper)); box-shadow:0 0 8px var(--trace);
+    animation:underlineIn .35s var(--ease-spring) both;
+  }
+  @keyframes underlineIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+
+  /* Toggle switches — spring-eased knob + glow when on */
+  .switch{ transition:background-color .3s var(--ease-premium), box-shadow .3s ease; }
+  .switch::after{ transition:transform .32s var(--ease-spring) !important; }
+  .switch.on{ box-shadow:0 0 14px rgba(0,240,255,.45); }
+
+  /* LEDs & bulbs — soft pulse while active */
+  .led-btn.on .bulb, .bulb.on{ animation:bulbPulse 1.8s ease-in-out infinite; }
+  @keyframes bulbPulse{
+    0%,100%{ filter:drop-shadow(0 0 4px rgba(0,240,255,.75)) brightness(1); }
+    50%{ filter:drop-shadow(0 0 11px rgba(0,240,255,.9)) brightness(1.25); }
+  }
+
+  /* Energized wires / gates in schematics */
+  .wire.hot{ transition:stroke .25s ease, filter .25s ease; filter:drop-shadow(0 0 3px var(--trace)); }
+  .gate-body.hot{ transition:filter .25s ease; filter:drop-shadow(0 0 4px var(--trace)); }
+
+  /* Login entrance */
+  .login-card{ animation:loginIn .6s var(--ease-premium) both; }
+  @keyframes loginIn{ from{ opacity:0; transform:translateY(18px) scale(.97); } to{ opacity:1; transform:translateY(0) scale(1); } }
+
+  /* Assessment score pop */
+  .asm-result-score .big{ animation:scorePop .5s var(--ease-spring) both; }
+  @keyframes scorePop{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:scale(1); } }
+
+  /* Progress / bar fills — shimmer sweep */
+  .asm-progress-fill, .asm-bar-fill{ position:relative; overflow:hidden; }
+  .asm-progress-fill::after, .asm-bar-fill::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+    animation:shimmerSweep 1.8s linear infinite;
+  }
+  @keyframes shimmerSweep{ from{ transform:translateX(-100%); } to{ transform:translateX(100%); } }
+
+  /* Themed scrollbar */
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:var(--bg-alt); }
+  ::-webkit-scrollbar-thumb{ background:var(--panel-border); border-radius:8px; }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--trace-dim); }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
 </style>
 </head>
 <body>
@@ -791,6 +934,8 @@ function showSection(id){
     return;
   }
 
+  if(window.__flashTopLoader) window.__flashTopLoader();
+
   document.querySelectorAll('.lab-section').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById('sec-'+id);if(sec)sec.classList.add('active');
   document.querySelectorAll('.nav-group button').forEach(b=>b.classList.remove('active'));
@@ -809,6 +954,7 @@ function showSection(id){
   }
   
   window.scrollTo({top:0,behavior:'smooth'});
+  if(window.__applyReveal) setTimeout(window.__applyReveal, 80);
 }
 
 /* ── Audio Synthesizer (Web Audio API) ── */
@@ -1261,15 +1407,15 @@ function generateBreadboardSVG(type){
     wires.push({ from: {x: 170, y: 260}, via: [{x: 376, y: 260}], to: {x: 376, y: 215}, color: stateEnc42Std[3] ? '#00f0ff' : '#3b465c' });
     // Y1 → Pin 5 (2B, x=394, y=215): A0 input 2
     wires.push({ from: {x: 75, y: 200}, via: [{x: 210, y: 200}, {x: 210, y: 275}, {x: 394, y: 275}], to: {x: 394, y: 215}, color: stateEnc42Std[1] ? '#00f0ff' : '#3b465c' });
-    // Y0 → Pin 9 (3A, x=340, y=105): V input — route via top channel
-    wires.push({ from: {x: 75, y: 260}, via: [{x: 230, y: 260}, {x: 230, y: 50}, {x: 340, y: 50}], to: {x: 340, y: 105}, color: stateEnc42Std[0] ? '#00f0ff' : '#3b465c' });
+    // Y0 → Pin 9 (3A, x=412, y=105): V input — route via top channel
+    wires.push({ from: {x: 75, y: 260}, via: [{x: 230, y: 260}, {x: 230, y: 50}, {x: 412, y: 50}], to: {x: 412, y: 105}, color: stateEnc42Std[0] ? '#00f0ff' : '#3b465c' });
 
     // Pin 3 (1Y=A1 OR output, x=358, y=215) → LED A1
     wires.push({ from: {x: 358, y: 215}, via: [{x: 358, y: 230}, {x: 640, y: 230}, {x: 640, y: 110}], to: {x: 675, y: 110}, color: (a1&&v) ? '#00f0ff' : '#3b465c' });
     // Pin 6 (2Y=A0 OR output, x=412, y=215) → LED A0
     wires.push({ from: {x: 412, y: 215}, via: [{x: 412, y: 240}, {x: 625, y: 240}, {x: 625, y: 170}], to: {x: 675, y: 170}, color: (a0&&v) ? '#00f0ff' : '#3b465c' });
-    // Pin 8 (3Y=V OR output, x=358, y=105) → LED V
-    wires.push({ from: {x: 358, y: 105}, via: [{x: 358, y: 65}, {x: 610, y: 65}, {x: 610, y: 230}], to: {x: 675, y: 230}, color: v ? '#ff9d00' : '#3b465c' });
+    // Pin 8 (3Y=V OR output, x=430, y=105) → LED V
+    wires.push({ from: {x: 430, y: 105}, via: [{x: 430, y: 65}, {x: 610, y: 65}, {x: 610, y: 230}], to: {x: 675, y: 230}, color: v ? '#ff9d00' : '#3b465c' });
   }
   else if(type==='enc82'){
     const a1 = (stateEnc82[7] || stateEnc82[6] || stateEnc82[5] || stateEnc82[4]) ? 1 : 0;
@@ -3338,6 +3484,61 @@ function updateSbStatus(){
   else if(ci===ti&&co===to){st.textContent='🔌 All sockets wired — click Run Circuit to test connection';st.style.color='#8a7a58';}
   else{st.textContent=`🔌 ${ci}/${ti} inputs · ${co}/${to} outputs wired`;st.style.color='var(--text-dim)';}
 }
+
+/* ══════════════════════════════════════════════════════════
+   PREMIUM MOTION LAYER
+   Top loading bar on navigation, ripple feedback on buttons/
+   cards, and reveal-on-scroll for panels. Pure add-on — never
+   touches existing state, render, or quiz logic.
+   ══════════════════════════════════════════════════════════ */
+(function(){
+  // Top page-transition progress bar
+  const loader = document.createElement('div');
+  loader.id = 'topLoader';
+  document.body.appendChild(loader);
+  window.__flashTopLoader = function(){
+    loader.classList.add('active');
+    loader.style.width = '0%';
+    requestAnimationFrame(()=>{ loader.style.width = '65%'; });
+    setTimeout(()=>{ loader.style.width = '100%'; }, 220);
+    setTimeout(()=>{ loader.classList.remove('active'); loader.style.width = '0%'; }, 520);
+  };
+
+  // Ripple feedback on interactive elements
+  document.addEventListener('click', function(e){
+    const el = e.target.closest('.hub-btn,.util-btn,.asm-btn,.login-btn,.nav-group button,.card-item,.asm-option');
+    if(!el) return;
+    const rect = el.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple-el';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top  = (e.clientY - rect.top  - size/2) + 'px';
+    if(getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    el.appendChild(ripple);
+    setTimeout(()=>ripple.remove(), 700);
+  });
+
+  // Reveal-on-scroll for panels within the active section
+  const io = ('IntersectionObserver' in window) ? new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){ en.target.classList.add('in-view'); io.unobserve(en.target); }
+    });
+  }, { threshold: .12 }) : null;
+
+  window.__applyReveal = function(){
+    const targets = document.querySelectorAll('.lab-section.active .panel, .lab-section.active .lab-group, .lab-section.active .asm-card, .lab-section.active .cmp-table');
+    targets.forEach((el, i)=>{
+      if(el.classList.contains('reveal')) return;
+      el.classList.add('reveal');
+      el.style.transitionDelay = Math.min(i * 55, 300) + 'ms';
+      if(io) io.observe(el); else el.classList.add('in-view');
+    });
+  };
+
+  window.addEventListener('load', ()=> setTimeout(window.__applyReveal, 80));
+})();
 </script>
 </body>
 </html>
