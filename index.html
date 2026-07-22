@@ -253,6 +253,78 @@
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
   }
+
+  /* ══════════════════════════════════════════════════════════
+     MOBILE ALIGNMENT HARDENING
+     lab_style.css (base layout) is not part of this upload, so
+     these rules guarantee correct alignment on phones no matter
+     what that file does — they win the cascade because they're
+     declared later, at equal specificity.
+     ══════════════════════════════════════════════════════════ */
+  @media (max-width: 860px){
+    /* Nav bar: brand on its own line, topic tabs become a
+       horizontally-scrollable strip (no more squeezed/wrapped
+       buttons), utility icons wrap under it */
+    .tabs{ display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px 12px; }
+    .nav-brand{ text-align:center; font-size:13px; }
+    .nav-group{
+      display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; overflow-y:hidden;
+      -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; padding-bottom:4px;
+      scrollbar-width:thin;
+    }
+    .nav-group button{ flex:0 0 auto; scroll-snap-align:start; white-space:nowrap; font-size:12px; padding:9px 12px; }
+    .nav-utility{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
+    .nav-utility .util-btn{ font-size:11.5px; padding:8px 10px; }
+
+    /* Two-column workspaces stack cleanly on phones */
+    .grid-2{ display:grid; grid-template-columns:1fr !important; gap:16px; }
+
+    /* Panels & main content get breathing room without overflow */
+    main{ padding:0 14px 40px; }
+    .panel, .lab-group, .asm-card{ padding:16px !important; }
+    .hero{ padding:26px 16px 20px; }
+    .hero h1{ font-size:clamp(24px, 8vw, 34px); }
+    .hero .sub, .lead{ font-size:14px; }
+
+    /* SVG diagrams & breadboards scale to their container instead
+       of overflowing or clipping */
+    svg.diagram, .bb-svg, .breadboard-container svg{
+      width:100% !important; height:auto !important; max-width:100%; display:block;
+    }
+    .breadboard-container{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+    /* Tables scroll horizontally instead of squashing/overlapping */
+    .table-wrapper{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .table-wrapper table{ font-size:12.5px; }
+
+    /* Input/output rows wrap instead of overflowing */
+    .led-row{ flex-wrap:wrap; gap:10px !important; }
+    .output-readout{ flex-wrap:wrap; gap:6px; }
+
+    /* K-map cards stack instead of forcing min-width overflow */
+    .kmap-card{ min-width:100% !important; flex:1 1 100% !important; }
+    .kmap-grid{ font-size:12px; }
+
+    /* Dashboard cards */
+    .card-item{ flex-wrap:wrap; gap:8px; }
+
+    /* Modals fit the viewport and scroll internally */
+    .modal-card{ width:92vw !important; max-width:92vw; max-height:85vh; overflow-y:auto; padding:20px 16px !important; }
+
+    /* Login card */
+    .login-card{ width:92vw; max-width:380px; padding:26px 20px; }
+
+    /* Assessment top bar / meta rows wrap cleanly */
+    .asm-topbar, .asm-meta-row, .asm-result-actions{ flex-wrap:wrap; justify-content:center; }
+    .asm-card{ padding:20px 16px; }
+    .asm-question{ font-size:16.5px; }
+  }
+
+  @media (max-width: 420px){
+    .nav-group button{ font-size:11px; padding:8px 10px; }
+    .hero h1{ font-size:22px; }
+    .asm-result-score .big{ font-size:42px; }
+  }
 </style>
 </head>
 <body>
@@ -748,7 +820,7 @@
       💡 <strong>How to wire:</strong> <strong>Drag</strong> a <span style="color:#ff8822">switch hole</span> → drop on the matching <span style="color:#ff8822">IC input pin</span>. <strong>Drag</strong> an <span style="color:#22cc66">IC output pin</span> → drop on the matching <span style="color:#22cc66">LED</span>. Toggle wired switches to see live logic. Use <strong>Auto-Wire</strong> to skip manual wiring.
     </div>
     <div class="sandbox-canvas" id="sandbox-canvas-wrap">
-      <svg id="ic-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" style="width:100%;display:block;">
+      <svg id="ic-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" style="width:100%;display:block;touch-action:none;">
         <text x="400" y="185" text-anchor="middle" fill="#3a4c60" font-family="JetBrains Mono,monospace" font-size="14">← Select an IC above to begin wiring</text>
       </svg>
     </div>
@@ -3149,16 +3221,18 @@ function renderSandboxSVG(){
       /* signal label */
       s+=`<text x="${SW_X-26}" y="${y+4}" font-size="9" fill="#6a5830" font-family="'Courier New',monospace" text-anchor="end" font-weight="700">${pin.sig}</text>`;
       /* drag handle */
-      s+=`<rect x="${SW_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="transparent" style="cursor:grab"
+      s+=`<rect x="${SW_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="transparent" style="cursor:grab;touch-action:none;"
         onmousedown="sbMouseDown(event,'sw','${pin.sig}',${SW_X},${y})"
+        ontouchstart="sbMouseDown(event,'sw','${pin.sig}',${SW_X},${y})"
         title="Drag to IC pin '${pin.sig}' to connect"/>`;
     }
     /* IC input pin drag target */
     if(!isGND){
       sbNodePos[`ipin_${pin.sig}`]={cx:pnx,cy:y,role:'ipin',sig:pin.sig};
-      s+=`<circle cx="${pnx}" cy="${y}" r="12" fill="transparent" style="cursor:crosshair"
+      s+=`<circle cx="${pnx}" cy="${y}" r="12" fill="transparent" style="cursor:crosshair;touch-action:none;"
         onmousedown="sbMouseDown(event,'ipin','${pin.sig}',${pnx},${y})"
         onmouseup="sbMouseUp(event,'ipin','${pin.sig}')"
+        ontouchstart="sbMouseDown(event,'ipin','${pin.sig}',${pnx},${y})"
         title="IC Input pin: ${pin.sig}"/>`;
     }
   });
@@ -3197,9 +3271,10 @@ function renderSandboxSVG(){
     /* IC output pin drag source */
     if(!isVCC){
       sbNodePos[`opin_${pin.sig}`]={cx:pnx,cy:y,role:'opin',sig:pin.sig};
-      s+=`<circle cx="${pnx}" cy="${y}" r="12" fill="transparent" style="cursor:grab"
+      s+=`<circle cx="${pnx}" cy="${y}" r="12" fill="transparent" style="cursor:grab;touch-action:none;"
         onmousedown="sbMouseDown(event,'opin','${pin.sig}',${pnx},${y})"
         onmouseup="sbMouseUp(event,'opin','${pin.sig}')"
+        ontouchstart="sbMouseDown(event,'opin','${pin.sig}',${pnx},${y})"
         title="Drag to LED to connect"/>`;
 
       /* LED node */
@@ -3271,6 +3346,24 @@ function renderSandboxSVG(){
   svg.innerHTML=s;
   svg.onmousemove=sbSvgMove;
   svg.onmouseup=e=>sbMouseUp(e,null,null);
+  svg.ontouchmove=function(e){
+    if(!sbDragging)return;
+    e.preventDefault();
+    sbSvgMove(e.touches[0]);
+  };
+  svg.ontouchend=function(e){
+    if(!sbDragging)return;
+    e.preventDefault();
+    const t=e.changedTouches[0];
+    sbMouseUp(t,null,null);
+  };
+  svg.ontouchcancel=function(e){
+    if(!sbDragging)return;
+    sbDragging=false;sbDragSig=null;sbDragRole=null;
+    const lw=document.getElementById('sb-lw');
+    if(lw)lw.setAttribute('stroke','transparent');
+    renderSandboxSVG();updateSbStatus();
+  };
 }
 
 /* ── DRAG HANDLERS ── */
