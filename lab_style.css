@@ -544,3 +544,446 @@ footer {
   font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
   border-top: 1px solid var(--panel-border); margin-top: 50px;
 }
+
+/* ── Page Transitions ── */
+.lab-section {
+  display: none;
+  opacity: 0;
+  transform: translateY(12px);
+}
+.lab-section.active {
+  display: block;
+  animation: sectionEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes sectionEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Lock states for sequential gating ── */
+.nav-locked {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  color: var(--text-dim) !important;
+  border-color: transparent !important;
+  pointer-events: auto !important; /* Allow click so we can show custom lock warning */
+}
+.nav-locked:hover {
+  color: var(--text-dim) !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.card-locked {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  border-color: var(--panel-border) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  pointer-events: auto !important; /* Allow click so we can show warning alert */
+}
+.card-locked:hover {
+  border-color: var(--panel-border) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  background: var(--bg-alt) !important;
+}
+
+/* ── Validation Test Panel ── */
+.test-panel {
+  border: 1px solid var(--panel-border);
+  margin-top: 30px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.test-panel h4 {
+  color: var(--trace) !important;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+.test-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  text-align: center;
+}
+.test-table th {
+  background: var(--bg-alt);
+  color: var(--copper);
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.test-table td {
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+}
+.test-table select {
+  background: var(--bg-alt);
+  color: var(--trace);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: 90px;
+  text-align: center;
+}
+.test-table select:focus {
+  border-color: var(--trace);
+}
+.test-table select.correct-cell {
+  border-color: var(--good) !important;
+  color: var(--good) !important;
+  background: rgba(53, 224, 138, 0.08) !important;
+}
+.test-table select.wrong-cell {
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  background: rgba(255, 84, 112, 0.08) !important;
+}
+
+/* ── Expression Builder UI ── */
+.expr-builder-container {
+  background: var(--bg-alt);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.expr-display-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+}
+.expr-target {
+  color: var(--copper);
+  font-weight: bold;
+}
+.expr-workspace {
+  flex-grow: 1;
+  background: #04060a;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  color: var(--text-dim);
+}
+.expr-workspace.active-expr {
+  color: var(--trace);
+}
+.expr-workspace span.expr-token {
+  background: var(--trace-dim);
+  color: var(--trace);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid var(--trace);
+  font-weight: bold;
+}
+.expr-workspace span.expr-placeholder {
+  color: #4c5b70;
+  font-size: 13px;
+}
+
+.token-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.token-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.token-btn:hover {
+  border-color: var(--trace);
+  color: var(--trace);
+  background: var(--bg-alt);
+}
+
+.expr-ctrl-btn {
+  border-color: var(--copper-dim);
+  color: var(--copper);
+}
+.expr-ctrl-btn:hover {
+  border-color: var(--copper);
+  color: var(--copper);
+  background: rgba(255, 157, 0, 0.05);
+}
+
+/* ── Feedback and Actions ── */
+.test-feedback {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 13.5px;
+  display: none;
+}
+.test-feedback.show {
+  display: block;
+}
+.test-feedback.success {
+  background: rgba(53, 224, 138, 0.08);
+  border: 1px solid var(--good);
+  color: var(--good);
+}
+.test-feedback.fail {
+  background: rgba(255, 84, 112, 0.08);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.test-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.proceed-btn {
+  background: var(--good) !important;
+  color: #031012 !important;
+  animation: pulseGreen 2s infinite;
+}
+@keyframes pulseGreen {
+  0% { box-shadow: 0 0 0 0 rgba(53, 224, 138, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(53, 224, 138, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(53, 224, 138, 0); }
+}
+
+.bb-chassis {
+  fill: #dce0e8;
+  stroke: #b4b9c5;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+[data-theme="light"] .bb-chassis {
+  fill: #eef1f6;
+  stroke: #c4c9d4;
+}
+
+/* ── Workspace Sub-Tabs Navigation ── */
+.workspace-sub-tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--bg-alt);
+  padding: 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  max-width: fit-content;
+}
+.sub-tab-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sub-tab-btn:hover:not(:disabled) {
+  color: var(--trace);
+  background: var(--panel);
+}
+.sub-tab-btn.active {
+  color: var(--trace);
+  background: var(--panel);
+  box-shadow: 0 2px 8px rgba(0, 240, 255, 0.08);
+}
+.sub-tab-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── Diagnostic Test Cover & Active Banner ── */
+.diag-active-bar {
+  background: rgba(255, 157, 0, 0.1);
+  border: 1px dashed var(--copper);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--copper);
+}
+.diag-start-screen {
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.diag-start-screen h3 {
+  margin-top: 0;
+  color: var(--trace);
+}
+.diag-start-screen p {
+  color: var(--text-dim);
+  max-width: 480px;
+  margin: 0 auto 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* ─── IC Wiring Sandbox ─── */
+.ic-selector {
+  display:flex; gap:0; background:var(--bg-alt);
+  border-bottom:1px solid var(--panel-border); overflow-x:auto;
+  scrollbar-width:thin;
+}
+.ic-sel-btn {
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.06em;
+  background:transparent; color:var(--text-dim);
+  border:none; border-bottom:3px solid transparent;
+  padding:12px 15px; cursor:pointer; white-space:nowrap; transition:all 0.15s;
+}
+.ic-sel-btn:hover { color:var(--trace); background:rgba(0,240,255,0.04); }
+.ic-sel-btn.active { color:var(--trace); border-bottom-color:var(--trace); background:rgba(0,240,255,0.07); }
+.ic-tip-bar {
+  background:rgba(255,157,0,0.05); border-bottom:1px solid rgba(255,157,0,0.15);
+  padding:9px 18px; font-size:12px; color:var(--text-dim); line-height:1.5;
+}
+.sandbox-canvas { background:#05070d; border-bottom:1px solid var(--panel-border); overflow:hidden; }
+.ic-controls {
+  display:flex; gap:12px; padding:12px 18px; background:var(--bg-alt);
+  align-items:center; flex-wrap:wrap; border-bottom:1px solid var(--panel-border);
+}
+.ic-readout {
+  padding:12px 18px; font-family:'JetBrains Mono',monospace; font-size:12px;
+  display:flex; gap:16px; flex-wrap:wrap; align-items:center; background:var(--panel);
+}
+.ic-readout-led { display:flex; align-items:center; gap:7px; }
+.ic-readout-dot {
+  width:12px; height:12px; border-radius:50%;
+  background:#0a1218; border:1px solid #253040; transition:all 0.25s;
+}
+.ic-readout-dot.on {
+  background:var(--led-on); border-color:var(--led-on); box-shadow:0 0 8px var(--led-on);
+}
+
+/* ── Mobile View Adjustments ── */
+@media (max-width: 860px) {
+  nav.tabs {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .nav-brand {
+    justify-content: center;
+    font-size: 14px;
+    padding: 2px 0;
+  }
+  
+  .nav-group {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 4px 2px;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar for clean UI */
+  }
+  .nav-group::-webkit-scrollbar {
+    display: none; /* Hide webkit scrollbar */
+  }
+  nav.tabs button {
+    padding: 6px 10px;
+    font-size: 11px;
+    flex-shrink: 0; /* Prevent buttons from squishing */
+  }
+  
+  .nav-utility {
+    justify-content: center;
+    width: 100%;
+    margin-top: 2px;
+  }
+  
+  .util-btn {
+    font-size: 10.5px;
+    padding: 4px 8px;
+  }
+
+  /* Sandbox scroll wrapper to make wiring drag easy on touch screens */
+  .sandbox-canvas {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #ic-svg {
+    min-width: 680px; /* Force minimum width to keep pins and lines easily interactable */
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 16px 12px 80px;
+  }
+  header.hero {
+    padding: 30px 16px 20px;
+  }
+  header.hero h1 {
+    font-size: 26px;
+  }
+  .grid-2 {
+    gap: 16px;
+  }
+  .panel {
+    padding: 16px;
+  }
+  
+  /* Make sub-tabs scrollable if they don't fit */
+  .workspace-sub-tabs {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .workspace-sub-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .sub-tab-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+}
+

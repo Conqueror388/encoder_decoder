@@ -138,17 +138,17 @@
 <nav class="tabs" id="mainNav">
   <div class="nav-brand">⚡ DIGITAL <span>LOGIC LAB</span></div>
   <div class="nav-group">
-    <button class="hub-btn active" onclick="showSection('hub')">🏠 Hub</button>
-    <button onclick="showSection('dec12')">1:2 Dec</button>
-    <button onclick="showSection('dec24')">2:4 Dec</button>
-    <button onclick="showSection('dec38')">3:8 Dec</button>
-    <button onclick="showSection('enc21')">2:1 Enc</button>
-    <button onclick="showSection('enc42std')">4:2 Enc</button>
-    <button onclick="showSection('enc82')">8:2 Enc</button>
-    <button onclick="showSection('enc42')">4:2 P.Enc</button>
-    <button onclick="showSection('enc83')">8:3 P.Enc</button>
-    <button onclick="showSection('sandbox')" style="color:var(--copper);">🛠️ Sandbox</button>
-    <button onclick="showSection('assessment')" style="color:var(--trace);">Assessment</button>
+    <button id="btn-nav-hub" class="hub-btn active" onclick="showSection('hub')">🏠 Hub</button>
+    <button id="btn-nav-dec12" onclick="showSection('dec12')">1:2 Dec</button>
+    <button id="btn-nav-dec24" onclick="showSection('dec24')">2:4 Dec</button>
+    <button id="btn-nav-dec38" onclick="showSection('dec38')">3:8 Dec</button>
+    <button id="btn-nav-enc21" onclick="showSection('enc21')">2:1 Enc</button>
+    <button id="btn-nav-enc42std" onclick="showSection('enc42std')">4:2 Enc</button>
+    <button id="btn-nav-enc82" onclick="showSection('enc82')">8:2 Enc</button>
+    <button id="btn-nav-enc42" onclick="showSection('enc42')">4:2 P.Enc</button>
+    <button id="btn-nav-enc83" onclick="showSection('enc83')">8:3 P.Enc</button>
+    <button id="btn-nav-sandbox" onclick="showSection('sandbox')" style="color:var(--copper);">🛠️ Sandbox</button>
+    <button id="btn-nav-assessment" onclick="showSection('assessment')" style="color:var(--trace);">Assessment</button>
   </div>
   <div class="nav-utility">
     <button class="util-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀ Theme</button>
@@ -167,6 +167,9 @@
   <h1>QUANTUM VOID <span>LIBRARIES</span></h1>
   <p class="sub">Welcome to the interactive digital electronics dashboard. Click any card below to launch an isolated, fully interactive laboratory simulation workspace.</p>
   <div class="welcome-banner" id="welcomeBanner"></div>
+  <div style="margin-top: 14px; display: flex; justify-content: center; gap: 10px;">
+    <button class="tool-btn" onclick="resetProgress()" style="margin:0; border-color: var(--danger); color: var(--danger);">↺ Reset Lab Progress</button>
+  </div>
 </header>
 <main>
   <section style="margin-bottom:40px;">
@@ -185,7 +188,7 @@
         <h3>Standard Encoders</h3>
         <div class="card-list">
           <div class="card-item" onclick="showSection('enc21')"><div class="card-content"><h4>2:1 Encoder</h4><p>2 Inputs (Y₁, Y₀) · 1 Output, Valid</p></div><div class="arrow">→</div></div>
-          <div class="card-item" onclick="showSection('enc42std')"><div class="card-content"><h4>4:2 Standard Encoder</h4><p>4 Inputs (Y₃–Y₀) · 2 Outputs, Valid</p></div><div class="arrow">→</div></div>
+          <div class="card-item" onclick="showSection('enc42std')"><div class="card-content"><h4>4:2 Encoder</h4><p>4 Inputs (Y₃–Y₀) · 2 Outputs, Valid</p></div><div class="arrow">→</div></div>
           <div class="card-item" onclick="showSection('enc82')"><div class="card-content"><h4>8:2 Encoder</h4><p>8 Inputs (Y₇–Y₀) · 2 Outputs, Valid</p></div><div class="arrow">→</div></div>
         </div>
         <div class="info-box"><strong>Note:</strong> Standard encoders assume one active input at a time. Multiple active inputs are combined by OR-gate logic.</div>
@@ -581,45 +584,38 @@
 <!-- SANDBOX & CUSTOM GATE BUILDER -->
 <!-- ══════════════════════════════════════════════════════════════════════ -->
 <section class="lab-section" id="sec-sandbox">
-<header class="hero"><span class="chip-eyebrow">ECE · Freeform Sandbox</span><h1>CUSTOM GATE <span>BUILDER</span></h1><p class="sub">Experiment by connecting custom logic switches to gates and watching live outputs.</p></header>
+<header class="hero">
+  <span class="chip-eyebrow">ECE · Interactive Wiring Lab</span>
+  <h1>IC WIRING <span>SANDBOX</span></h1>
+  <p class="sub">Place ICs on a virtual breadboard — connect wires, flip switches, observe live logic outputs.</p>
+</header>
 <main>
-  <div class="panel" style="max-width:800px;margin:0 auto;">
-    <h4>Interactive Sandbox Controls</h4>
-    <div class="led-row" style="margin-bottom:20px;">
-      <div class="toggle"><div class="switch" id="sw-sb-in1" onclick="toggleSandbox('in1')"></div><span>Input A</span></div>
-      <div class="toggle"><div class="switch" id="sw-sb-in2" onclick="toggleSandbox('in2')"></div><span>Input B</span></div>
+  <div class="panel" style="padding:0;overflow:hidden;margin-bottom:24px;">
+    <div class="ic-selector" id="ic-selector-bar">
+      <button class="ic-sel-btn active" id="ic-btn-dec12" onclick="selectSandboxIC('dec12')">1:2 Decoder</button>
+      <button class="ic-sel-btn" id="ic-btn-dec24" onclick="selectSandboxIC('dec24')">2:4 Decoder</button>
+      <button class="ic-sel-btn" id="ic-btn-dec38" onclick="selectSandboxIC('dec38')">3:8 Decoder</button>
+      <button class="ic-sel-btn" id="ic-btn-enc21" onclick="selectSandboxIC('enc21')">2:1 Encoder</button>
+      <button class="ic-sel-btn" id="ic-btn-enc42std" onclick="selectSandboxIC('enc42std')">4:2 Encoder</button>
+      <button class="ic-sel-btn" id="ic-btn-enc82" onclick="selectSandboxIC('enc82')">8:2 Encoder</button>
+      <button class="ic-sel-btn" id="ic-btn-enc42" onclick="selectSandboxIC('enc42')">4:2 Priority</button>
+      <button class="ic-sel-btn" id="ic-btn-enc83" onclick="selectSandboxIC('enc83')">8:3 Priority</button>
     </div>
-    <div class="grid-2" style="margin-top:16px;">
-      <div>
-        <h5 style="color:var(--copper);margin:0 0 8px;font-family:'JetBrains Mono',monospace;font-size:11px;">Select Gate Type</h5>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="tool-btn active" id="sb-gate-and" onclick="setSandboxGate('AND')">AND Gate</button>
-          <button class="tool-btn" id="sb-gate-or" onclick="setSandboxGate('OR')">OR Gate</button>
-          <button class="tool-btn" id="sb-gate-nand" onclick="setSandboxGate('NAND')">NAND Gate</button>
-          <button class="tool-btn" id="sb-gate-nor" onclick="setSandboxGate('NOR')">NOR Gate</button>
-          <button class="tool-btn" id="sb-gate-xor" onclick="setSandboxGate('XOR')">XOR Gate</button>
-        </div>
-      </div>
-      <div>
-        <h5 style="color:var(--copper);margin:0 0 8px;font-family:'JetBrains Mono',monospace;font-size:11px;">Output LED State</h5>
-        <div class="led-row" style="justify-content:flex-start;">
-          <div class="led-btn" disabled><span id="led-sb-out" class="bulb"></span><span id="lbl-sb-out">Output = 0</span></div>
-        </div>
-      </div>
+    <div class="ic-tip-bar">
+      💡 <strong>How to wire:</strong> <strong>Drag</strong> a <span style="color:#ff8822">switch hole</span> → drop on the matching <span style="color:#ff8822">IC input pin</span>. <strong>Drag</strong> an <span style="color:#22cc66">IC output pin</span> → drop on the matching <span style="color:#22cc66">LED</span>. Toggle wired switches to see live logic. Use <strong>Auto-Wire</strong> to skip manual wiring.
     </div>
-    <div style="margin-top:20px;">
-      <svg class="diagram" viewBox="0 0 400 160">
-        <text x="15" y="44" class="gate-label">A</text>
-        <text x="15" y="124" class="gate-label">B</text>
-        <path id="sb-wire-a" d="M 40 40 H 160" class="wire"/>
-        <path id="sb-wire-b" d="M 40 120 H 160" class="wire"/>
-        <path id="sb-gate-body" d="M 160 30 H 185 A 25 25 0 0 1 185 130 H 160 Z" class="gate-body"/>
-        <text id="sb-gate-text" x="180" y="84" class="gate-label" text-anchor="middle">AND</text>
-        <path id="sb-wire-out" d="M 210 80 H 320" class="wire"/>
-        <circle id="sb-led" cx="335" cy="80" r="8" fill="var(--led-off)" stroke="#05080c" stroke-width="1.5"/>
-        <text x="350" y="84" class="gate-label">OUT</text>
+    <div class="sandbox-canvas" id="sandbox-canvas-wrap">
+      <svg id="ic-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" style="width:100%;display:block;">
+        <text x="400" y="185" text-anchor="middle" fill="#3a4c60" font-family="JetBrains Mono,monospace" font-size="14">← Select an IC above to begin wiring</text>
       </svg>
     </div>
+    <div class="ic-controls">
+      <button class="asm-btn" onclick="sbRunCircuit()">▶ Run Circuit</button>
+      <button class="asm-btn ghost" onclick="sbAutoWire()">⚡ Auto-Wire All</button>
+      <button class="asm-btn ghost" onclick="sbResetWires()">↺ Reset Wires</button>
+      <span id="sb-status" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);margin-left:8px;"></span>
+    </div>
+    <div class="ic-readout" id="ic-readout" style="display:none;"></div>
   </div>
 </main>
 </section>
@@ -706,19 +702,117 @@ function unlockSite(){document.getElementById('loginOverlay').style.display='non
 function handleLogin(e){e.preventDefault();const u=document.getElementById('loginUser').value.trim(),err=document.getElementById('loginError');if(u.length>0){try{sessionStorage.setItem(NAME_KEY,u);}catch(e){}err.classList.remove('show');unlockSite();}else{err.classList.add('show');document.getElementById('loginUser').focus();}return false;}
 window.addEventListener('load',()=>{try{if(sessionStorage.getItem(NAME_KEY))unlockSite();}catch(e){}});
 
-/* ── Section Navigation ── */
+/* ── Section Navigation & Progression ── */
+const TOPIC_SEQUENCE = ['dec12', 'dec24', 'dec38', 'enc21', 'enc42std', 'enc82', 'enc42', 'enc83'];
+const TOPIC_LABELS = {
+  dec12: '1:2 Decoder',
+  dec24: '2:4 Decoder',
+  dec38: '3:8 Decoder',
+  enc21: '2:1 Encoder',
+  enc42std: '4:2 Standard Encoder',
+  enc82: '8:2 Encoder',
+  enc42: '4:2 Priority Encoder',
+  enc83: '8:3 Priority Encoder'
+};
+
+function getTopicCompleted(topicId) {
+  return localStorage.getItem('ecd_completed_' + topicId) === 'true';
+}
+
+function setTopicCompleted(topicId) {
+  localStorage.setItem('ecd_completed_' + topicId, 'true');
+  updateNavLockStates();
+}
+
+function isTopicUnlocked(id) {
+  if (id === 'hub' || id === 'sandbox' || id === 'assessment') return true;
+  const idx = TOPIC_SEQUENCE.indexOf(id);
+  if (idx <= 0) return true;
+  const prevTopic = TOPIC_SEQUENCE[idx - 1];
+  return getTopicCompleted(prevTopic);
+}
+
+function updateNavLockStates() {
+  TOPIC_SEQUENCE.forEach((id) => {
+    const btn = document.getElementById('btn-nav-' + id);
+    const unlocked = isTopicUnlocked(id);
+    const completed = getTopicCompleted(id);
+    
+    if (btn) {
+      let text = btn.textContent;
+      text = text.replace('🔒 ', '').replace(' ✅', '').replace('🔒', '').trim();
+      
+      if (!unlocked) {
+        btn.classList.add('nav-locked');
+        btn.textContent = '🔒 ' + text;
+      } else {
+        btn.classList.remove('nav-locked');
+        if (completed) {
+          btn.textContent = text + ' ✅';
+        } else {
+          btn.textContent = text;
+        }
+      }
+    }
+    
+    const cards = document.querySelectorAll(`[onclick="showSection('${id}')"]`);
+    cards.forEach(card => {
+      if (!unlocked) {
+        card.classList.add('card-locked');
+        const arrow = card.querySelector('.arrow');
+        if (arrow) arrow.textContent = '🔒';
+      } else {
+        card.classList.remove('card-locked');
+        const arrow = card.querySelector('.arrow');
+        if (arrow) {
+          arrow.textContent = completed ? '✅' : '→';
+        }
+      }
+    });
+  });
+}
+
+function resetProgress() {
+  if (confirm("Are you sure you want to reset your laboratory progress? This will lock all advanced topics again.")) {
+    TOPIC_SEQUENCE.forEach(id => {
+      localStorage.removeItem('ecd_completed_' + id);
+    });
+    alert("Progress reset. Reloading laboratory...");
+    window.location.reload();
+  }
+}
+
 function showSection(id){
+  if (!isTopicUnlocked(id)) {
+    const idx = TOPIC_SEQUENCE.indexOf(id);
+    const prevTopic = TOPIC_SEQUENCE[idx - 1];
+    const prevLabel = TOPIC_LABELS[prevTopic];
+    alert(`🔒 Workspace Locked\nPlease complete the validation test for "${prevLabel}" to unlock this workspace!`);
+    return;
+  }
+
   document.querySelectorAll('.lab-section').forEach(s=>s.classList.remove('active'));
   const sec=document.getElementById('sec-'+id);if(sec)sec.classList.add('active');
   document.querySelectorAll('.nav-group button').forEach(b=>b.classList.remove('active'));
-  const btns=document.querySelectorAll('.nav-group button');
-  const map={hub:0,dec12:1,dec24:2,dec38:3,enc21:4,enc42std:5,enc82:6,enc42:7,enc83:8,sandbox:9,assessment:10};
-  if(map[id]!==undefined&&btns[map[id]])btns[map[id]].classList.add('active');
+  
+  const navBtn = document.getElementById('btn-nav-' + id);
+  if (navBtn) {
+    navBtn.classList.add('active');
+  } else {
+    const btns=document.querySelectorAll('.nav-group button');
+    const map={hub:0,dec12:1,dec24:2,dec38:3,enc21:4,enc42std:5,enc82:6,enc42:7,enc83:8,sandbox:9,assessment:10};
+    if(map[id]!==undefined&&btns[map[id]])btns[map[id]].classList.add('active');
+  }
+  
+  if (TOPIC_SEQUENCE.includes(id)) {
+    generateBreadboardSVG(id);
+  }
+  
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
 /* ── Audio Synthesizer (Web Audio API) ── */
-let audioCtx=null, audioSynthEnabled=false;
+let audioCtx=null, audioSynthEnabled=true;
 function toggleAudioSynth(){
   audioSynthEnabled=!audioSynthEnabled;
   const btn=document.getElementById('btnAudioToggle');
@@ -732,9 +826,13 @@ function toggleAudioSynth(){
   }
 }
 function playSynthTone(freq=440){
-  if(!audioSynthEnabled||!audioCtx)return;
+  if(!audioSynthEnabled)return;
+  if(!audioCtx){
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC) audioCtx=new AC();
+  }
   try{
-    if(audioCtx.state==='suspended')audioCtx.resume();
+    if(audioCtx && audioCtx.state==='suspended')audioCtx.resume();
     const osc=audioCtx.createOscillator(), g=audioCtx.createGain();
     osc.type='sine'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
     g.gain.setValueAtTime(0.08, audioCtx.currentTime);
@@ -742,6 +840,16 @@ function playSynthTone(freq=440){
     osc.connect(g); g.connect(audioCtx.destination);
     osc.start(); osc.stop(audioCtx.currentTime+0.26);
   }catch(e){}
+}
+function playSuccessSound() {
+  playSynthTone(523.25); // C5
+  setTimeout(() => playSynthTone(659.25), 100); // E5
+  setTimeout(() => playSynthTone(783.99), 200); // G5
+  setTimeout(() => playSynthTone(1046.50), 300); // C6
+}
+function playFailSound() {
+  playSynthTone(220); // A3
+  setTimeout(() => playSynthTone(196), 150); // G3
 }
 
 /* ── Voice Control (Web Speech API) ── */
@@ -1498,9 +1606,13 @@ function renderSandbox(){
 
 /* ── Init all renders ── */
 window.addEventListener('load',()=>{
-  renderDec12();renderDec24();renderDec38();renderEnc21();renderEnc42();renderEnc83();
-  ['dec12','dec24','dec38','enc21','enc42','enc83'].forEach(id=>generateBreadboardSVG(id));
-  renderSandbox();showBestPreview();setupClickableTables();
+  renderDec12();renderDec24();renderDec38();renderEnc21();renderEnc42Std();renderEnc82();renderEnc42();renderEnc83();
+  ['dec12','dec24','dec38','enc21','enc42std','enc82','enc42','enc83'].forEach(id=>generateBreadboardSVG(id));
+  showBestPreview();setupClickableTables();
+  updateNavLockStates();
+  initWorkspaceSubTabs();
+  initSectionTests();
+  selectSandboxIC('dec12');
 });
 
 /* ── Tour & Cheatsheet Drawers ── */
@@ -1885,7 +1997,8 @@ function renderEnc42(){let a1=0,a0=0,v=0,ar=0;if(stateEnc42[3]===1){a1=1;a0=1;v=
 
 /* ═══════ 8:3 PRIORITY ENCODER ═══════ */
 const stateEnc83=new Array(8).fill(0);
-(function(){const iw=document.getElementById('enc83-inputs');for(let j=7;j>=0;j--){const b=document.createElement('button');b.className='led-btn';b.id='sw-enc83-y'+j;b.innerHTML=`<span class="bulb"></span><span>Y${j}</span>`;b.onclick=()=>{stateEnc83[j]=stateEnc83[j]?0:1;renderEnc83();};iw.appendChild(b);}const bw=document.getElementById('bd-enc83-inputs');let h='';for(let j=7;j>=0;j--){const y=25+(7-j)*33;h+=`<path id="bd-enc83-w-y${j}" d="M 20 ${y} H 70" class="wire"/><text x="8" y="${y+4}" class="gate-label" style="font-size:9px;">Y${j}</text>`;}bw.innerHTML=h;})();
+(function(){const iw=document.getElementById('enc83-inputs');for(let j=7;j>=0;j--){const b=document.createElement('button');b.className='led-btn';b.id='sw-enc83-y'+j;b.innerHTML=`<span class="bulb"></span><span>Y${j}</span>`;b.onclick=()=>{toggleEnc83(j);};iw.appendChild(b);}const bw=document.getElementById('bd-enc83-inputs');let h='';for(let j=7;j>=0;j--){const y=25+(7-j)*33;h+=`<path id="bd-enc83-w-y${j}" d="M 20 ${y} H 70" class="wire"/><text x="8" y="${y+4}" class="gate-label" style="font-size:9px;">Y${j}</text>`;}bw.innerHTML=h;})();
+function toggleEnc83(j){stateEnc83[j]=stateEnc83[j]?0:1;renderEnc83();}
 function orPath(x,mn,mx){const w=55,m=(mn+mx)/2;return`M${x},${mn} Q${x+w*0.3},${m} ${x},${mx} Q${x+w*0.65},${mx} ${x+w},${m} Q${x+w*0.65},${mn} ${x},${mn} Z`;}
 function renderEnc83(){
   let w=-1;for(let j=7;j>=0;j--){if(stateEnc83[j]===1){w=j;break;}}
@@ -2072,8 +2185,1159 @@ function setupClickableTables(){
   });
 }
 
-/* ── Init all renders ── */
-window.addEventListener('load',()=>{renderDec12();renderDec24();renderDec38();renderEnc21();renderEnc42Std();renderEnc82();renderEnc42();renderEnc83();showBestPreview();setupClickableTables();});
+/* ═══════ SECTION TESTS SYSTEM ═══════ */
+const SECTION_TESTS = {
+  dec12: {
+    title: "1:2 Decoder Validation Test",
+    truthTable: {
+      headers: ["E", "A", "D0", "D1"],
+      rows: [
+        { inputs: [0, 'X'], correct: [0, 0] },
+        { inputs: [1, 0], correct: [1, 0] },
+        { inputs: [1, 1], correct: [0, 1] }
+      ]
+    },
+    expression: {
+      target: "D1",
+      correct: "E · A",
+      tokens: ["E", "A", "·", "+", "⊕", "'", "(", ")"]
+    }
+  },
+  dec24: {
+    title: "2:4 Decoder Validation Test",
+    truthTable: {
+      headers: ["E", "A1", "A0", "D0", "D1", "D2", "D3"],
+      rows: [
+        { inputs: [0, 'X', 'X'], correct: [0, 0, 0, 0] },
+        { inputs: [1, 0, 0], correct: [1, 0, 0, 0] },
+        { inputs: [1, 1, 0], correct: [0, 0, 1, 0] },
+        { inputs: [1, 1, 1], correct: [0, 0, 0, 1] }
+      ]
+    },
+    expression: {
+      target: "D2",
+      correct: "E · A1 · A0'",
+      tokens: ["E", "A1", "A0", "·", "+", "'", "(", ")"]
+    }
+  },
+  dec38: {
+    title: "3:8 Decoder Validation Test",
+    truthTable: {
+      headers: ["A2", "A1", "A0", "Active Output (E=1)"],
+      rows: [
+        { inputs: [0, 1, 0], correct: ["D2"] },
+        { inputs: [1, 0, 1], correct: ["D5"] },
+        { inputs: [1, 1, 1], correct: ["D7"] }
+      ]
+    },
+    expression: {
+      target: "D5",
+      correct: "A2 · A1' · A0",
+      tokens: ["A2", "A1", "A0", "·", "+", "'", "(", ")"]
+    }
+  },
+  enc21: {
+    title: "2:1 Encoder Validation Test",
+    truthTable: {
+      headers: ["Y1", "Y0", "A", "V"],
+      rows: [
+        { inputs: [0, 0], correct: ['X', 0] },
+        { inputs: [0, 1], correct: [0, 1] },
+        { inputs: [1, 0], correct: [1, 1] },
+        { inputs: [1, 1], correct: [1, 1] }
+      ]
+    },
+    expression: {
+      target: "V",
+      correct: "Y1 + Y0",
+      tokens: ["Y1", "Y0", "·", "+", "'", "(", ")"]
+    }
+  },
+  enc42std: {
+    title: "4:2 Standard Encoder Validation Test",
+    truthTable: {
+      headers: ["Y3", "Y2", "Y1", "Y0", "A1", "A0", "V"],
+      rows: [
+        { inputs: [0, 0, 0, 0], correct: [0, 0, 0] },
+        { inputs: [0, 1, 0, 0], correct: [1, 0, 1] },
+        { inputs: [1, 0, 0, 0], correct: [1, 1, 1] }
+      ]
+    },
+    expression: {
+      target: "A1",
+      correct: "Y3 + Y2",
+      tokens: ["Y3", "Y2", "Y1", "Y0", "·", "+", "'", "(", ")"]
+    }
+  },
+  enc82: {
+    title: "8:2 Encoder Validation Test",
+    truthTable: {
+      headers: ["Active Input Group", "A1", "A0", "V"],
+      rows: [
+        { inputs: ["None (All 0)"], correct: [0, 0, 0] },
+        { inputs: ["Group 1 (Y2, Y3)"], correct: [0, 1, 1] },
+        { inputs: ["Group 2 (Y4, Y5)"], correct: [1, 0, 1] }
+      ]
+    },
+    expression: {
+      target: "A0",
+      correct: "Y7 + Y6 + Y3 + Y2",
+      tokens: ["Y7", "Y6", "Y5", "Y4", "Y3", "Y2", "Y1", "Y0", "·", "+"]
+    }
+  },
+  enc42: {
+    title: "4:2 Priority Encoder Validation Test",
+    truthTable: {
+      headers: ["Y3", "Y2", "Y1", "Y0", "A1", "A0", "V"],
+      rows: [
+        { inputs: [0, 0, 0, 1], correct: [0, 0, 1] },
+        { inputs: [0, 0, 1, 'X'], correct: [0, 1, 1] },
+        { inputs: [0, 1, 'X', 'X'], correct: [1, 0, 1] },
+        { inputs: [1, 'X', 'X', 'X'], correct: [1, 1, 1] }
+      ]
+    },
+    expression: {
+      target: "A0",
+      correct: "Y3 + Y2' · Y1",
+      tokens: ["Y3", "Y2", "Y1", "Y0", "·", "+", "'", "(", ")"]
+    }
+  },
+  enc83: {
+    title: "8:3 Priority Encoder Validation Test",
+    truthTable: {
+      headers: ["Highest Active Input", "A2", "A1", "A0", "V"],
+      rows: [
+        { inputs: ["Y0"], correct: [0, 0, 0, 1] },
+        { inputs: ["Y3"], correct: [0, 1, 1, 1] },
+        { inputs: ["Y5"], correct: [1, 0, 1, 1] },
+        { inputs: ["Y6"], correct: [1, 1, 0, 1] }
+      ]
+    },
+    expression: {
+      target: "A2",
+      correct: "Y7 + Y6 + Y5 + Y4",
+      tokens: ["Y7", "Y6", "Y5", "Y4", "Y3", "Y2", "Y1", "Y0", "·", "+"]
+    }
+  }
+};
+
+const activeTestTokens = {};
+
+function getSelectOptionsForTopic(topicId) {
+  if (topicId === 'dec38') {
+    return ['0', '1', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7'];
+  }
+  return ['0', '1', 'X'];
+}
+
+/* ═══════ WORKSPACE SUB-TABS DIVISION ═══════ */
+function initWorkspaceSubTabs() {
+  const ids = ['dec12', 'dec24', 'dec38', 'enc21', 'enc42std', 'enc82', 'enc42', 'enc83'];
+  ids.forEach(id => {
+    const sec = document.getElementById('sec-' + id);
+    if (!sec) return;
+    const mainEl = sec.querySelector('main');
+    if (!mainEl) return;
+    
+    // Create tab containers
+    const learningDiv = document.createElement('div');
+    learningDiv.className = 'sub-tab-content learning-content';
+    learningDiv.id = 'content-learning-' + id;
+    
+    const practiceDiv = document.createElement('div');
+    practiceDiv.className = 'sub-tab-content practice-content';
+    practiceDiv.id = 'content-practice-' + id;
+    practiceDiv.style.display = 'none';
+    
+    const testDiv = document.createElement('div');
+    testDiv.className = 'sub-tab-content test-content';
+    testDiv.id = 'content-test-' + id;
+    testDiv.style.display = 'none';
+    
+    // Find grids, panels & note blocks
+    const grids = Array.from(mainEl.querySelectorAll('.grid-2'));
+    const panels = Array.from(mainEl.querySelectorAll('.panel'));
+    const notes = Array.from(mainEl.querySelectorAll('.note'));
+    
+    // Find breadboard panel
+    let breadboardPanel = null;
+    panels.forEach(p => {
+      const h4 = p.querySelector('h4');
+      if (h4 && (h4.textContent.includes('Breadboard') || h4.textContent.includes('Hardware'))) {
+        breadboardPanel = p;
+      }
+    });
+    
+    // Move elements to Learning content:
+    const learningGrid = document.createElement('div');
+    learningGrid.className = 'grid-2';
+    
+    // Block Diagram (first grid, second child)
+    if (grids[0] && grids[0].children[1]) {
+      learningGrid.appendChild(grids[0].children[1]);
+    }
+    // Truth Table & Equations (second grid, first child)
+    if (grids[1] && grids[1].children[0]) {
+      learningGrid.appendChild(grids[1].children[0]);
+    }
+    learningDiv.appendChild(learningGrid);
+    
+    // Logic Schematic (second grid, second child -> now first child since we moved table)
+    if (grids[1] && grids[1].children[0]) {
+      learningDiv.appendChild(grids[1].children[0]);
+    }
+    
+    // Move notes
+    notes.forEach(note => learningDiv.appendChild(note));
+    
+    // Move elements to Practice content:
+    // Simulator (first grid, first child)
+    if (grids[0] && grids[0].children[0]) {
+      practiceDiv.appendChild(grids[0].children[0]);
+    }
+    // Breadboard panel
+    if (breadboardPanel) {
+      practiceDiv.appendChild(breadboardPanel);
+    }
+    
+    // Remove the now empty grid containers
+    grids.forEach(g => g.remove());
+    
+    // Create Tabs navigation
+    const tabsDiv = document.createElement('div');
+    tabsDiv.className = 'workspace-sub-tabs';
+    tabsDiv.id = 'sub-tabs-' + id;
+    tabsDiv.innerHTML = `
+      <button class="sub-tab-btn active" id="btn-sub-learning-${id}" onclick="switchWorkspaceSubTab('${id}', 'learning')">📖 Learning</button>
+      <button class="sub-tab-btn" id="btn-sub-practice-${id}" onclick="switchWorkspaceSubTab('${id}', 'practice')">🛠️ Practice</button>
+      <button class="sub-tab-btn" id="btn-sub-test-${id}" onclick="switchWorkspaceSubTab('${id}', 'test')">📝 Diagnostic Test</button>
+    `;
+    
+    // Append in clean order
+    mainEl.appendChild(tabsDiv);
+    mainEl.appendChild(learningDiv);
+    mainEl.appendChild(practiceDiv);
+    mainEl.appendChild(testDiv);
+  });
+}
+
+function switchWorkspaceSubTab(sectionId, tabName) {
+  ['learning', 'practice', 'test'].forEach(t => {
+    const el = document.getElementById(`content-${t}-${sectionId}`);
+    if (el) el.style.display = (t === tabName) ? 'block' : 'none';
+    
+    const btn = document.getElementById(`btn-sub-${t}-${sectionId}`);
+    if (btn) btn.classList.toggle('active', t === tabName);
+  });
+  
+  if (tabName === 'practice') {
+    generateBreadboardSVG(sectionId);
+  }
+}
+
+/* ═══════ DIAGNOSTIC TEST VISIBILITY CONTROLLERS ═══════ */
+function startDiagnosticTest(sectionId) {
+  playSynthTone(500);
+  
+  // Hide navigation tabs
+  const tabs = document.getElementById('sub-tabs-' + sectionId);
+  if (tabs) tabs.style.display = 'none';
+  
+  // Hide start cover page, show test workspace & warning active banner
+  const cover = document.getElementById('diag-cover-' + sectionId);
+  if (cover) cover.style.display = 'none';
+  
+  const workspace = document.getElementById('diag-workspace-' + sectionId);
+  if (workspace) workspace.style.display = 'block';
+  
+  const banner = document.getElementById('diag-banner-' + sectionId);
+  if (banner) banner.style.display = 'flex';
+  
+  resetTestInputs(sectionId);
+}
+
+function cancelDiagnosticTest(sectionId) {
+  playSynthTone(300);
+  
+  // Restore navigation tabs
+  const tabs = document.getElementById('sub-tabs-' + sectionId);
+  if (tabs) tabs.style.display = 'flex';
+  
+  // Show start cover page, hide test workspace & active banner
+  const cover = document.getElementById('diag-cover-' + sectionId);
+  if (cover) cover.style.display = 'block';
+  
+  const workspace = document.getElementById('diag-workspace-' + sectionId);
+  if (workspace) workspace.style.display = 'none';
+  
+  const banner = document.getElementById('diag-banner-' + sectionId);
+  if (banner) banner.style.display = 'none';
+  
+  resetTestInputs(sectionId);
+}
+
+function resetTestInputs(sectionId) {
+  const config = SECTION_TESTS[sectionId];
+  
+  // Reset all selects to default "?" and remove diagnostic check color classes
+  config.truthTable.rows.forEach((row, rIdx) => {
+    row.correct.forEach((corrVal, cIdx) => {
+      const select = document.getElementById(`test-select-${sectionId}-${rIdx}-${cIdx}`);
+      if (select) {
+        select.value = "?";
+        select.className = "";
+      }
+    });
+  });
+  
+  clearTestTokens(sectionId);
+  
+  const fb = document.getElementById('test-feedback-' + sectionId);
+  if (fb) fb.className = 'test-feedback';
+}
+
+function initSectionTests() {
+  Object.keys(SECTION_TESTS).forEach(sectionId => {
+    const testContainer = document.getElementById('content-test-' + sectionId);
+    if (!testContainer) return;
+    
+    const panel = document.createElement('div');
+    panel.className = 'panel test-panel';
+    panel.id = 'test-panel-' + sectionId;
+    
+    const config = SECTION_TESTS[sectionId];
+    const isCompleted = getTopicCompleted(sectionId);
+    
+    panel.innerHTML = `
+      <!-- Cover screen -->
+      <div class="diag-start-screen" id="diag-cover-${sectionId}" style="display: ${isCompleted ? 'none' : 'block'};">
+        <h3>📝 Diagnostic Validation Test</h3>
+        <p>Diagnostic mode will hide all learning and practice resources in this workspace. You must complete the truth table and construct the logic expression from memory.</p>
+        <button class="asm-btn" onclick="startDiagnosticTest('${sectionId}')">Start Diagnostic Test</button>
+      </div>
+      
+      <!-- Workspace content -->
+      <div id="diag-workspace-${sectionId}" style="display: ${isCompleted ? 'block' : 'none'};">
+        <div class="diag-active-bar" id="diag-banner-${sectionId}" style="display: none;">
+          <span>⚠️ Diagnostic Test Active — Reference material hidden.</span>
+          <button class="tool-btn" onclick="cancelDiagnosticTest('${sectionId}')" style="margin:0; border-color: var(--danger); color: var(--danger); font-size:11px; padding: 4px 10px; background: transparent; border-width: 1px; border-style: solid; border-radius: 6px; cursor: pointer;">Cancel Test</button>
+        </div>
+        
+        <h4>🔬 ${config.title}</h4>
+        <p class="sub" style="font-size:12.5px;color:var(--text-dim);margin-bottom:16px;">
+          Complete the truth table validation cells and construct the correct output logical expression. Successful verification unlocks progress to the next combinational logic page.
+        </p>
+        
+        <div class="grid-2">
+          <div>
+            <h5 style="color:var(--copper);margin:0 0 10px;font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">
+              1. Complete the Truth Table
+            </h5>
+            <div class="table-wrapper">
+              <table class="test-table">
+                <thead>
+                  <tr>
+                    ${config.truthTable.headers.map(h => `<th>${h}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${config.truthTable.rows.map((row, rIdx) => `
+                    <tr>
+                      ${row.inputs.map(val => `<td><strong>${val}</strong></td>`).join('')}
+                      ${row.correct.map((corrVal, cIdx) => `
+                        <td>
+                          <select id="test-select-${sectionId}-${rIdx}-${cIdx}">
+                            <option value="?">?</option>
+                            ${getSelectOptionsForTopic(sectionId).map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                          </select>
+                        </td>
+                      `).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div>
+            <h5 style="color:var(--copper);margin:0 0 10px;font-family:'JetBrains Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">
+              2. Build the Logical Expression
+            </h5>
+            <div class="expr-builder-container">
+              <div class="expr-display-row">
+                <span class="expr-target">${config.expression.target} =</span>
+                <div class="expr-workspace" id="expr-work-${sectionId}">
+                  <span class="expr-placeholder">Click tokens below to build the expression...</span>
+                </div>
+              </div>
+              
+              <div class="token-bank">
+                ${config.expression.tokens.map((token, tokenIdx) => `
+                  <button class="token-btn" onclick="addTestTokenIdx('${sectionId}', ${tokenIdx})">${token}</button>
+                `).join('')}
+                <button class="token-btn expr-ctrl-btn" onclick="popTestToken('${sectionId}')">⌫ Backspace</button>
+                <button class="token-btn expr-ctrl-btn" onclick="clearTestTokens('${sectionId}')">↺ Clear</button>
+              </div>
+              <p style="font-size:11px;color:var(--text-dim);margin:6px 0 0 0;font-family:'JetBrains Mono',monospace;">
+                * Standard term syntax: Click operators (·, +) to link variables. Standard minterms sequence Enable first, then inputs in decreasing index order.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="test-feedback" id="test-feedback-${sectionId}"></div>
+        
+        <div class="test-actions">
+          <button class="asm-btn" onclick="verifySectionTest('${sectionId}')">Verify Diagnostic Answers</button>
+          <button class="asm-btn proceed-btn" id="btn-proceed-${sectionId}" style="display:none;" onclick="proceedToNextTopic('${sectionId}')">
+            Proceed to Next Topic →
+          </button>
+        </div>
+      </div>
+    `;
+    
+    testContainer.appendChild(panel);
+    activeTestTokens[sectionId] = [];
+    
+    if (isCompleted) {
+      setTimeout(() => {
+        const testBtn = document.getElementById('btn-sub-test-' + sectionId);
+        if (testBtn && !testBtn.textContent.includes('✅')) {
+          testBtn.textContent = '📝 Diagnostic Test ✅';
+        }
+        
+        const proceedBtn = document.getElementById('btn-proceed-' + sectionId);
+        if (proceedBtn) proceedBtn.style.display = 'inline-block';
+        
+        config.truthTable.rows.forEach((row, rIdx) => {
+          row.correct.forEach((corrVal, cIdx) => {
+            const select = document.getElementById(`test-select-${sectionId}-${rIdx}-${cIdx}`);
+            if (select) {
+              select.value = corrVal;
+              select.className = 'correct-cell';
+            }
+          });
+        });
+        
+        activeTestTokens[sectionId] = config.expression.correct.split(/\s+/);
+        const ws = document.getElementById('expr-work-' + sectionId);
+        if (ws) {
+          ws.className = 'expr-workspace active-expr';
+          ws.innerHTML = activeTestTokens[sectionId].map(t => `<span class="expr-token">${t}</span>`).join(' ');
+          ws.style.borderColor = 'var(--good)';
+        }
+      }, 50);
+    }
+  });
+}
+
+function addTestToken(sectionId, token) {
+  playSynthTone(400);
+  const tokens = activeTestTokens[sectionId];
+  tokens.push(token);
+  renderTestExpression(sectionId);
+}
+
+function addTestTokenIdx(sectionId, tokenIdx) {
+  const token = SECTION_TESTS[sectionId].expression.tokens[tokenIdx];
+  addTestToken(sectionId, token);
+}
+
+function popTestToken(sectionId) {
+  playSynthTone(350);
+  const tokens = activeTestTokens[sectionId];
+  if (tokens.length > 0) {
+    tokens.pop();
+  }
+  renderTestExpression(sectionId);
+}
+
+function clearTestTokens(sectionId) {
+  playSynthTone(300);
+  activeTestTokens[sectionId] = [];
+  renderTestExpression(sectionId);
+}
+
+function renderTestExpression(sectionId) {
+  const ws = document.getElementById('expr-work-' + sectionId);
+  if (!ws) return;
+  
+  const tokens = activeTestTokens[sectionId];
+  if (tokens.length === 0) {
+    ws.className = 'expr-workspace';
+    ws.innerHTML = `<span class="expr-placeholder">Click tokens below to build the expression...</span>`;
+    ws.style.borderColor = 'var(--panel-border)';
+  } else {
+    ws.className = 'expr-workspace active-expr';
+    ws.innerHTML = tokens.map(t => `<span class="expr-token">${t}</span>`).join(' ');
+    ws.style.borderColor = 'var(--panel-border)';
+  }
+}
+
+function checkExpressionCorrectness(sectionId, userExpr) {
+  if (sectionId === 'dec12') {
+    return ['E·A', 'A·E'].includes(userExpr);
+  }
+  if (sectionId === 'dec24') {
+    const parts = userExpr.split('·');
+    return parts.length === 3 && parts.includes('E') && parts.includes('A1') && parts.includes("A0'");
+  }
+  if (sectionId === 'dec38') {
+    const parts = userExpr.split('·');
+    return parts.length === 3 && parts.includes('A2') && parts.includes("A1'") && parts.includes('A0');
+  }
+  if (sectionId === 'enc21') {
+    return ['Y1+Y0', 'Y0+Y1'].includes(userExpr);
+  }
+  if (sectionId === 'enc42std') {
+    return ['Y3+Y2', 'Y2+Y3'].includes(userExpr);
+  }
+  if (sectionId === 'enc82') {
+    const parts = userExpr.split('+');
+    return parts.length === 4 && parts.includes('Y7') && parts.includes('Y6') && parts.includes('Y3') && parts.includes('Y2');
+  }
+  if (sectionId === 'enc42') {
+    return ['Y3+Y2\'·Y1', 'Y2\'·Y1+Y3', 'Y3+Y1·Y2\'', 'Y1·Y2\'+Y3'].includes(userExpr);
+  }
+  if (sectionId === 'enc83') {
+    const parts = userExpr.split('+');
+    return parts.length === 4 && parts.includes('Y7') && parts.includes('Y6') && parts.includes('Y5') && parts.includes('Y4');
+  }
+  return false;
+}
+
+function verifySectionTest(sectionId) {
+  const config = SECTION_TESTS[sectionId];
+  let allCorrect = true;
+  
+  // 1. Verify Truth Table
+  config.truthTable.rows.forEach((row, rIdx) => {
+    row.correct.forEach((corrVal, cIdx) => {
+      const select = document.getElementById(`test-select-${sectionId}-${rIdx}-${cIdx}`);
+      if (select) {
+        const val = select.value;
+        const isCellCorrect = (String(val) === String(corrVal));
+        if (isCellCorrect) {
+          select.className = 'correct-cell';
+        } else {
+          select.className = 'wrong-cell';
+          allCorrect = false;
+        }
+      }
+    });
+  });
+  
+  // 2. Verify Logic Expression
+  const ws = document.getElementById('expr-work-' + sectionId);
+  const userTokens = activeTestTokens[sectionId];
+  const userExprNormalized = userTokens.join('').replace(/\s+/g, '');
+  const isExprCorrect = checkExpressionCorrectness(sectionId, userExprNormalized);
+  
+  if (isExprCorrect) {
+    if (ws) ws.style.borderColor = 'var(--good)';
+  } else {
+    if (ws) ws.style.borderColor = 'var(--danger)';
+    allCorrect = false;
+  }
+  
+  const feedback = document.getElementById('test-feedback-' + sectionId);
+  const proceedBtn = document.getElementById('btn-proceed-' + sectionId);
+  
+  if (allCorrect) {
+    setTopicCompleted(sectionId);
+    playSuccessSound();
+    
+    // Restore navigation tabs & remove active warning banner
+    const tabs = document.getElementById('sub-tabs-' + sectionId);
+    if (tabs) tabs.style.display = 'flex';
+    
+    const banner = document.getElementById('diag-banner-' + sectionId);
+    if (banner) banner.style.display = 'none';
+    
+    const testBtn = document.getElementById('btn-sub-test-' + sectionId);
+    if (testBtn && !testBtn.textContent.includes('✅')) {
+      testBtn.textContent = '📝 Diagnostic Test ✅';
+    }
+    
+    if (feedback) {
+      feedback.className = 'test-feedback show success';
+      feedback.innerHTML = `<strong>✅ Diagnostic Successful!</strong> All logic outputs and expressions are verified. Next combinational logic level has been unlocked.`;
+    }
+    if (proceedBtn) {
+      proceedBtn.style.display = 'inline-block';
+    }
+  } else {
+    playFailSound();
+    
+    if (feedback) {
+      feedback.className = 'test-feedback show fail';
+      feedback.innerHTML = `<strong>❌ Diagnostic Mismatch!</strong> Some inputs or logic terms do not match the expected behavior. Review highlighted elements and re-verify.`;
+    }
+    if (proceedBtn) {
+      proceedBtn.style.display = 'none';
+    }
+  }
+}
+
+function proceedToNextTopic(sectionId) {
+  const idx = TOPIC_SEQUENCE.indexOf(sectionId);
+  if (idx !== -1 && idx < TOPIC_SEQUENCE.length - 1) {
+    const nextTopic = TOPIC_SEQUENCE[idx + 1];
+    showSection(nextTopic);
+  } else {
+    alert("🎉 Congratulations! You have completed all combinational logic level diagnostics!");
+    showSection('hub');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   IC WIRING SANDBOX ENGINE
+   ══════════════════════════════════════════════════════════ */
+const SB_DEFS = {
+  dec12: {
+    name:'1:2 Decoder', icLabel:'1:2 DEC', color:'#00c8ff',
+    inputs:['E','A'], outputs:['D0','D1'],
+    logic(sw){ const E=sw.E|0,A=sw.A|0; return{D0:E&&!A?1:0,D1:E&&A?1:0}; }
+  },
+  dec24: {
+    name:'2:4 Decoder', icLabel:'74LS139', color:'#00c8ff',
+    inputs:['E','A1','A0'], outputs:['D0','D1','D2','D3'],
+    logic(sw){
+      const E=sw.E|0,A1=sw.A1|0,A0=sw.A0|0;
+      if(!E) return{D0:0,D1:0,D2:0,D3:0};
+      const i=(A1<<1)|A0; return{D0:i===0?1:0,D1:i===1?1:0,D2:i===2?1:0,D3:i===3?1:0};
+    }
+  },
+  dec38: {
+    name:'3:8 Decoder', icLabel:'74LS138', color:'#00c8ff',
+    inputs:['E','A2','A1','A0'], outputs:['D0','D1','D2','D3','D4','D5','D6','D7'],
+    logic(sw){
+      const r={D0:0,D1:0,D2:0,D3:0,D4:0,D5:0,D6:0,D7:0};
+      if(!(sw.E|0)) return r;
+      r['D'+((sw.A2<<2)|(sw.A1<<1)|sw.A0)]=1; return r;
+    }
+  },
+  enc21: {
+    name:'2:1 Encoder', icLabel:'2:1 ENC', color:'#ff9d00',
+    inputs:['Y0','Y1'], outputs:['A','V'],
+    logic(sw){ return{A:sw.Y1?1:0, V:(sw.Y0||sw.Y1)?1:0}; }
+  },
+  enc42std: {
+    name:'4:2 Std Encoder', icLabel:'4:2 ENC', color:'#ff9d00',
+    inputs:['Y0','Y1','Y2','Y3'], outputs:['A1','A0','V'],
+    logic(sw){
+      const Y=[sw.Y0|0,sw.Y1|0,sw.Y2|0,sw.Y3|0],V=Y.some(v=>v)?1:0;
+      return{A1:(Y[2]||Y[3])?1:0,A0:(Y[1]||Y[3])?1:0,V};
+    }
+  },
+  enc82: {
+    name:'8:2 Encoder', icLabel:'8:2 ENC', color:'#ff9d00',
+    inputs:['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'], outputs:['A1','A0','V'],
+    logic(sw){
+      const Y=Array.from({length:8},(_,i)=>sw['Y'+i]|0),V=Y.some(v=>v)?1:0;
+      return{A1:(Y[4]||Y[5]||Y[6]||Y[7])?1:0,A0:(Y[2]||Y[3]||Y[6]||Y[7])?1:0,V};
+    }
+  },
+  enc42: {
+    name:'4:2 Priority Enc', icLabel:'74LS147', color:'#c840fb',
+    inputs:['Y0','Y1','Y2','Y3'], outputs:['A1','A0','V'],
+    logic(sw){
+      const Y=[sw.Y0|0,sw.Y1|0,sw.Y2|0,sw.Y3|0],V=Y.some(v=>v)?1:0;
+      let A1=0,A0=0;
+      if(Y[3]){A1=1;A0=1;} else if(Y[2]){A1=1;} else if(Y[1]){A0=1;}
+      return{A1,A0,V};
+    }
+  },
+  enc83: {
+    name:'8:3 Priority Enc', icLabel:'74LS148', color:'#c840fb',
+    inputs:['Y0','Y1','Y2','Y3','Y4','Y5','Y6','Y7'], outputs:['A2','A1','A0','V'],
+    logic(sw){
+      let w=-1; for(let j=7;j>=0;j--) if(sw['Y'+j]){w=j;break;}
+      if(w<0) return{A2:0,A1:0,A0:0,V:0};
+      return{A2:[4,5,6,7].includes(w)?1:0,A1:[2,3,6,7].includes(w)?1:0,A0:[1,3,5,7].includes(w)?1:0,V:1};
+    }
+  }
+};
+
+/* ── Wire colour palettes ── */
+const SB_WCI=['#ff3d3d','#ff8c00','#ffe03d','#ff44cc','#e83dff','#3d84ff','#ff6644','#ff55aa'];
+const SB_WCO=['#22dd77','#22ccff','#aaee22','#22ffcc','#ff99ff','#ffaa44','#44ffaa','#9999ff'];
+let sbConnIn={},sbConnOut={},sbSw={},sbOut=null;
+let sbFlashing=null,sbFlashTimer=null;
+let sbDragging=false,sbDragSig=null,sbDragRole=null,sbDragX0=0,sbDragY0=0,sbDragCol='#fff';
+let sbNodePos={},sbCvH=360,sbDiagStep=0;
+function sbWCI(i){return SB_WCI[i%SB_WCI.length];}
+function sbWCO(i){return SB_WCO[i%SB_WCO.length];}
+function sbSvgCoords(e){
+  const sv=document.getElementById('ic-svg'),r=sv.getBoundingClientRect();
+  return{x:(e.clientX-r.left)*800/r.width,y:(e.clientY-r.top)*sbCvH/r.height};
+}
+
+function selectSandboxIC(id){
+  sbIC=SB_DEFS[id];sbICId=id;
+  sbConnIn={};sbConnOut={};sbSw={};sbOut=null;
+  sbDragging=false;sbDragSig=null;sbDragRole=null;
+  sbIC.inputs.forEach(s=>{sbSw[s]=0;});
+  document.querySelectorAll('.ic-sel-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('ic-btn-'+id);if(btn)btn.classList.add('active');
+  renderSandboxSVG();updateSbStatus();
+  const rd=document.getElementById('ic-readout');if(rd){rd.innerHTML='';rd.style.display='none';}
+}
+
+function renderSandboxSVG(){
+  if(!sbIC)return;
+  const INP=sbIC.inputs,OUT=sbIC.outputs;
+  const rows=Math.max(INP.length+1,OUT.length+1);
+  const STEP=66,IC_TOP=62,IC_H=rows*STEP+12,CV_H=IC_TOP+IC_H+64;
+  sbCvH=CV_H;
+  const IC_L=296,IC_R=504,SW_X=104,LED_X=696;
+  const VCC_Y=20,GND_Y=CV_H-20;
+  sbNodePos={};
+  const svg=document.getElementById('ic-svg');
+  svg.setAttribute('viewBox',`0 0 800 ${CV_H}`);
+  const ly=i=>IC_TOP+STEP*0.62+i*STEP;
+
+  /* ─ DEFS ─ */
+  let s=`<defs>
+    <filter id="gfn"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="gfl"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="gfw"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="bbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8f3e8"/><stop offset="100%" stop-color="#ece6d8"/>
+    </linearGradient>
+    <linearGradient id="icg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e1e"/><stop offset="100%" stop-color="#060606"/>
+    </linearGradient>
+    <linearGradient id="legg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#c8c8c8"/><stop offset="45%" stop-color="#f0f0f0"/><stop offset="100%" stop-color="#a0a0a0"/>
+    </linearGradient>
+    <linearGradient id="railR" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c00014"/><stop offset="100%" stop-color="#8a0010"/>
+    </linearGradient>
+    <linearGradient id="railB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#003db5"/><stop offset="100%" stop-color="#00248a"/>
+    </linearGradient>
+  </defs>`;
+
+  /* ─ BREADBOARD BODY ─ */
+  s+=`<rect width="800" height="${CV_H}" fill="url(#bbg)"/>`;
+  /* fine texture */
+  for(let tx=0;tx<800;tx+=2)s+=`<line x1="${tx}" y1="0" x2="${tx}" y2="${CV_H}" stroke="#e0dace" stroke-width="0.5" opacity="0.35"/>`;
+  /* hole grid */
+  s+=`<g opacity="0.2">`;
+  for(let gx=40;gx<762;gx+=15){
+    for(let gy=38;gy<CV_H-35;gy+=15){
+      if(gx>268&&gx<533&&gy>IC_TOP-10&&gy<IC_TOP+IC_H+10)continue;
+      s+=`<circle cx="${gx}" cy="${gy}" r="2.8" fill="#181008" stroke="#0e0b04" stroke-width="0.4"/>`;
+      s+=`<circle cx="${gx}" cy="${gy}" r="1.4" fill="#2a1e08" opacity="0.6"/>`;
+    }
+  }
+  s+=`</g>`;
+
+  /* ─ VCC RAIL ─ */
+  s+=`<rect x="32" y="${VCC_Y-10}" width="736" height="20" rx="3" fill="url(#railR)" opacity="0.92"/>`;
+  s+=`<text x="16" y="${VCC_Y+4}" font-size="8" fill="#ff6666" font-family="Arial,sans-serif" font-weight="bold" text-anchor="middle">V+</text>`;
+  for(let hx=48;hx<764;hx+=15)s+=`<circle cx="${hx}" cy="${VCC_Y}" r="3.5" fill="#060000" stroke="#ff6666" stroke-width="0.9" opacity="0.85"/>`;
+
+  /* ─ GND RAIL ─ */
+  s+=`<rect x="32" y="${GND_Y-10}" width="736" height="20" rx="3" fill="url(#railB)" opacity="0.92"/>`;
+  s+=`<text x="16" y="${GND_Y+4}" font-size="8" fill="#6688ff" font-family="Arial,sans-serif" font-weight="bold" text-anchor="middle">−</text>`;
+  for(let hx=48;hx<764;hx+=15)s+=`<circle cx="${hx}" cy="${GND_Y}" r="3.5" fill="#000006" stroke="#6688ff" stroke-width="0.9" opacity="0.85"/>`;
+
+  /* section dividers + labels */
+  s+=`<line x1="258" y1="${IC_TOP-8}" x2="258" y2="${IC_TOP+IC_H+8}" stroke="#c8bea4" stroke-width="1.2" stroke-dasharray="4,4" opacity="0.55"/>`;
+  s+=`<line x1="542" y1="${IC_TOP-8}" x2="542" y2="${IC_TOP+IC_H+8}" stroke="#c8bea4" stroke-width="1.2" stroke-dasharray="4,4" opacity="0.55"/>`;
+  s+=`<text x="${SW_X}" y="${IC_TOP-16}" text-anchor="middle" font-size="9" fill="#8a7a58" font-family="Arial,sans-serif" font-weight="700" letter-spacing="0.12em">INPUTS</text>`;
+  s+=`<text x="${LED_X}" y="${IC_TOP-16}" text-anchor="middle" font-size="9" fill="#8a7a58" font-family="Arial,sans-serif" font-weight="700" letter-spacing="0.12em">OUTPUTS</text>`;
+
+  /* ─ LEFT PINS (inputs + GND) ─ */
+  const leftPins=[...INP.map(sg=>({sig:sg,type:'input'})),{sig:'GND',type:'gnd'}];
+  leftPins.forEach((pin,i)=>{
+    const y=ly(i),pnx=IC_L-28,isGND=pin.type==='gnd';
+    const swConn=isGND?'GND':sbConnIn[pin.sig]; // Maps pin.sig to connected switch name (e.g. 'E')
+    const wCol=isGND?'#1133cc':(swConn ? sbWCI(INP.indexOf(swConn)) : sbWCI(i));
+    const sw=isGND?0:(swConn ? (sbSw[swConn]||0) : 0);
+    const isFlash=sbFlashing&&!isGND&&sbFlashing.sig===pin.sig&&sbFlashing.type==='in';
+
+    /* silver IC leg */
+    s+=`<rect x="${IC_L-30}" y="${y-3.5}" width="30" height="7" rx="2" fill="url(#legg)" stroke="#a0a0a0" stroke-width="0.7"/>`;
+
+    /* coloured wire */
+    if(isGND){
+      s+=`<path d="M${pnx-2},${y} C${pnx-40},${y} ${pnx-40},${GND_Y} 60,${GND_Y}" stroke="#1133cc" stroke-width="2.2" fill="none" stroke-dasharray="6,4" opacity="0.65"/>`;
+    }else if(swConn){
+      const swIdx=INP.indexOf(swConn);
+      const swY=ly(swIdx);
+      const mx=(SW_X+pnx)/2;
+      s+=`<path d="M${SW_X},${swY} C${mx},${swY-10} ${mx},${y+10} ${pnx},${y}" stroke="${wCol}" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.92" ${isFlash?'filter="url(#gfw)"':''}>`
+      if(isFlash)s+=`<animate attributeName="stroke-width" values="4;9;4;7;4" dur="0.5s" repeatCount="1"/>`;
+      s+=`</path>`;
+      if(sbDiagStep===1){
+        s+=`<path d="M${SW_X},${swY} C${mx},${swY-10} ${mx},${y+10} ${pnx},${y}" stroke="#ffffff" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-dasharray="14,14" filter="url(#gfn)">
+          <animate attributeName="stroke-dashoffset" values="28;0" dur="0.25s" repeatCount="indefinite"/>
+        </path>`;
+      }
+    }else{
+      s+=`<line x1="${SW_X}" y1="${y}" x2="${pnx}" y2="${y}" stroke="#b8a888" stroke-width="1.2" stroke-dasharray="4,7" opacity="0.32"/>`;
+    }
+
+    /* switch hole */
+    if(!isGND){
+      // A switch is connected if some pin points to it
+      const swIsConnected=Object.values(sbConnIn).includes(pin.sig);
+      const isDragSrc=sbDragging&&sbDragSig===pin.sig&&sbDragRole==='sw';
+      const isTarget=sbDragging&&sbDragRole==='ipin'&&sbDragSig===pin.sig&&!swIsConnected;
+      sbNodePos[`sw_${pin.sig}`]={cx:SW_X,cy:y,role:'sw',sig:pin.sig};
+      /* socket plate */
+      s+=`<rect x="${SW_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="${swIsConnected?'#dedad0':'#eae5d8'}" stroke="${isDragSrc||isTarget?'#ffdd00':swIsConnected?wCol:'#b8a880'}" stroke-width="${isDragSrc||isTarget?2.5:1.2}"/>`;
+      /* hole */
+      s+=`<circle cx="${SW_X}" cy="${y}" r="8" fill="${swIsConnected?wCol:'#181208'}" stroke="${swIsConnected?wCol:'#584820'}" stroke-width="1.8"/>`;
+      if(swIsConnected){
+        /* wire plug sticking out top */
+        s+=`<rect x="${SW_X-3.5}" y="${y-17}" width="7" height="11" rx="1.5" fill="${wCol}" stroke="white" stroke-width="0.8" opacity="0.9"/>`;
+        /* toggle pill */
+        const currentSwVal=sbSw[pin.sig]||0;
+        s+=`<rect x="${SW_X-16}" y="${y+12}" width="32" height="13" rx="4" fill="${currentSwVal?wCol:'#282010'}" stroke="${wCol}" stroke-width="1.2" style="cursor:pointer" onmousedown="event.stopPropagation();sbToggleSw('${pin.sig}')"/>`;
+        s+=`<text x="${SW_X}" y="${y+22}" font-size="7.5" fill="${currentSwVal?'#080600':'#b0a880'}" font-family="monospace" text-anchor="middle" pointer-events="none">${currentSwVal?'HIGH':'LOW'}</text>`;
+      }
+      /* signal label */
+      s+=`<text x="${SW_X-26}" y="${y+4}" font-size="9" fill="#6a5830" font-family="'Courier New',monospace" text-anchor="end" font-weight="700">${pin.sig}</text>`;
+      /* drag handle */
+      s+=`<rect x="${SW_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="transparent" style="cursor:grab"
+        onmousedown="sbMouseDown(event,'sw','${pin.sig}',${SW_X},${y})"
+        title="Drag to IC pin '${pin.sig}' to connect"/>`;
+    }
+    /* IC input pin drag target */
+    if(!isGND){
+      sbNodePos[`ipin_${pin.sig}`]={cx:pnx,cy:y,role:'ipin',sig:pin.sig};
+      s+=`<circle cx="${pnx}" cy="${y}" r="12" fill="transparent" style="cursor:crosshair"
+        onmousedown="sbMouseDown(event,'ipin','${pin.sig}',${pnx},${y})"
+        onmouseup="sbMouseUp(event,'ipin','${pin.sig}')"
+        title="IC Input pin: ${pin.sig}"/>`;
+    }
+  });
+
+  /* ─ RIGHT PINS (VCC + outputs) ─ */
+  const rightPins=[{sig:'VCC',type:'vcc'},...OUT.map(o=>({sig:o,type:'output'}))];
+  rightPins.forEach((pin,i)=>{
+    const y=ly(i),pnx=IC_R+28,isVCC=pin.type==='vcc';
+    const oIdx=i-1;
+    const connectedLed = isVCC?null:sbConnOut[pin.sig]; // E.g. 'D0'
+    const wCol=isVCC?'#cc1111':(connectedLed ? sbWCO(OUT.indexOf(connectedLed)) : sbWCO(oIdx));
+    const isFlash=sbFlashing&&!isVCC&&sbFlashing.sig===pin.sig&&sbFlashing.type==='out';
+    const ledOn = !isVCC && connectedLed && sbOut && sbOut[connectedLed];
+
+    /* silver IC leg */
+    s+=`<rect x="${IC_R}" y="${y-3.5}" width="30" height="7" rx="2" fill="url(#legg)" stroke="#a0a0a0" stroke-width="0.7"/>`;
+
+    if(isVCC){
+      s+=`<path d="M${pnx+2},${y} C${pnx+40},${y} ${pnx+40},${VCC_Y} 742,${VCC_Y}" stroke="#cc1111" stroke-width="2.2" fill="none" stroke-dasharray="6,4" opacity="0.65"/>`;
+    }else if(connectedLed){
+      const ledIdx = OUT.indexOf(connectedLed);
+      const ledY = ly(ledIdx + 1); // +1 because VCC is at 0
+      const mx=(pnx+LED_X)/2;
+      s+=`<path d="M${pnx},${y} C${mx},${y-10} ${mx},${ledY+10} ${LED_X},${ledY}" stroke="${wCol}" stroke-width="4" fill="none" stroke-linecap="round" opacity="${ledOn?'0.92':'0.5'}" ${isFlash?'filter="url(#gfw)"':''}>`
+      if(isFlash)s+=`<animate attributeName="stroke-width" values="4;9;4;7;4" dur="0.5s" repeatCount="1"/>`;
+      s+=`</path>`;
+      if(sbDiagStep===3){
+        s+=`<path d="M${pnx},${y} C${mx},${y-10} ${mx},${ledY+10} ${LED_X},${ledY}" stroke="#ffffff" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-dasharray="14,14" filter="url(#gfn)">
+          <animate attributeName="stroke-dashoffset" values="28;0" dur="0.25s" repeatCount="indefinite"/>
+        </path>`;
+      }
+    }else{
+      s+=`<line x1="${pnx}" y1="${y}" x2="${LED_X}" y2="${y}" stroke="#b8a888" stroke-width="1.2" stroke-dasharray="4,7" opacity="0.32"/>`;
+    }
+
+    /* IC output pin drag source */
+    if(!isVCC){
+      sbNodePos[`opin_${pin.sig}`]={cx:pnx,cy:y,role:'opin',sig:pin.sig};
+      s+=`<circle cx="${pnx}" cy="${y}" r="12" fill="transparent" style="cursor:grab"
+        onmousedown="sbMouseDown(event,'opin','${pin.sig}',${pnx},${y})"
+        onmouseup="sbMouseUp(event,'opin','${pin.sig}')"
+        title="Drag to LED to connect"/>`;
+
+      /* LED node */
+      const ledSig = pin.sig;
+      // Is this LED connected to some output pin?
+      const connectedOpin = Object.keys(sbConnOut).find(k => sbConnOut[k] === ledSig);
+      const isDragSrc=sbDragging&&sbDragSig===ledSig&&sbDragRole==='opin';
+      const isTarget=sbDragging&&sbDragRole==='opin'&&sbDragSig===connectedOpin&&!connectedOpin;
+      sbNodePos[`led_${ledSig}`]={cx:LED_X,cy:y,role:'led',sig:ledSig};
+      
+      const plateStroke = connectedOpin ? wCol : '#b8a880';
+      
+      /* socket plate */
+      s+=`<rect x="${LED_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="${connectedOpin?'#dedad0':'#eae5d8'}" stroke="${isDragSrc||isTarget?'#ffdd00':plateStroke}" stroke-width="${isDragSrc||isTarget?2.5:1.2}"/>`;
+      /* LED bulb */
+      s+=`<ellipse cx="${LED_X}" cy="${y-3}" rx="8.5" ry="8" fill="${ledOn?wCol:'#181208'}" stroke="${connectedOpin?wCol:'#584820'}" stroke-width="1.8" ${ledOn?'filter="url(#gfl)"':''}/>`;
+      /* LED flat bottom line */
+      s+=`<line x1="${LED_X-4}" y1="${y+5}" x2="${LED_X+4}" y2="${y+5}" stroke="${connectedOpin?wCol:'#584820'}" stroke-width="1.5"/>`;
+      /* leads */
+      s+=`<line x1="${LED_X-3}" y1="${y+5}" x2="${LED_X-3}" y2="${y+17}" stroke="${connectedOpin?wCol:'#584820'}" stroke-width="1.5"/>`;
+      s+=`<line x1="${LED_X+3}" y1="${y+5}" x2="${LED_X+3}" y2="${y+17}" stroke="${connectedOpin?wCol:'#584820'}" stroke-width="1.5"/>`;
+      
+      const ledTextVal = ledOn ? '1' : (connectedOpin ? '0' : '');
+      s+=`<text x="${LED_X}" y="${y+2}" font-size="7.5" fill="${ledOn?'#000':'#6a5830'}" font-family="monospace" text-anchor="middle" pointer-events="none">${ledTextVal}</text>`;
+      /* signal label */
+      s+=`<text x="${LED_X+26}" y="${y+4}" font-size="9" fill="#6a5830" font-family="'Courier New',monospace" text-anchor="start" font-weight="700">${ledSig}</text>`;
+      /* drag target */
+      s+=`<rect x="${LED_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="transparent" style="cursor:crosshair"
+        onmouseup="sbMouseUp(event,'led','${ledSig}')"
+        title="${connectedOpin?ledSig+' is connected':'Drop output wire here: '+ledSig}"/>`;
+    }
+  });
+
+  /* ─ IC DIP BODY (drawn last over pin legs) ─ */
+  const icW=IC_R-IC_L;
+  /* shadow */
+  s+=`<rect x="${IC_L+4}" y="${IC_TOP+4}" width="${icW}" height="${IC_H}" rx="5" fill="rgba(0,0,0,0.35)"/>`;
+  /* main body */
+  const icStroke=sbDiagStep===2?'#ffdd00':'#2e2e2e';
+  const icStrokeW=sbDiagStep===2?4.5:2.5;
+  s+=`<rect x="${IC_L}" y="${IC_TOP}" width="${icW}" height="${IC_H}" rx="5" fill="url(#icg)" stroke="${icStroke}" stroke-width="${icStrokeW}" ${sbDiagStep===2?'filter="url(#gfl)"':''}/>`;
+  /* top edge highlight */
+  s+=`<line x1="${IC_L+3}" y1="${IC_TOP+2}" x2="${IC_R-3}" y2="${IC_TOP+2}" stroke="#383838" stroke-width="1.2"/>`;
+  /* body reflection */
+  s+=`<rect x="${IC_L+4}" y="${IC_TOP+4}" width="${icW-8}" height="${IC_H*0.28}" rx="3" fill="white" opacity="0.04"/>`;
+  /* notch (pin-1 end) */
+  const nx=IC_L+icW/2;
+  s+=`<path d="M${nx-14},${IC_TOP} A14,13 0 0,1 ${nx+14},${IC_TOP}" fill="#141414" stroke="#383838" stroke-width="1.5"/>`;
+  /* pin-1 dot */
+  s+=`<circle cx="${IC_L+17}" cy="${IC_TOP+15}" r="5" fill="none" stroke="#c0c0c0" stroke-width="1.6"/>`;
+  s+=`<circle cx="${IC_L+17}" cy="${IC_TOP+15}" r="1.8" fill="#c0c0c0"/>`;
+  /* silkscreen text */
+  s+=`<text x="${nx}" y="${IC_TOP+38}" text-anchor="middle" font-size="15" fill="#d8d8d8" font-family="'Courier New',monospace" font-weight="700" letter-spacing="0.05em">${sbIC.icLabel}</text>`;
+  s+=`<text x="${nx}" y="${IC_TOP+54}" text-anchor="middle" font-size="8.5" fill="#7a7a7a" font-family="monospace">${sbIC.name}</text>`;
+  s+=`<line x1="${IC_L+20}" y1="${IC_TOP+60}" x2="${IC_R-20}" y2="${IC_TOP+60}" stroke="#282828" stroke-width="1"/>`;
+  /* pin labels inside body */
+  leftPins.forEach((pin,i)=>{
+    const y=ly(i),isGND=pin.type==='gnd';
+    s+=`<text x="${IC_L+13}" y="${y+4}" font-size="9" fill="${isGND?'#4466ee':'#d0d0d0'}" font-family="'Courier New',monospace" font-weight="600">${pin.sig}</text>`;
+  });
+  rightPins.forEach((pin,i)=>{
+    const y=ly(i),isVCC=pin.type==='vcc';
+    s+=`<text x="${IC_R-13}" y="${y+4}" font-size="9" fill="${isVCC?'#ee4444':'#88cc88'}" font-family="'Courier New',monospace" font-weight="600" text-anchor="end">${pin.sig}</text>`;
+  });
+
+  /* ─ LIVE DRAG WIRE (always on top) ─ */
+  s+=`<line id="sb-lw" x1="0" y1="0" x2="0" y2="0" stroke="transparent" stroke-width="4" stroke-linecap="round" stroke-dasharray="9,5" pointer-events="none" filter="url(#gfn)"/>`;
+
+  svg.innerHTML=s;
+  svg.onmousemove=sbSvgMove;
+  svg.onmouseup=e=>sbMouseUp(e,null,null);
+}
+
+/* ── DRAG HANDLERS ── */
+function sbMouseDown(e,role,sig,cx,cy){
+  e.preventDefault();e.stopPropagation();
+  if(role==='sw'){
+    const isConnected=Object.values(sbConnIn).includes(sig);
+    if(isConnected){sbToggleSw(sig);return;}
+  }
+  sbDragging=true;sbDragSig=sig;sbDragRole=role;
+  sbDragX0=cx;sbDragY0=cy;
+  const col=role==='sw'?sbWCI(sbIC.inputs.indexOf(sig)):
+             role==='opin'?sbWCO(sbIC.outputs.indexOf(sig)):
+             role==='ipin'?sbWCI(sbIC.inputs.indexOf(sig)):'#fff';
+  sbDragCol=col;
+  const lw=document.getElementById('sb-lw');
+  if(lw){lw.setAttribute('stroke',col);lw.setAttribute('x1',cx);lw.setAttribute('y1',cy);lw.setAttribute('x2',cx);lw.setAttribute('y2',cy);}
+  updateSbStatus();
+}
+function sbSvgMove(e){
+  if(!sbDragging)return;
+  const c=sbSvgCoords(e);
+  const lw=document.getElementById('sb-lw');
+  if(lw){lw.setAttribute('x2',c.x);lw.setAttribute('y2',c.y);}
+}
+function sbMouseUp(e,role,sig){
+  if(!sbDragging)return;
+  const lw=document.getElementById('sb-lw');
+  if(lw)lw.setAttribute('stroke','transparent');
+  let ok=false;
+  if(role&&sig){ok=sbTryConnect(role,sig);}
+  else{const c=sbSvgCoords(e);ok=sbHitTest(c.x,c.y);}
+  sbDragging=false;sbDragSig=null;sbDragRole=null;
+  renderSandboxSVG();updateSbStatus();
+  if(ok)autoEvaluateSb();
+}
+function sbTryConnect(tr,ts){
+  if(!sbDragRole||!sbDragSig)return false;
+  const src=sbDragRole,ss=sbDragSig;
+  
+  // Drag switch -> ipin
+  if((src==='sw'&&tr==='ipin')||(src==='ipin'&&tr==='sw')){
+    const swSig = src==='sw'?ss:ts;
+    const ipinSig = src==='ipin'?ss:ts;
+    sbConnIn[ipinSig]=swSig;
+    sbFlashWire(ipinSig,'in');
+    playSynthTone(520);
+    return true;
+  }
+  // Drag opin -> led
+  if((src==='opin'&&tr==='led')||(src==='led'&&tr==='opin')){
+    const opinSig = src==='opin'?ss:ts;
+    const ledSig = src==='led'?ss:ts;
+    sbConnOut[opinSig]=ledSig;
+    sbFlashWire(opinSig,'out');
+    playSynthTone(560);
+    return true;
+  }
+  playSynthTone(160);
+  return false;
+}
+function sbHitTest(mx,my){
+  let best=null,bestD=32;
+  for(const[,pos]of Object.entries(sbNodePos)){
+    const d=Math.hypot(mx-pos.cx,my-pos.cy);
+    if(d<bestD){bestD=d;best=pos;}
+  }
+  if(!best)return false;
+  return sbTryConnect(best.role,best.sig);
+}
+function sbFlashWire(sig,type){
+  if(sbFlashTimer)clearTimeout(sbFlashTimer);
+  sbFlashing={sig,type};
+  sbFlashTimer=setTimeout(()=>{sbFlashing=null;renderSandboxSVG();},650);
+}
+function sbToggleSw(sig){
+  const isConnected=Object.values(sbConnIn).includes(sig);
+  if(!isConnected)return;
+  sbSw[sig]=sbSw[sig]?0:1;
+  playSynthTone(sbSw[sig]?440:360);
+  autoEvaluateSb();
+}
+function autoEvaluateSb(){
+  if(!sbIC)return;
+  const pinVals={};
+  sbIC.inputs.forEach(p=>{
+    const conn=sbConnIn[p];
+    pinVals[p]=conn?(sbSw[conn]||0):0;
+  });
+  const rawOut=sbIC.logic(pinVals);
+  sbOut={};
+  sbIC.outputs.forEach(p=>{
+    const connLed=sbConnOut[p];
+    if(connLed)sbOut[connLed]=rawOut[p]||0;
+  });
+  renderSandboxSVG();updateSbReadout();
+}
+function sbRunCircuit(){
+  if(!sbIC)return;
+  const btn=document.querySelector('.ic-controls .asm-btn');
+  if(btn){btn.textContent='⚙ Trace: Inputs...';btn.style.opacity='0.65';btn.style.pointerEvents='none';}
+
+  // 1. Trace inputs
+  sbDiagStep=1; renderSandboxSVG(); playSynthTone(261.63); // C4
+
+  // 2. Trace IC calculation
+  setTimeout(()=>{
+    if(btn) btn.textContent='⚙ Trace: IC Logic...';
+    sbDiagStep=2; renderSandboxSVG(); playSynthTone(329.63); // E4
+  }, 350);
+
+  // 3. Trace outputs
+  setTimeout(()=>{
+    if(btn) btn.textContent='⚙ Trace: Outputs...';
+    sbDiagStep=3; renderSandboxSVG(); playSynthTone(392.00); // G4
+  }, 700);
+
+  // 4. Final Output Render
+  setTimeout(()=>{
+    sbDiagStep=0;
+    autoEvaluateSb();
+    
+    // Check wiring correctness
+    const errors=[];
+    sbIC.inputs.forEach(p=>{
+      const conn=sbConnIn[p];
+      if(!conn) errors.push(`Input pin <strong>${p}</strong> is missing a connection.`);
+      else if(conn!==p) errors.push(`Input pin <strong>${p}</strong> is incorrectly wired to Switch <strong>${conn}</strong>.`);
+    });
+    sbIC.outputs.forEach(p=>{
+      const conn=sbConnOut[p];
+      if(!conn) errors.push(`Output pin <strong>${p}</strong> is missing a connection.`);
+      else if(conn!==p) errors.push(`Output pin <strong>${p}</strong> is incorrectly wired to LED <strong>${conn}</strong>.`);
+    });
+
+    const st=document.getElementById('sb-status');
+    const rd=document.getElementById('ic-readout');
+    if(btn){btn.textContent='▶ Run Circuit';btn.style.opacity='';btn.style.pointerEvents='';}
+
+    if(errors.length>0){
+      playSynthTone(220);
+      setTimeout(()=>playSynthTone(170),150);
+      if(st){
+        st.innerHTML=`<span style="color:#ee3333;font-weight:bold;">❌ Connection Wrong!</span><br/>`+
+                     `<span style="font-size:11.5px;color:#d87a7d;line-height:1.45;">${errors.join('<br/>')}</span>`;
+      }
+      if(rd){
+        rd.style.transition='box-shadow 0.15s';
+        rd.style.boxShadow='0 0 28px rgba(238,50,50,0.5)';
+        setTimeout(()=>{rd.style.boxShadow='none';},650);
+      }
+    }else{
+      playSynthTone(523.25);
+      setTimeout(()=>playSynthTone(659.25),120);
+      setTimeout(()=>playSynthTone(783.99),240);
+      if(st){
+        st.innerHTML=`<span style="color:#22bb55;font-weight:bold;">✅ Connection Correct! All inputs and outputs are wired correctly.</span>`;
+      }
+      if(rd){
+        rd.style.transition='box-shadow 0.15s, transform 0.1s';
+        rd.style.boxShadow='0 0 28px rgba(34,187,85,0.55)';
+        rd.style.transform='scale(1.02)';
+        setTimeout(()=>{rd.style.boxShadow='none';rd.style.transform='none';},650);
+      }
+    }
+
+    const cv=document.getElementById('sandbox-canvas-wrap');
+    if(cv){
+      cv.style.transition='box-shadow 0.15s';
+      cv.style.boxShadow='inset 0 0 36px rgba(60,200,80,0.22)';
+      setTimeout(()=>{cv.style.boxShadow='none';},500);
+    }
+  }, 1050);
+}
+function sbResetWires(){
+  if(!sbIC)return;
+  sbConnIn={};sbConnOut={};sbOut=null;sbDragging=false;
+  sbIC.inputs.forEach(s=>{sbSw[s]=0;});
+  renderSandboxSVG();
+  const rd=document.getElementById('ic-readout');if(rd){rd.innerHTML='';rd.style.display='none';}
+  updateSbStatus();
+}
+function sbAutoWire(){
+  if(!sbIC)return;
+  sbIC.inputs.forEach(s=>{sbConnIn[s]=s;});
+  sbIC.outputs.forEach(s=>{sbConnOut[s]=s;});
+  playSynthTone(620);sbRunCircuit();updateSbStatus();
+}
+function updateSbReadout(){
+  if(!sbIC||!sbOut)return;
+  const rd=document.getElementById('ic-readout');
+  const iStr=sbIC.inputs.map((s,i)=>{
+    const conn=sbConnIn[s];
+    const swVal=conn?(sbSw[conn]||0):0;
+    return `<span style="color:${swVal?sbWCI(sbIC.inputs.indexOf(conn)):'#8a7a58'};font-family:monospace">${s}=${swVal}</span>`;
+  }).join('<span style="color:#c8b888;padding:0 5px">|</span>');
+  const oStr=sbIC.outputs.map((sig,i)=>{
+    const val=sbOut[sig]||0,conn=Object.keys(sbConnOut).find(k=>sbConnOut[k]===sig);
+    const wc=conn?sbWCO(sbIC.outputs.indexOf(conn)):'#8a7a58';
+    return`<span class="ic-readout-led"><span class="ic-readout-dot ${val?'on':''}"></span><span style="color:${val?wc:'#8a7a58'};font-family:monospace">${sig}=${conn?val:'?'}</span></span>`;
+  }).join('');
+  rd.style.display='flex';
+  rd.innerHTML=`<span style="color:#8a7a58;font-size:10px;text-transform:uppercase;font-family:monospace">Inputs:</span>${iStr}<span style="width:1px;background:#c8b888;"></span><span style="color:#8a7a58;font-size:10px;text-transform:uppercase;font-family:monospace">Outputs:</span>${oStr}`;
+}
+function updateSbStatus(){
+  const st=document.getElementById('sb-status');if(!sbIC||!st)return;
+  const ti=sbIC.inputs.length,to=sbIC.outputs.length;
+  const ci=sbIC.inputs.filter(s=>sbConnIn[s]).length;
+  const co=sbIC.outputs.filter(s=>sbConnOut[s]).length;
+  if(sbDragging){st.textContent='↔ Drag to matching pin and release to connect';st.style.color='#e0d020';}
+  else if(ci===ti&&co===to){st.textContent='🔌 All sockets wired — click Run Circuit to test connection';st.style.color='#8a7a58';}
+  else{st.textContent=`🔌 ${ci}/${ti} inputs · ${co}/${to} outputs wired`;st.style.color='var(--text-dim)';}
+}
 </script>
 </body>
 </html>
