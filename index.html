@@ -315,6 +315,34 @@
       box-shadow:0 0 6px rgba(255,138,43,0.7);
     }
     .breadboard-container::-webkit-scrollbar-thumb:hover{ background:#ffa64d; }
+
+    /* Wrapper stays fixed while the inner canvas scrolls, so the hint
+       badge and edge fade below don't move with the content */
+    .hscroll-wrap{ position:relative; }
+
+    .hscroll-hint{
+      position:absolute; top:10px; right:10px; z-index:6;
+      display:flex; align-items:center; gap:5px;
+      background:#ff8a2b; color:#1a1210; font-weight:800; font-size:11.5px;
+      padding:6px 12px; border-radius:20px; pointer-events:none;
+      box-shadow:0 3px 12px rgba(0,0,0,0.5);
+      animation:hscrollHintPulse 1.4s ease-in-out infinite;
+      transition:opacity 0.4s ease, transform 0.4s ease;
+    }
+    .hscroll-hint span{ font-size:14px; line-height:1; }
+    .hscroll-hint.faded{ opacity:0; transform:translateY(-6px); }
+    @keyframes hscrollHintPulse{
+      0%,100%{ transform:translateX(0); }
+      50%{ transform:translateX(-8px); }
+    }
+
+    .hscroll-edge-fade{
+      position:absolute; top:0; right:0; bottom:20px; width:34px; z-index:5;
+      background:linear-gradient(to right, transparent, rgba(0,0,0,0.4));
+      border-radius:0 16px 16px 0; pointer-events:none;
+      transition:opacity 0.4s ease;
+    }
+    .hscroll-edge-fade.faded{ opacity:0; }
     /* Small text hint so the scroll affordance is unmissable even before
        the user notices the bar itself */
     .breadboard-container{ position:relative; }
@@ -845,10 +873,14 @@
     <div class="ic-tip-bar">
       💡 <strong>How to wire:</strong> <strong>Drag</strong> a <span style="color:#ff8822">switch hole</span> → drop on the matching <span style="color:#ff8822">IC input pin</span>. <strong>Drag</strong> an <span style="color:#22cc66">IC output pin</span> → drop on the matching <span style="color:#22cc66">LED</span>. Toggle wired switches to see live logic. Use <strong>Auto-Wire</strong> to skip manual wiring.
     </div>
-    <div class="sandbox-canvas" id="sandbox-canvas-wrap">
-      <svg id="ic-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" style="width:100%;display:block;touch-action:none;">
-        <text x="400" y="185" text-anchor="middle" fill="#3a4c60" font-family="JetBrains Mono,monospace" font-size="14">← Select an IC above to begin wiring</text>
+    <div class="hscroll-wrap">
+      <div class="sandbox-canvas" id="sandbox-canvas-wrap">
+        <svg id="ic-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" style="width:100%;display:block;touch-action:none;">
+          <text x="400" y="185" text-anchor="middle" fill="#3a4c60" font-family="JetBrains Mono,monospace" font-size="14">← Select an IC above to begin wiring</text>
       </svg>
+      </div>
+      <div class="hscroll-hint"><span>↔</span> Scroll to see full circuit</div>
+      <div class="hscroll-edge-fade"></div>
     </div>
     <div class="ic-controls">
       <button class="asm-btn" onclick="sbRunCircuit()">▶ Run Circuit</button>
@@ -1758,7 +1790,12 @@ function generateBreadboardSVG(type){
 
   svg+=`</svg>`;
 
-  container.innerHTML = `<div class="breadboard-container">${svg}</div>`;
+  container.innerHTML = `<div class="hscroll-wrap">
+      <div class="breadboard-container">${svg}</div>
+      <div class="hscroll-hint${window.__hscrollSeen ? ' faded' : ''}"><span>↔</span> Scroll to see full circuit</div>
+      <div class="hscroll-edge-fade${window.__hscrollSeen ? ' faded' : ''}"></div>
+    </div>`;
+  initHScrollHint(container.querySelector('.hscroll-wrap'));
 }
 let currentExportFormat='verilog';
 function openCodeExportModal(){document.getElementById('codeModal').classList.add('open');showExportCode(currentExportFormat);}
@@ -1857,7 +1894,25 @@ window.addEventListener('load',()=>{
   initWorkspaceSubTabs();
   initSectionTests();
   selectSandboxIC('dec12');
+  initHScrollHint(document.getElementById('sandbox-canvas-wrap')?.closest('.hscroll-wrap'));
 });
+
+/* Fades out the "scroll to see full circuit" hint + edge fade the first
+   time the user actually scrolls the given wrapper, so it doesn't linger
+   and get in the way once they've found it. */
+function initHScrollHint(wrap){
+  if(!wrap || wrap.dataset.hscrollBound) return;
+  const scrollEl = wrap.querySelector('.breadboard-container, .sandbox-canvas');
+  const hint = wrap.querySelector('.hscroll-hint');
+  const fade = wrap.querySelector('.hscroll-edge-fade');
+  if(!scrollEl) return;
+  wrap.dataset.hscrollBound = '1';
+  scrollEl.addEventListener('scroll', ()=>{
+    window.__hscrollSeen = true;
+    if(hint) hint.classList.add('faded');
+    if(fade) fade.classList.add('faded');
+  }, { passive:true });
+}
 
 /* ── Tour & Cheatsheet Drawers ── */
 function openTourModal(){document.getElementById('tourModal').classList.add('open');}
