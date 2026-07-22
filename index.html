@@ -286,12 +286,31 @@
     .hero h1{ font-size:clamp(24px, 8vw, 34px); }
     .hero .sub, .lead{ font-size:14px; }
 
-    /* SVG diagrams & breadboards scale to their container instead
-       of overflowing or clipping */
-    svg.diagram, .bb-svg, .breadboard-container svg{
+    /* Schematic/logic SVGs scale to their container so they never
+       overflow or clip on narrow screens */
+    svg.diagram{
       width:100% !important; height:auto !important; max-width:100%; display:block;
     }
-    .breadboard-container{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+    /* Breadboard/IC wiring views keep their real, readable size on
+       mobile instead of being squashed illegibly small — the
+       container scrolls horizontally so pins/wires stay legible */
+    .bb-svg, .breadboard-container svg{
+      width:760px !important; min-width:760px !important; max-width:none !important;
+      height:auto !important; display:block;
+    }
+    .breadboard-container{
+      overflow-x:auto !important; -webkit-overflow-scrolling:touch;
+      max-width:100%;
+      /* visible scrollbar so it's obvious the view scrolls */
+      scrollbar-width:thin; scrollbar-color:var(--copper,#c77) transparent;
+      padding-bottom:14px; /* room for the scrollbar so it doesn't sit on the wiring */
+    }
+    .breadboard-container::-webkit-scrollbar{ height:10px; }
+    .breadboard-container::-webkit-scrollbar-track{ background:rgba(0,0,0,0.08); border-radius:6px; }
+    .breadboard-container::-webkit-scrollbar-thumb{
+      background:var(--copper,#c77); border-radius:6px;
+    }
 
     /* Tables scroll horizontally instead of squashing/overlapping */
     .table-wrapper{ overflow-x:auto; -webkit-overflow-scrolling:touch; }

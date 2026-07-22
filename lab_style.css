@@ -947,7 +947,13 @@ footer {
   .sandbox-canvas {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--copper, #c77) transparent;
+    padding-bottom: 12px; /* room for the scrollbar so it doesn't sit over the wiring */
   }
+  .sandbox-canvas::-webkit-scrollbar { height: 10px; }
+  .sandbox-canvas::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 6px; }
+  .sandbox-canvas::-webkit-scrollbar-thumb { background: var(--copper, #c77); border-radius: 6px; }
   #ic-svg {
     min-width: 680px; /* Force minimum width to keep pins and lines easily interactable */
   }
