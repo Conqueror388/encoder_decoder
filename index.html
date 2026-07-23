@@ -128,6 +128,14 @@
     --ease-premium:cubic-bezier(.22,1,.36,1);
     --ease-spring:cubic-bezier(.34,1.56,.64,1);
   }
+  /* Light theme needs these too — without them, every animation/transition
+     that references var(--ease-premium) or var(--ease-spring) becomes an
+     invalid CSS declaration in light mode, which was leaving whole sections
+     (and panels) permanently stuck at opacity:0. */
+  [data-theme="light"]{
+    --ease-premium:cubic-bezier(.22,1,.36,1);
+    --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  }
 
   /* Aurora ambient background — slow drifting glow, never distracting */
   body{ position:relative; }
