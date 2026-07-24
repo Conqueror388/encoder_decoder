@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>(function(){try{if(localStorage.getItem("ecd_assessment_active")==="1"){location.replace("assessment.html");}}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interactive Digital Lab — Encoders &amp; Decoders</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -425,7 +426,7 @@
     <button id="btn-nav-enc42" onclick="showSection('enc42')">4:2 P.Enc</button>
     <button id="btn-nav-enc83" onclick="showSection('enc83')">8:3 P.Enc</button>
     <button id="btn-nav-sandbox" onclick="showSection('sandbox')" style="color:var(--copper);">🛠️ Sandbox</button>
-    <button id="btn-nav-assessment" onclick="showSection('assessment')" style="color:var(--trace);">Assessment</button>
+    <button id="btn-nav-assessment" onclick="location.href='assessment.html'" style="color:var(--trace);">Assessment</button>
   </div>
   <div class="nav-utility">
     <button class="util-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀ Theme</button>
@@ -482,9 +483,9 @@
   </section>
   <section style="margin-bottom:40px;">
     <h2 class="section-title">Interactive Assessment</h2>
-    <p class="lead">20-question timed assessment covering all 6 circuits with instant feedback and a topic-wise breakdown.</p>
-    <div class="card-item" onclick="showSection('assessment')" style="background:var(--panel);border:1px solid var(--trace-dim);max-width:520px;box-shadow:0 0 20px rgba(0,240,255,0.07);">
-      <div class="card-content"><h4 style="color:var(--trace);">Launch Assessment</h4><p>20 questions · 10 min · instant feedback · personal best</p></div>
+    <p class="lead">15-question timed assessment covering all 6 circuits with instant feedback and a topic-wise breakdown.</p>
+    <div class="card-item" onclick="location.href='assessment.html'" style="background:var(--panel);border:1px solid var(--trace-dim);max-width:520px;box-shadow:0 0 20px rgba(0,240,255,0.07);">
+      <div class="card-content"><h4 style="color:var(--trace);">Launch Assessment</h4><p>15 questions · 15 min · instant feedback · personal best</p></div>
       <div class="arrow" style="font-size:24px;">→</div>
     </div>
   </section>
@@ -842,19 +843,6 @@
 </section>
 
 <!-- ══════════════════════════════════════════════════════════════════════ -->
-<!-- ASSESSMENT -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<section class="lab-section" id="sec-assessment">
-<header class="hero"><span class="chip-eyebrow">ECE · Interactive Assessment</span><h1>TEST YOUR <span>LOGIC</span></h1><p class="sub">Answer, get instant feedback, and see a full topic breakdown at the end.</p></header>
-<main>
-  <div class="asm-shell">
-    <div class="asm-card asm-start" id="screenStart"><h3>Ready to test yourself?</h3><p>20 questions across all six circuits. Each gives instant feedback before you move on.</p><div class="asm-meta-row"><div class="asm-meta"><div class="num">20</div><div class="lbl">Questions</div></div><div class="asm-meta"><div class="num">10:00</div><div class="lbl">Time Limit</div></div><div class="asm-meta"><div class="num">6</div><div class="lbl">Topics</div></div></div><button class="asm-btn" onclick="startAssessment()">Begin Assessment</button><div class="asm-best" id="bestPreview" style="margin-top:20px;"></div></div>
-    <div class="asm-card" id="screenQuiz" style="display:none;"><div class="asm-topbar"><div class="asm-progress-label" id="progressLabel">Question 1 of 20</div><div class="asm-timer" id="timerDisplay">10:00</div></div><div class="asm-progress-track"><div class="asm-progress-fill" id="progressFill"></div></div><div class="asm-topic-tag" id="topicTag">TOPIC</div><div class="asm-question" id="questionText">Question text</div><div class="asm-options" id="optionsWrap"></div><div class="asm-feedback" id="feedbackBox"><strong id="feedbackTitle"></strong><span id="feedbackText"></span></div><div class="asm-actions"><button class="asm-btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button></div></div>
-    <div class="asm-card" id="screenResults" style="display:none;"><div class="asm-result-score"><div class="big" id="scoreBig">0/20</div><div class="pct" id="scorePct">0%</div><div id="newBestBadge"></div></div><div class="asm-breakdown" id="breakdownWrap"></div><div class="asm-best" id="bestFinal"></div><div class="asm-result-actions"><button class="asm-btn" onclick="startAssessment()">Retake</button><button class="asm-btn ghost" onclick="showSection('hub')">Back to Hub</button></div></div>
-  </div>
-</main>
-</section>
-
 <!-- ══════════════════════════════════════════════════════════════════════ -->
 <!-- SANDBOX & CUSTOM GATE BUILDER -->
 <!-- ══════════════════════════════════════════════════════════════════════ -->
@@ -936,7 +924,7 @@
       <div class="story-box" style="margin:0;">1️⃣ <strong>Toggle Switches:</strong> Flip input switches to see binary signals travel live through logic gates.</div>
       <div class="story-box" style="margin:0;">2️⃣ <strong>Trace Glowing Wires:</strong> Cyan wires carry HIGH ($1$) signals; dark wires carry LOW ($0$).</div>
       <div class="story-box" style="margin:0;">3️⃣ <strong>Click Truth Tables:</strong> Click any row in a truth table to auto-load that state into the simulator.</div>
-      <div class="story-box" style="margin:0;">4️⃣ <strong>Take the Assessment:</strong> Test your knowledge with 20 interactive timed questions!</div>
+      <div class="story-box" style="margin:0;">4️⃣ <strong>Take the Assessment:</strong> Test your knowledge with 15 interactive timed questions!</div>
     </div>
     <button class="asm-btn" onclick="closeTourModal()">Start Exploring Lab →</button>
   </div>
@@ -1167,7 +1155,7 @@ function processVoiceCmd(c){
     if(c.includes('2')||c.includes('two'))showSection('enc21');
     else if(c.includes('4')||c.includes('four'))showSection('enc42');
     else if(c.includes('8')||c.includes('eight'))showSection('enc83');
-  }else if(c.includes('assessment')||c.includes('test')){showSection('assessment');}
+  }else if(c.includes('assessment')||c.includes('test')){location.href='assessment.html';}
   else if(c.includes('hub')||c.includes('home')){showSection('hub');}
 }
 
@@ -1895,7 +1883,7 @@ function renderSandbox(){
 window.addEventListener('load',()=>{
   renderDec12();renderDec24();renderDec38();renderEnc21();renderEnc42Std();renderEnc82();renderEnc42();renderEnc83();
   ['dec12','dec24','dec38','enc21','enc42std','enc82','enc42','enc83'].forEach(id=>generateBreadboardSVG(id));
-  showBestPreview();setupClickableTables();
+  setupClickableTables();
   updateNavLockStates();
   initWorkspaceSubTabs();
   initSectionTests();
@@ -2361,21 +2349,6 @@ function renderEnc83(){
   document.getElementById('diag-enc83').innerHTML=s;
   generateBreadboardSVG('enc83');
 }
-
-/* ═══════ ASSESSMENT ═══════ */
-const QUESTIONS=[{topic:'dec12',label:'1:2 Decoder',q:'In a 1:2 decoder, how many output lines are active (HIGH) at any one time?',opts:['0','Exactly 1','2','Depends on Enable only'],correct:1,explain:'A decoder always activates exactly one output line.'},{topic:'dec12',label:'1:2 Decoder',q:'If A=1 in a 1:2 decoder, which output goes HIGH?',opts:['D0','D1','Both','Neither'],correct:1,explain:'D1 = A, so when A=1, D1 is HIGH.'},{topic:'dec12',label:'1:2 Decoder',q:'Boolean expression for D0 in a 1:2 decoder?',opts:['A',"A'",'A+1','A·A'],correct:1,explain:"D0 = A' (NOT A)."},{topic:'dec24',label:'2:4 Decoder',q:'A 2:4 decoder has how many input and output lines?',opts:['4 in, 2 out','2 in, 4 out','2 in, 2 out','3 in, 4 out'],correct:1,explain:'2-bit input → 4 outputs.'},{topic:'dec24',label:'2:4 Decoder',q:'If A1A0=10 and E=1, which output activates?',opts:['D0','D1','D2','D3'],correct:2,explain:'10 binary = 2, so D2.'},{topic:'dec24',label:'2:4 Decoder',q:'What happens when Enable=0?',opts:['All HIGH','Last value','All LOW','D0 only'],correct:2,explain:'E=0 forces all outputs LOW.'},{topic:'dec38',label:'3:8 Decoder',q:'A 3:8 decoder can activate how many distinct outputs?',opts:['3','6','8','16'],correct:2,explain:'3 bits → 2³ = 8 outputs.'},{topic:'dec38',label:'3:8 Decoder',q:'For A2A1A0=101, which output activates?',opts:['D3','D5','D6','D7'],correct:1,explain:'101 = 5, so D5.'},{topic:'dec38',label:'3:8 Decoder',q:'Minterm for D6 of a 3:8 decoder?',opts:["A2·A1·A0","A2·A1·A0'","A2'·A1·A0'","A2·A1'·A0'"],correct:1,explain:"6=110, so D6 = A2·A1·A0'."},{topic:'enc21',label:'2:1 Encoder',q:'A 2:1 encoder converts how many inputs to how many outputs?',opts:['1→2','2→1','2→2','4→1'],correct:1,explain:'2 inputs → 1 output bit.'},{topic:'enc21',label:'2:1 Encoder',q:'Output A in a 2:1 encoder equals:',opts:['Y0','Y1',"Y0'",'Y0·Y1'],correct:1,explain:'A = Y1.'},{topic:'enc21',label:'2:1 Encoder',q:'Key limitation of a basic encoder?',opts:['Needs clock','Ambiguous if multiple inputs active','Max 2 inputs','Cannot use gates'],correct:1,explain:'Multiple active inputs → ambiguous output.'},{topic:'enc42',label:'4:2 Encoder',q:'Highest priority input in a 4:2 priority encoder?',opts:['Y0','Y1','Y2','Y3'],correct:3,explain:'Y3 is highest priority.'},{topic:'enc42',label:'4:2 Encoder',q:'If Y3=1 and Y1=1 simultaneously, A1A0=?',opts:['00','01','10','11'],correct:3,explain:'Y3 wins → 11.'},{topic:'enc42',label:'4:2 Encoder',q:'Valid (V) output indicates:',opts:['Clock running','At least one input active','Error','All LOW'],correct:1,explain:'V=1 means output code is valid.'},{topic:'enc83',label:'8:3 Encoder',q:'An 8:3 encoder: how many inputs → outputs?',opts:['3→8','8→3','8→8','4→3'],correct:1,explain:'8 inputs → 3 output bits.'},{topic:'enc83',label:'8:3 Encoder',q:'If Y6 is highest active, A2A1A0=?',opts:['101','110','011','111'],correct:1,explain:'6 = 110.'},{topic:'enc83',label:'8:3 Encoder',q:'A0 = Y1+Y3+Y5+Y7 sums which inputs?',opts:['Even-indexed','Above 4','Odd-indexed (LSB=1)','Highest only'],correct:2,explain:'A0 is HIGH for odd indices.'},{topic:'general',label:'General',q:'Encoder vs decoder?',opts:['Encoders expand, decoders compress','Encoders compress, decoders expand','Same function','Decoders need clock'],correct:1,explain:'Encoders compress, decoders expand.'},{topic:'general',label:'General',q:'Priority encoders are used for:',opts:['Storage','Resolving simultaneous interrupt requests','Amplifying signals','Clock generation'],correct:1,explain:'CPU interrupt controllers use priority encoders.'}];
-const TOTAL_TIME=600,TOPIC_ORDER=[{key:'dec12',label:'1:2 Decoder'},{key:'dec24',label:'2:4 Decoder'},{key:'dec38',label:'3:8 Decoder'},{key:'enc21',label:'2:1 Encoder'},{key:'enc42',label:'4:2 Encoder'},{key:'enc83',label:'8:3 Encoder'},{key:'general',label:'General'}],BEST_KEY='ecd_assessment_best_v1';
-let asmOrder=[],asmCurrent=0,asmAnswers=[],asmTimeLeft=TOTAL_TIME,asmTimer=null,asmLocked=false;
-function shuffled(n){const a=Array.from({length:n},(_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function fmtTime(s){return Math.floor(s/60).toString().padStart(2,'0')+':'+(s%60).toString().padStart(2,'0');}
-function showBestPreview(){const b=localStorage.getItem(BEST_KEY);document.getElementById('bestPreview').textContent=b?'Personal best: '+b+'/'+QUESTIONS.length:'No attempts yet.';}
-function startAssessment(){asmOrder=shuffled(QUESTIONS.length);asmCurrent=0;asmAnswers=new Array(QUESTIONS.length).fill(null);asmTimeLeft=TOTAL_TIME;document.getElementById('screenStart').style.display='none';document.getElementById('screenResults').style.display='none';document.getElementById('screenQuiz').style.display='block';clearInterval(asmTimer);asmTimer=setInterval(asmTick,1000);updTimer();renderQ();}
-function asmTick(){asmTimeLeft--;updTimer();if(asmTimeLeft<=0){clearInterval(asmTimer);finishAssessment();}}
-function updTimer(){const e=document.getElementById('timerDisplay');e.textContent=fmtTime(Math.max(asmTimeLeft,0));e.classList.toggle('low',asmTimeLeft<=60);}
-function renderQ(){asmLocked=false;const qi=asmOrder[asmCurrent],it=QUESTIONS[qi];document.getElementById('progressLabel').textContent=`Question ${asmCurrent+1} of ${QUESTIONS.length}`;document.getElementById('progressFill').style.width=(asmCurrent/QUESTIONS.length*100)+'%';document.getElementById('topicTag').textContent=it.label;document.getElementById('questionText').textContent=it.q;const w=document.getElementById('optionsWrap');w.innerHTML='';['A','B','C','D'].forEach((l,i)=>{if(i>=it.opts.length)return;const b=document.createElement('button');b.className='asm-option';b.innerHTML=`<span class="letter">${l}</span><span>${it.opts[i]}</span>`;b.onclick=()=>selAnswer(i);w.appendChild(b);});document.getElementById('feedbackBox').className='asm-feedback';document.getElementById('nextBtn').disabled=true;document.getElementById('nextBtn').textContent=asmCurrent===QUESTIONS.length-1?'Finish':'Next';}
-function selAnswer(i){if(asmLocked)return;asmLocked=true;const qi=asmOrder[asmCurrent],it=QUESTIONS[qi];asmAnswers[qi]=i;document.querySelectorAll('.asm-option').forEach((e,idx)=>{e.classList.add('locked');if(idx===it.correct)e.classList.add('correct');else if(idx===i)e.classList.add('wrong');});const fb=document.getElementById('feedbackBox'),ok=i===it.correct;fb.className='asm-feedback show '+(ok?'right':'wrong');document.getElementById('feedbackTitle').textContent=ok?'Correct':'Not quite';document.getElementById('feedbackText').textContent=it.explain;document.getElementById('nextBtn').disabled=false;}
-function nextQuestion(){if(asmCurrent===QUESTIONS.length-1){clearInterval(asmTimer);finishAssessment();return;}asmCurrent++;renderQ();}
-function finishAssessment(){document.getElementById('screenQuiz').style.display='none';document.getElementById('screenResults').style.display='block';let sc=0;const ts={};TOPIC_ORDER.forEach(t=>ts[t.key]={correct:0,total:0});QUESTIONS.forEach((it,i)=>{ts[it.topic].total++;if(asmAnswers[i]===it.correct){sc++;ts[it.topic].correct++;}});const pc=Math.round(sc/QUESTIONS.length*100);document.getElementById('scoreBig').textContent=sc+'/'+QUESTIONS.length;document.getElementById('scorePct').textContent=pc+'% correct';const bd=document.getElementById('breakdownWrap');bd.innerHTML='<div class="asm-topic-row" style="margin-bottom:18px;"><strong style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;">Topic breakdown</strong></div>';TOPIC_ORDER.forEach(t=>{const s=ts[t.key];if(!s.total)return;const p=Math.round(s.correct/s.total*100),r=document.createElement('div');r.className='asm-topic-row';r.innerHTML=`<div class="row-top"><span>${t.label}</span><span>${s.correct}/${s.total}</span></div><div class="asm-bar-track"><div class="asm-bar-fill" style="width:${p}%"></div></div>`;bd.appendChild(r);});const pb=parseInt(localStorage.getItem(BEST_KEY)||'0',10),bg=document.getElementById('newBestBadge');if(sc>pb){localStorage.setItem(BEST_KEY,String(sc));bg.innerHTML='<div class="asm-badge">New personal best!</div>';}else bg.innerHTML='';document.getElementById('bestFinal').innerHTML='Personal best: <strong>'+Math.max(sc,pb)+'/'+QUESTIONS.length+'</strong>';}
 
 /* ── Clickable Truth Table Row Handler ── */
 function setupClickableTables(){
@@ -3368,8 +3341,8 @@ function renderSandboxSVG(){
       const ledSig = pin.sig;
       // Is this LED connected to some output pin?
       const connectedOpin = Object.keys(sbConnOut).find(k => sbConnOut[k] === ledSig);
-      const isDragSrc=sbDragging&&sbDragSig===ledSig&&sbDragRole==='opin';
-      const isTarget=sbDragging&&sbDragRole==='opin'&&sbDragSig===connectedOpin&&!connectedOpin;
+      const isDragSrc=sbDragging&&sbDragSig===ledSig&&(sbDragRole==='opin'||sbDragRole==='led');
+      const isTarget=sbDragging&&sbDragRole==='opin'&&sbDragSig===ledSig&&!connectedOpin;
       sbNodePos[`led_${ledSig}`]={cx:LED_X,cy:y,role:'led',sig:ledSig};
       
       const plateStroke = connectedOpin ? wCol : '#b8a880';
@@ -3388,10 +3361,12 @@ function renderSandboxSVG(){
       s+=`<text x="${LED_X}" y="${y+2}" font-size="7.5" fill="${ledOn?'#000':'#6a5830'}" font-family="monospace" text-anchor="middle" pointer-events="none">${ledTextVal}</text>`;
       /* signal label */
       s+=`<text x="${LED_X+26}" y="${y+4}" font-size="9" fill="#6a5830" font-family="'Courier New',monospace" text-anchor="start" font-weight="700">${ledSig}</text>`;
-      /* drag target */
-      s+=`<rect x="${LED_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="transparent" style="cursor:crosshair"
+      /* drag target (also usable as a drag source, matching the switch module on the input side) */
+      s+=`<rect x="${LED_X-17}" y="${y-17}" width="34" height="34" rx="5" fill="transparent" style="cursor:grab;touch-action:none;"
+        onmousedown="sbMouseDown(event,'led','${ledSig}',${LED_X},${y})"
         onmouseup="sbMouseUp(event,'led','${ledSig}')"
-        title="${connectedOpin?ledSig+' is connected':'Drop output wire here: '+ledSig}"/>`;
+        ontouchstart="sbMouseDown(event,'led','${ledSig}',${LED_X},${y})"
+        title="${connectedOpin?ledSig+' is connected — drag to rewire':'Drag to output pin, or drop a wire here: '+ledSig}"/>`;
     }
   });
 
@@ -3464,6 +3439,7 @@ function sbMouseDown(e,role,sig,cx,cy){
   sbDragX0=cx;sbDragY0=cy;
   const col=role==='sw'?sbWCI(sbIC.inputs.indexOf(sig)):
              role==='opin'?sbWCO(sbIC.outputs.indexOf(sig)):
+             role==='led'?sbWCO(sbIC.outputs.indexOf(sig)):
              role==='ipin'?sbWCI(sbIC.inputs.indexOf(sig)):'#fff';
   sbDragCol=col;
   const lw=document.getElementById('sb-lw');
