@@ -917,6 +917,10 @@ footer {
     gap: 6px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Hide scrollbar for clean UI */
+    width: 100%;
+    min-width: 0; /* lets this flex item shrink so overflow-x can actually
+                     scroll, instead of the box just growing wider than
+                     the screen (the root cause of the stuck nav bar) */
   }
   .nav-group::-webkit-scrollbar {
     display: none; /* Hide webkit scrollbar */

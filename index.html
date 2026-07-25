@@ -280,6 +280,9 @@
       display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; overflow-y:hidden;
       -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; padding-bottom:4px;
       scrollbar-width:thin;
+      width:100%;
+      min-width:0; /* lets this flex item shrink so overflow-x can actually scroll,
+                      instead of the box just growing wider than the screen */
     }
     .nav-group button{ flex:0 0 auto; scroll-snap-align:start; white-space:nowrap; font-size:12px; padding:9px 12px; }
     .nav-utility{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
