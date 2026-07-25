@@ -853,7 +853,7 @@ footer {
   }
   
   .nav-utility {
-    justify-content: center;
+    justify-content: flex-end;
     width: 100%;
     margin-top: 2px;
   }
