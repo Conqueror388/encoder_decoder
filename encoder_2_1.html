@@ -9,7 +9,8 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -17,15 +18,15 @@
   <p class="sub">The simplest encoder: two input lines compress into a single output bit. It also shows, most clearly, why plain encoders break when more than one input is active at once.</p>
 </header>
 
-<nav class="tabs">
+<nav class="tabs" aria-label="Lab navigation">
   <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
-  <button class="active" onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
+  <button class="active" aria-current="page" onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
   <button onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
   <button onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
   <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
 </nav>
 
-<main>
+<main id="main-content">
 
   <span class="eyebrow-num">Encoder Lab 01</span>
   <h2 class="section-title">2:1 Encoder Simulator</h2>
@@ -36,14 +37,14 @@
     <div class="panel">
       <h4>Interactive Simulator</h4>
       <div class="led-row" style="margin-bottom:20px;">
-        <div class="toggle"><div class="switch" id="sw-enc21-y0" onclick="toggleEnc21('y0')"></div><span>Y0</span></div>
-        <div class="toggle"><div class="switch" id="sw-enc21-y1" onclick="toggleEnc21('y1')"></div><span>Y1</span></div>
+        <div class="toggle"><button type="button" class="switch" id="sw-enc21-y0" onclick="toggleEnc21('y0')" role="switch" aria-checked="false" aria-label="Input Y0"></button><span>Y0</span></div>
+        <div class="toggle"><button type="button" class="switch" id="sw-enc21-y1" onclick="toggleEnc21('y1')" role="switch" aria-checked="false" aria-label="Input Y1"></button><span>Y1</span></div>
       </div>
       <div class="led-row">
-        <div class="led-btn" disabled><span id="led-enc21-a" class="bulb"></span><span>Output A</span></div>
-        <div class="led-btn" disabled><span id="led-enc21-v" class="bulb amber"></span><span>Valid (V)</span></div>
+        <div class="led-btn" disabled><span id="led-enc21-a" class="bulb" aria-hidden="true"></span><span>Output A</span></div>
+        <div class="led-btn" disabled><span id="led-enc21-v" class="bulb amber" aria-hidden="true"></span><span>Valid (V)</span></div>
       </div>
-      <div class="output-readout">
+      <div class="output-readout" aria-live="polite" aria-atomic="true">
         <span>Encoded State</span>
         <span id="readout-enc21" class="val">A = 0 | V = 0</span>
       </div>
@@ -131,7 +132,9 @@ const stateEnc21 = { y0: 0, y1: 0 };
 
 function toggleEnc21(pin){
   stateEnc21[pin] = stateEnc21[pin] ? 0 : 1;
-  document.getElementById(`sw-enc21-${pin}`).classList.toggle('on', stateEnc21[pin] === 1);
+  const sw = document.getElementById(`sw-enc21-${pin}`);
+  sw.classList.toggle('on', stateEnc21[pin] === 1);
+  sw.setAttribute('aria-checked', stateEnc21[pin] === 1 ? 'true' : 'false');
   renderEnc21();
 }
 

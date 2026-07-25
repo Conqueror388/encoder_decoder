@@ -101,10 +101,34 @@
     margin:0 auto 26px; padding:16px 18px; border:1px solid var(--panel-border); border-radius:10px; background:var(--bg-alt);
   }
   .asm-appreciation .emoji{ font-size:30px; display:block; margin-bottom:8px; }
+
+  /* Question type badge (MCQ / Truth Table / Expression) */
+  .asm-type-tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--trace); border:1px solid var(--trace-dim); background:var(--bg-alt);
+    padding:3px 9px; border-radius:999px; margin-left:8px; vertical-align:middle;
+  }
+
+  /* Truth-table question widget */
+  .asm-table-wrap{ margin-bottom:20px; }
+  .asm-table-wrap .table-wrapper{ margin-bottom:6px; }
+  .asm-table-wrap td.asm-blank-cell{
+    color:var(--copper); font-weight:800; background:rgba(255,167,64,0.12);
+    border:1px dashed var(--copper-dim);
+  }
+  .asm-table-hint{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin:0 0 4px;
+  }
+
+  /* Expression-style options: larger monospace, centered */
+  .asm-option.mono-expr span:last-child{
+    font-family:'JetBrains Mono',monospace; font-size:15px; letter-spacing:0.02em; color:var(--text);
+  }
 </style>
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle light/dark theme">☀</button>
 
 <header class="hero" id="labHeader">
   <span class="chip-eyebrow">ECE · Interactive Assessment</span>
@@ -112,23 +136,23 @@
   <p class="sub">A question-by-question interactive assessment covering all six circuits in this lab. Answer, get instant feedback, and see a full topic breakdown at the end.</p>
 </header>
 
-<nav class="tabs" id="labNav">
+<nav class="tabs" id="labNav" aria-label="Lab navigation">
   <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
-  <button class="active" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
+  <button class="active" aria-current="page" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
 </nav>
 
-<div class="asm-focus-banner" id="focusBanner" style="display:none;">🔒 Focus mode — navigation is locked until you finish the assessment</div>
+<div class="asm-focus-banner" id="focusBanner" style="display:none;" role="status">🔒 Focus mode — navigation is locked until you finish the assessment</div>
 
-<main>
+<main id="main-content">
   <div class="asm-shell">
 
     <!-- START SCREEN -->
     <div class="asm-card asm-start" id="screenStart">
       <h3>Ready to test yourself?</h3>
-      <p>15 questions across all six circuits — 1:2, 2:4 &amp; 3:8 decoders and 2:1, 4:2 &amp; 8:3 encoders. Each question gives instant feedback with a short explanation before you move on.</p>
+      <p>21 questions across all six circuits — 1:2, 2:4 &amp; 3:8 decoders and 2:1, 4:2 &amp; 8:3 encoders. A mix of multiple-choice, truth-table completion, and logical-expression questions, each with instant feedback and a short explanation before you move on.</p>
       <div class="asm-meta-row">
-        <div class="asm-meta"><div class="num">15</div><div class="lbl">Questions</div></div>
-        <div class="asm-meta"><div class="num">15:00</div><div class="lbl">Time Limit</div></div>
+        <div class="asm-meta"><div class="num">21</div><div class="lbl">Questions</div></div>
+        <div class="asm-meta"><div class="num">20:00</div><div class="lbl">Time Limit</div></div>
         <div class="asm-meta"><div class="num">6</div><div class="lbl">Topics</div></div>
       </div>
       <p style="font-size:12.5px; color:var(--text-dim); margin-top:-8px;">Once you begin, the hub navigation will be hidden until you finish — focus mode, no peeking at the labs.</p>
@@ -139,16 +163,18 @@
     <!-- QUESTION SCREEN -->
     <div class="asm-card" id="screenQuiz" style="display:none;">
       <div class="asm-topbar">
-        <div class="asm-progress-label" id="progressLabel">Question 1 of 15</div>
-        <div class="asm-timer" id="timerDisplay">10:00</div>
+        <div class="asm-progress-label" id="progressLabel" aria-live="polite">Question 1 of 21</div>
+        <div class="asm-timer" id="timerDisplay" aria-label="Time remaining" role="timer">20:00</div>
+        <span class="sr-only" id="timerAnnounce" aria-live="assertive" aria-atomic="true"></span>
       </div>
-      <div class="asm-progress-track"><div class="asm-progress-fill" id="progressFill"></div></div>
+      <div class="asm-progress-track" role="progressbar" aria-label="Assessment progress" aria-valuemin="0" aria-valuemax="21" aria-valuenow="0"><div class="asm-progress-fill" id="progressFill"></div></div>
 
-      <div class="asm-topic-tag" id="topicTag">TOPIC</div>
+      <div class="asm-topic-tag" id="topicTag">TOPIC</div><span class="asm-type-tag" id="typeTag" style="display:none;"></span>
       <div class="asm-question" id="questionText">Question text</div>
+      <div class="asm-table-wrap" id="tableWrap" style="display:none;"></div>
       <div class="asm-options" id="optionsWrap"></div>
 
-      <div class="asm-feedback" id="feedbackBox">
+      <div class="asm-feedback" id="feedbackBox" role="status" aria-live="polite">
         <strong id="feedbackTitle"></strong>
         <span id="feedbackText"></span>
       </div>
@@ -193,7 +219,7 @@ const QUESTIONS = [
 
   { topic:'dec38', label:'3:8 Decoder', q:'A 3:8 decoder can uniquely activate how many distinct output lines?', opts:['3','6','8','16'], correct:2, explain:'3 address bits give 2³ = 8 possible codes, so there are 8 output lines (D0–D7).' },
   { topic:'dec38', label:'3:8 Decoder', q:'For inputs A2 A1 A0 = 101 on a 3:8 decoder, which output is activated?', opts:['D3','D5','D6','D7'], correct:1, explain:'101 in binary equals 5, so output D5 = A2·A1′·A0 goes HIGH.' },
-  { topic:'dec38', label:'3:8 Decoder', q:'Which minterm expression correctly represents output D6 of a 3:8 decoder?', opts:["A2·A1·A0", "A2·A1·A0'", "A2'·A1·A0'", "A2·A1'·A0'"], correct:1, explain:"6 = 110 in binary, so D6 = A2·A1·A0' (A2 HIGH, A1 HIGH, A0 LOW)." },
+  { topic:'dec38', label:'3:8 Decoder', type:'expression', q:'Which minterm expression correctly represents output D6 of a 3:8 decoder?', opts:["A2·A1·A0", "A2·A1·A0'", "A2'·A1·A0'", "A2·A1'·A0'"], correct:1, explain:"6 = 110 in binary, so D6 = A2·A1·A0' (A2 HIGH, A1 HIGH, A0 LOW)." },
 
   { topic:'enc21', label:'2:1 Encoder', q:'A basic 2:1 encoder converts how many input lines into how many output bit(s)?', opts:['1 input → 2 outputs','2 inputs → 1 output','2 inputs → 2 outputs','4 inputs → 1 output'], correct:1, explain:'An encoder compresses 2ⁿ inputs into n bits — here 2 inputs (Y0, Y1) compress into 1 output bit (A).' },
   { topic:'enc21', label:'2:1 Encoder', q:'What is a key limitation of a basic (non-priority) encoder?', opts:['It needs a clock signal','Output is undefined/ambiguous if more than one input is active at once','It can only have 2 inputs','It cannot be built from logic gates'], correct:1, explain:'Basic encoders assume only one input is HIGH at a time — if two or more go HIGH together, the output code becomes ambiguous. Priority encoders exist to fix this.' },
@@ -204,9 +230,33 @@ const QUESTIONS = [
   { topic:'enc83', label:'8:3 Encoder', q:'An 8:3 priority encoder compresses how many input lines into how many output bits?', opts:['3 inputs → 8 outputs','8 inputs → 3 outputs','8 inputs → 8 outputs','4 inputs → 3 outputs'], correct:1, explain:'8 = 2³, so 8 input lines (Y0–Y7) compress into a 3-bit binary output (A2 A1 A0).' },
   { topic:'enc83', label:'8:3 Encoder', q:'If Y6 is the highest-priority active input on an 8:3 encoder, what is A2 A1 A0?', opts:['101','110','011','111'], correct:1, explain:'6 in binary is 110, so the encoded output is A2 A1 A0 = 110.' },
   { topic:'enc83', label:'8:3 Encoder', q:'In a plain 8:3 encoder, the expression A0 = Y1+Y3+Y5+Y7 sums which inputs?', opts:['All even-indexed inputs','All inputs greater than 4','All odd-indexed inputs (those with LSB = 1)','Only the highest priority input'], correct:2, explain:'A0 is the least significant output bit, so it goes HIGH for any input whose index is odd — i.e. its binary form ends in 1.' },
+
+  { topic:'dec12', label:'1:2 Decoder', type:'expression', q:'Which Boolean expression correctly describes output D0 of a 1:2 decoder?', opts:["E·A", "E·A'", "A'", "E+A'"], correct:1, explain:"D0 is only HIGH when Enable is HIGH and A is LOW, so D0 = E·A′." },
+
+  { topic:'dec24', label:'2:4 Decoder', type:'truthtable', q:'The row for A1 A0 = 10 (with Enable = 1) is hidden below. What should D0 D1 D2 D3 read?',
+    table:{ headers:['E','A1','A0','D0','D1','D2','D3'], blankRow:2,
+      rows:[ ['0','X','X','0','0','0','0'], ['1','0','0','1','0','0','0'], ['1','1','0','?','?','?','?'], ['1','1','1','0','0','0','1'] ] },
+    opts:['0 0 1 0','1 0 0 0','0 0 0 1','0 1 0 0'], correct:0,
+    explain:'A1 A0 = 10 is binary for 2, so only D2 = E·A1·A0′ goes HIGH: D0 D1 D2 D3 = 0 0 1 0.' },
+
+  { topic:'dec38', label:'3:8 Decoder', type:'truthtable', q:'The active output for A2 A1 A0 = 110 is hidden below. Which output line is it?',
+    table:{ headers:['A2','A1','A0','Active Output'], blankRow:3,
+      rows:[ ['1','0','0','D4'], ['1','0','1','D5'], ['1','1','0','?'], ['1','1','1','D7'] ] },
+    opts:['D3','D5','D6','D7'], correct:2,
+    explain:'110 in binary equals 6, so the hidden row corresponds to output D6.' },
+
+  { topic:'enc21', label:'2:1 Encoder', type:'expression', q:'Which expression correctly gives the Valid (V) output of a 2:1 encoder?', opts:['Y1·Y0', 'Y1+Y0', "Y1'+Y0'", 'Y1 XOR Y0'], correct:1, explain:'V should be HIGH whenever at least one input is active, which is a logical OR: V = Y1 + Y0.' },
+
+  { topic:'enc42', label:'4:2 Encoder', type:'expression', q:'For a 4:2 priority encoder, which expression correctly defines output A0?', opts:['Y3+Y2', "Y3+Y2'·Y1", 'Y1·Y0', "Y3'·Y2'"], correct:1, explain:"A0 is HIGH if the highest-priority input Y3 is active, OR if Y3 is inactive but Y1 is active while Y2 is not: A0 = Y3 + Y2′·Y1." },
+
+  { topic:'enc83', label:'8:3 Encoder', type:'truthtable', q:'The output code for winning input Y6 is hidden below. What should A2 A1 A0 read?',
+    table:{ headers:['Winning Input','A2','A1','A0'], blankRow:1,
+      rows:[ ['Y4','1','0','0'], ['Y6','?','?','?'], ['Y7','1','1','1'] ] },
+    opts:['0 1 1','1 1 0','1 0 1','0 0 1'], correct:1,
+    explain:'6 in binary is 110, so the hidden row is A2 A1 A0 = 1 1 0.' },
 ];
 
-const TOTAL_TIME = 900; // 15 minutes in seconds
+const TOTAL_TIME = 1200; // 20 minutes in seconds
 const TOPIC_ORDER = [
   {key:'dec12', label:'1:2 Decoder'},
   {key:'dec24', label:'2:4 Decoder'},
@@ -262,6 +312,10 @@ function startAssessment(){
   document.getElementById('screenStart').style.display = 'none';
   document.getElementById('screenResults').style.display = 'none';
   document.getElementById('screenQuiz').style.display = 'block';
+  const track = document.querySelector('.asm-progress-track');
+  if(track){ track.setAttribute('aria-valuemax', String(QUESTIONS.length)); track.setAttribute('aria-valuenow','0'); }
+  const ann = document.getElementById('timerAnnounce');
+  if(ann) ann.textContent = '';
 
   // Lock out the other lab pages (nav, hub, direct URLs, other tabs) so
   // answers can't be looked up mid-assessment
@@ -281,6 +335,10 @@ function startAssessment(){
 function tick(){
   timeLeft--;
   updateTimerDisplay();
+  if(timeLeft === 60){
+    const ann = document.getElementById('timerAnnounce');
+    if(ann) ann.textContent = 'One minute remaining.';
+  }
   if(timeLeft <= 0){
     clearInterval(timerHandle);
     finishAssessment();
@@ -293,6 +351,18 @@ function updateTimerDisplay(){
   el.classList.toggle('low', timeLeft <= 60);
 }
 
+function buildTableHtml(tbl){
+  const headRow = tbl.headers.map(h=>`<th>${h}</th>`).join('');
+  const bodyRows = tbl.rows.map((row,ri)=>{
+    const cells = row.map(cell=>{
+      const isBlank = cell === '?';
+      return `<td${isBlank ? ' class="asm-blank-cell"' : ''}>${cell}</td>`;
+    }).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
+  return `<p class="asm-table-hint">Highlighted cells are the ones you need to work out.</p><div class="table-wrapper"><table><thead><tr>${headRow}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+}
+
 function renderQuestion(){
   locked = false;
   const qi = order[current];
@@ -300,16 +370,38 @@ function renderQuestion(){
   const optOrder = optionOrder[qi]; // display-position -> original option index
   document.getElementById('progressLabel').textContent = `Question ${current+1} of ${QUESTIONS.length}`;
   document.getElementById('progressFill').style.width = `${(current/QUESTIONS.length)*100}%`;
+  const track = document.querySelector('.asm-progress-track');
+  if(track) track.setAttribute('aria-valuenow', String(current));
   document.getElementById('topicTag').textContent = item.label;
   document.getElementById('questionText').textContent = item.q;
+
+  const typeTag = document.getElementById('typeTag');
+  const typeLabels = { truthtable:'Truth Table', expression:'Logical Expression' };
+  if(typeLabels[item.type]){
+    typeTag.textContent = typeLabels[item.type];
+    typeTag.style.display = 'inline-block';
+  } else {
+    typeTag.style.display = 'none';
+  }
+
+  const tableWrap = document.getElementById('tableWrap');
+  if(item.type === 'truthtable' && item.table){
+    tableWrap.innerHTML = buildTableHtml(item.table);
+    tableWrap.style.display = 'block';
+  } else {
+    tableWrap.innerHTML = '';
+    tableWrap.style.display = 'none';
+  }
 
   const wrap = document.getElementById('optionsWrap');
   wrap.innerHTML = '';
   const letters = ['A','B','C','D'];
   optOrder.forEach((origIdx,pos)=>{
     const btn = document.createElement('button');
-    btn.className = 'asm-option';
-    btn.innerHTML = `<span class="letter">${letters[pos]}</span><span>${item.opts[origIdx]}</span>`;
+    btn.type = 'button';
+    btn.className = 'asm-option' + (item.type === 'expression' ? ' mono-expr' : '');
+    btn.setAttribute('aria-label', `Option ${letters[pos]}: ${item.opts[origIdx]}`);
+    btn.innerHTML = `<span class="letter" aria-hidden="true">${letters[pos]}</span><span>${item.opts[origIdx]}</span>`;
     btn.onclick = () => selectAnswer(pos);
     wrap.appendChild(btn);
   });
@@ -331,6 +423,8 @@ function selectAnswer(pos){
   const opts = document.querySelectorAll('.asm-option');
   opts.forEach((el,idx)=>{
     el.classList.add('locked');
+    el.setAttribute('aria-disabled','true');
+    el.tabIndex = -1;
     const origIdx = optOrder[idx];
     if(origIdx === item.correct) el.classList.add('correct');
     else if(idx === pos) el.classList.add('wrong');

@@ -13,7 +13,8 @@
 </style>
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -21,15 +22,15 @@
   <p class="sub">Three address bits (A2 A1 A0) select exactly one of eight output lines — scale this pattern up (4:16, 5:32...) and you get memory address decoding for real systems.</p>
 </header>
 
-<nav class="tabs">
+<nav class="tabs" aria-label="Lab navigation">
   <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
   <button onclick="location.href='decoder_1_2.html'">1:2 Decoder</button>
   <button onclick="location.href='decoder_2_4.html'">2:4 Decoder</button>
-  <button class="active" onclick="location.href='decoder_3_8.html'">3:8 Decoder</button>
+  <button class="active" aria-current="page" onclick="location.href='decoder_3_8.html'">3:8 Decoder</button>
   <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
 </nav>
 
-<main>
+<main id="main-content">
 
   <span class="eyebrow-num">Decoder Lab 03</span>
   <h2 class="section-title">3:8 Decoder Simulator</h2>
@@ -40,13 +41,13 @@
     <div class="panel">
       <h4>Interactive Simulator</h4>
       <div class="led-row" style="margin-bottom:20px;">
-        <div class="toggle"><div class="switch" id="sw-dec38-a2" onclick="toggleDec38('a2')"></div><span>A2</span></div>
-        <div class="toggle"><div class="switch" id="sw-dec38-a1" onclick="toggleDec38('a1')"></div><span>A1</span></div>
-        <div class="toggle"><div class="switch" id="sw-dec38-a0" onclick="toggleDec38('a0')"></div><span>A0</span></div>
-        <div class="toggle"><div class="switch on" id="sw-dec38-e" onclick="toggleDec38('e')"></div><span>Enable</span></div>
+        <div class="toggle"><button type="button" class="switch" id="sw-dec38-a2" onclick="toggleDec38('a2')" role="switch" aria-checked="false" aria-label="Address bit A2"></button><span>A2</span></div>
+        <div class="toggle"><button type="button" class="switch" id="sw-dec38-a1" onclick="toggleDec38('a1')" role="switch" aria-checked="false" aria-label="Address bit A1"></button><span>A1</span></div>
+        <div class="toggle"><button type="button" class="switch" id="sw-dec38-a0" onclick="toggleDec38('a0')" role="switch" aria-checked="false" aria-label="Address bit A0"></button><span>A0</span></div>
+        <div class="toggle"><button type="button" class="switch on" id="sw-dec38-e" onclick="toggleDec38('e')" role="switch" aria-checked="true" aria-label="Enable"></button><span>Enable</span></div>
       </div>
       <div class="led-row" id="dec38-leds"></div>
-      <div class="output-readout">
+      <div class="output-readout" aria-live="polite" aria-atomic="true">
         <span>Decoded State</span>
         <span id="readout-dec38" class="val">Active: none</span>
       </div>
@@ -107,7 +108,7 @@ const stateDec38 = { a2:0, a1:0, a0:0, e:1 };
   for(let i=0;i<8;i++){
     const div = document.createElement('div');
     div.className = 'led-btn'; div.setAttribute('disabled','');
-    div.innerHTML = `<span id="led-dec38-d${i}" class="bulb"></span><span>D${i}</span>`;
+    div.innerHTML = `<span id="led-dec38-d${i}" class="bulb" aria-hidden="true"></span><span>D${i}</span>`;
     ledRow.appendChild(div);
   }
   const tbody = document.getElementById('table-dec38');
@@ -138,7 +139,9 @@ const stateDec38 = { a2:0, a1:0, a0:0, e:1 };
 
 function toggleDec38(pin){
   stateDec38[pin] = stateDec38[pin] ? 0 : 1;
-  document.getElementById(`sw-dec38-${pin}`).classList.toggle('on', stateDec38[pin] === 1);
+  const sw = document.getElementById(`sw-dec38-${pin}`);
+  sw.classList.toggle('on', stateDec38[pin] === 1);
+  sw.setAttribute('aria-checked', stateDec38[pin] === 1 ? 'true' : 'false');
   renderDec38();
 }
 

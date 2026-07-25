@@ -9,7 +9,8 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -17,15 +18,15 @@
   <p class="sub">Isolated logic workspace for a 4-to-2 line priority encoder circuit. Inputs are compressed into a 2-bit binary code representing the highest priority input active.</p>
 </header>
 
-<nav class="tabs">
+<nav class="tabs" aria-label="Lab navigation">
   <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
   <button onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
-  <button class="active" onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
+  <button class="active" aria-current="page" onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
   <button onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
   <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
 </nav>
 
-<main>
+<main id="main-content">
   
   <span class="eyebrow-num">Encoder Lab 02</span>
   <h2 class="section-title">4:2 Encoder Simulator</h2>
@@ -37,38 +38,38 @@
       <h4>Interactive Simulator (Priority Input)</h4>
       <p class="mono" style="font-size: 12px; margin-top: 0; color: var(--text-dim);">Toggle input lines (Y₃ is highest priority):</p>
       <div class="led-row">
-        <button id="sw-enc42-y0" class="led-btn" onclick="toggleEnc42(0)">
-          <span class="bulb"></span>
+        <button type="button" id="sw-enc42-y0" class="led-btn" onclick="toggleEnc42(0)" aria-pressed="false" aria-label="Input Y0">
+          <span class="bulb" aria-hidden="true"></span>
           <span>Y₀</span>
         </button>
-        <button id="sw-enc42-y1" class="led-btn" onclick="toggleEnc42(1)">
-          <span class="bulb"></span>
+        <button type="button" id="sw-enc42-y1" class="led-btn" onclick="toggleEnc42(1)" aria-pressed="false" aria-label="Input Y1">
+          <span class="bulb" aria-hidden="true"></span>
           <span>Y₁</span>
         </button>
-        <button id="sw-enc42-y2" class="led-btn" onclick="toggleEnc42(2)">
-          <span class="bulb"></span>
+        <button type="button" id="sw-enc42-y2" class="led-btn" onclick="toggleEnc42(2)" aria-pressed="false" aria-label="Input Y2">
+          <span class="bulb" aria-hidden="true"></span>
           <span>Y₂</span>
         </button>
-        <button id="sw-enc42-y3" class="led-btn" onclick="toggleEnc42(3)">
-          <span class="bulb"></span>
+        <button type="button" id="sw-enc42-y3" class="led-btn" onclick="toggleEnc42(3)" aria-pressed="false" aria-label="Input Y3, highest priority">
+          <span class="bulb" aria-hidden="true"></span>
           <span>Y₃</span>
         </button>
       </div>
       <div class="led-row">
         <div class="led-btn" disabled>
-          <span id="led-enc42-a1" class="bulb"></span>
+          <span id="led-enc42-a1" class="bulb" aria-hidden="true"></span>
           <span>Output A₁</span>
         </div>
         <div class="led-btn" disabled>
-          <span id="led-enc42-a0" class="bulb"></span>
+          <span id="led-enc42-a0" class="bulb" aria-hidden="true"></span>
           <span>Output A₀</span>
         </div>
         <div class="led-btn" disabled>
-          <span id="led-enc42-v" class="bulb amber"></span>
+          <span id="led-enc42-v" class="bulb amber" aria-hidden="true"></span>
           <span>Valid (V)</span>
         </div>
       </div>
-      <div class="output-readout">
+      <div class="output-readout" aria-live="polite" aria-atomic="true">
         <span>Encoded State</span>
         <span id="readout-enc42" class="val">A₁ A₀ = 0 0 | V = 0</span>
       </div>
@@ -216,6 +217,7 @@ function toggleEnc42(pin) {
   stateEnc42[pin] = stateEnc42[pin] ? 0 : 1;
   const btn = document.getElementById(`sw-enc42-y${pin}`);
   btn.classList.toggle('on', stateEnc42[pin] === 1);
+  btn.setAttribute('aria-pressed', stateEnc42[pin] === 1 ? 'true' : 'false');
   renderEnc42();
 }
 

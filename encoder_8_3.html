@@ -9,7 +9,8 @@
 <link rel="stylesheet" href="lab_style.css">
 </head>
 <body>
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀</button>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle light/dark theme">☀</button>
 
 <header class="hero">
   <span class="chip-eyebrow">ECE · Interactive Laboratory Workspace</span>
@@ -17,15 +18,15 @@
   <p class="sub">Eight input lines compress into a 3-bit binary code. Multiple inputs can be active at once — the highest-indexed line always wins, exactly like a real interrupt controller (e.g. the 74148 IC).</p>
 </header>
 
-<nav class="tabs">
+<nav class="tabs" aria-label="Lab navigation">
   <button class="hub-btn" onclick="location.href='index.html'">← Hub Dashboard</button>
   <button onclick="location.href='encoder_2_1.html'">2:1 Encoder</button>
   <button onclick="location.href='encoder_4_2.html'">4:2 Encoder</button>
-  <button class="active" onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
+  <button class="active" aria-current="page" onclick="location.href='encoder_8_3.html'">8:3 Encoder</button>
   <button onclick="location.href='assessment.html'" style="color:var(--trace);border-color:var(--trace-dim);">Assessment</button>
 </nav>
 
-<main>
+<main id="main-content">
 
   <span class="eyebrow-num">Encoder Lab 03</span>
   <h2 class="section-title">8:3 Encoder Simulator</h2>
@@ -38,12 +39,12 @@
       <p class="mono" style="font-size: 12px; margin-top: 0; color: var(--text-dim);">Toggle any lines — Y7 is highest priority:</p>
       <div class="led-row" id="enc83-inputs"></div>
       <div class="led-row">
-        <div class="led-btn" disabled><span id="led-enc83-a2" class="bulb"></span><span>A2</span></div>
-        <div class="led-btn" disabled><span id="led-enc83-a1" class="bulb"></span><span>A1</span></div>
-        <div class="led-btn" disabled><span id="led-enc83-a0" class="bulb"></span><span>A0</span></div>
-        <div class="led-btn" disabled><span id="led-enc83-v" class="bulb amber"></span><span>Valid (V)</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-a2" class="bulb" aria-hidden="true"></span><span>A2</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-a1" class="bulb" aria-hidden="true"></span><span>A1</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-a0" class="bulb" aria-hidden="true"></span><span>A0</span></div>
+        <div class="led-btn" disabled><span id="led-enc83-v" class="bulb amber" aria-hidden="true"></span><span>Valid (V)</span></div>
       </div>
-      <div class="output-readout">
+      <div class="output-readout" aria-live="polite" aria-atomic="true">
         <span>Encoded State</span>
         <span id="readout-enc83" class="val">A2 A1 A0 = X X X | V = 0</span>
       </div>
@@ -115,10 +116,13 @@ const stateEnc83 = new Array(8).fill(0); // index = Yj
   const inputWrap = document.getElementById('enc83-inputs');
   for(let j=7;j>=0;j--){
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'led-btn';
     btn.id = `sw-enc83-y${j}`;
-    btn.innerHTML = `<span class="bulb"></span><span>Y${j}</span>`;
-    btn.onclick = () => { stateEnc83[j] = stateEnc83[j] ? 0 : 1; renderEnc83(); };
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', `Input Y${j}${j===7?', highest priority':''}`);
+    btn.innerHTML = `<span class="bulb" aria-hidden="true"></span><span>Y${j}</span>`;
+    btn.onclick = () => { stateEnc83[j] = stateEnc83[j] ? 0 : 1; btn.setAttribute('aria-pressed', stateEnc83[j]===1?'true':'false'); renderEnc83(); };
     inputWrap.appendChild(btn);
   }
   const bdWrap = document.getElementById('bd-enc83-inputs');
