@@ -128,17 +128,6 @@
   border-color: rgba(0, 132, 168, 0.25);
   box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 0 30px rgba(0,132,168,0.08);
 }
-[data-theme="light"] .kmap-card {
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.04);
-}
-[data-theme="light"] .kmap-grid th {
-  background: #eef1f6;
-}
-[data-theme="light"] .kmap-cell {
-  background: #f4f6f9;
-  color: #97a2b5;
-  border-color: #dde2ea;
-}
 [data-theme="light"] .ic-chip {
   background: #eef1f6;
   border-color: #c4c9d4;
@@ -380,7 +369,7 @@ svg.diagram { width: 100%; height: auto; background: var(--bg-alt); border: 1px 
 .waveform-panel h5 { margin: 0 0 8px; font-size: 11px; color: var(--copper); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'JetBrains Mono', monospace; }
 canvas.waveform-canvas { width: 100%; height: 90px; background: #04060a; border-radius: 6px; border: 1px solid var(--panel-border); display: block; }
 
-/* Modal Dialogs (K-Map & Code Export) */
+/* Modal Dialogs (Code Export) */
 .modal-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
 .modal-card { width: 100%; max-width: 620px; background: var(--panel); border: 1px solid var(--trace-dim); border-radius: var(--radius); padding: 26px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); position: relative; max-height: 85vh; overflow-y: auto; }
@@ -390,94 +379,6 @@ canvas.waveform-canvas { width: 100%; height: 90px; background: #04060a; border-
 
 /* Code Export Box */
 pre.code-block { background: #04060a; border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px; color: var(--trace); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-x: auto; white-space: pre-wrap; }
-
-/* ── Futuristic K-Map UI ── */
-.kmap-card {
-  background: var(--bg-alt);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
-}
-.kmap-card-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 12px; font-family: 'JetBrains Mono', monospace;
-}
-.kmap-card-title { font-size: 13px; font-weight: 700; color: var(--copper); }
-.kmap-expr-badge {
-  font-size: 11px; font-weight: bold; color: var(--trace);
-  background: rgba(0, 240, 255, 0.1); border: 1px solid var(--trace-dim);
-  padding: 3px 10px; border-radius: 999px;
-}
-
-.kmap-grid-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 10px 0; }
-
-.kmap-grid {
-  border-collapse: separate;
-  border-spacing: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  margin: 0 auto;
-}
-.kmap-grid th {
-  background: #141a29;
-  color: var(--copper);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--panel-border);
-  min-width: 48px;
-  text-align: center;
-}
-.kmap-grid th.axis-hdr {
-  color: var(--text-dim);
-  background: transparent;
-  border: none;
-  font-size: 10.5px;
-}
-.kmap-cell {
-  background: #0d121c;
-  color: #4b586e;
-  font-size: 13px;
-  font-weight: 600;
-  width: 54px;
-  height: 54px;
-  text-align: center;
-  vertical-align: middle;
-  border-radius: 8px;
-  border: 1px solid #1a2233;
-  transition: all 0.2s ease;
-}
-.kmap-cell:hover {
-  transform: scale(1.06);
-  border-color: var(--trace-dim);
-}
-.kmap-cell.active {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(0, 240, 255, 0.05));
-  color: var(--trace);
-  font-weight: 800;
-  border: 1.5px solid var(--trace);
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
-}
-.kmap-cell.live-state {
-  border-color: var(--copper) !important;
-  box-shadow: 0 0 16px var(--copper) !important;
-  animation: pulseLiveCell 1.8s infinite;
-}
-@keyframes pulseLiveCell {
-  0%, 100% { box-shadow: 0 0 16px var(--copper); }
-  50% { box-shadow: 0 0 6px var(--copper); }
-}
-
-.kmap-loop-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px;
-  color: var(--good); background: rgba(53, 224, 138, 0.08);
-  border: 1px solid rgba(53, 224, 138, 0.3); border-radius: 6px;
-  padding: 4px 10px; margin-top: 6px;
-}
 
 /* IC Chip View */
 .ic-chip { background: #1a1d24; border: 2px solid #323a4d; border-radius: 12px; padding: 20px 14px; position: relative; max-width: 320px; margin: 0 auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
@@ -518,16 +419,6 @@ pre.code-block { background: #04060a; border: 1px solid var(--panel-border); bor
 .legend-color.address { background: var(--trace); }
 .legend-color.enable { background: var(--copper); }
 .legend-color.data { background: var(--good); }
-
-/* ── Slide-Out Cheatsheet Drawer ── */
-.cheatsheet-drawer {
-  position: fixed; top: 0; right: -380px; width: 360px; height: 100vh; z-index: 1100;
-  background: var(--panel); border-left: 1px solid var(--trace-dim); padding: 24px;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.5); transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow-y: auto;
-}
-.cheatsheet-drawer.open { right: 0; }
-.cheatsheet-drawer h3 { margin: 0 0 16px; font-size: 16px; color: var(--trace); }
 
 /* ── Realistic Hardware Breadboard View ── */
 .breadboard-container {

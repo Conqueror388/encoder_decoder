@@ -364,10 +364,6 @@
     .led-row{ flex-wrap:wrap; gap:10px !important; }
     .output-readout{ flex-wrap:wrap; gap:6px; }
 
-    /* K-map cards stack instead of forcing min-width overflow */
-    .kmap-card{ min-width:100% !important; flex:1 1 100% !important; }
-    .kmap-grid{ font-size:12px; }
-
     /* Dashboard cards */
     .card-item{ flex-wrap:wrap; gap:8px; }
 
@@ -430,9 +426,6 @@
   </div>
   <div class="nav-utility">
     <button class="util-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀ Theme</button>
-    <button class="util-btn" onclick="openTourModal()" title="Guided Tour">🎓 Tour</button>
-    <button class="util-btn" onclick="toggleCheatsheet()" title="Logic Cheatsheet">📖 Sheet</button>
-    <button class="util-btn" onclick="openKMapModal()" title="Live K-Map">🗺️ K-Map</button>
   </div>
 </nav>
 
@@ -888,16 +881,6 @@
 </section>
 
 <!-- ═══════════ MODAL DIALOGS ═══════════ -->
-<!-- K-Map Modal -->
-<div class="modal-overlay" id="kmapModal">
-  <div class="modal-card">
-    <button class="modal-close" onclick="closeKMapModal()">✕</button>
-    <h3>🗺️ Live Karnaugh Map (K-Map)</h3>
-    <p class="sub" style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Karnaugh map minterm representation for the active circuit.</p>
-    <div id="kmapContent"></div>
-  </div>
-</div>
-
 <!-- Code Export Modal -->
 <div class="modal-overlay" id="codeModal">
   <div class="modal-card">
@@ -911,44 +894,6 @@
     </div>
     <pre class="code-block" id="exportCodeText"></pre>
     <button class="asm-btn" style="margin-top:14px;" onclick="copyExportCode()">📋 Copy Code</button>
-  </div>
-</div>
-
-<!-- Guided Onboarding Tour Modal -->
-<div class="modal-overlay" id="tourModal">
-  <div class="modal-card">
-    <button class="modal-close" onclick="closeTourModal()">✕</button>
-    <h3>🎓 Welcome to Interactive Digital Logic Lab</h3>
-    <p class="sub" style="font-size:13px;color:var(--text-dim);margin:0 0 16px;">Follow these 4 quick tips to master decoders and encoders:</p>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
-      <div class="story-box" style="margin:0;">1️⃣ <strong>Toggle Switches:</strong> Flip input switches to see binary signals travel live through logic gates.</div>
-      <div class="story-box" style="margin:0;">2️⃣ <strong>Trace Glowing Wires:</strong> Cyan wires carry HIGH ($1$) signals; dark wires carry LOW ($0$).</div>
-      <div class="story-box" style="margin:0;">3️⃣ <strong>Click Truth Tables:</strong> Click any row in a truth table to auto-load that state into the simulator.</div>
-      <div class="story-box" style="margin:0;">4️⃣ <strong>Take the Assessment:</strong> Test your knowledge with 15 interactive timed questions!</div>
-    </div>
-    <button class="asm-btn" onclick="closeTourModal()">Start Exploring Lab →</button>
-  </div>
-</div>
-
-<!-- Slide-Out Cheatsheet Drawer -->
-<div class="cheatsheet-drawer" id="cheatsheetDrawer">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <h3 style="margin:0;">📖 Logic Cheatsheet</h3>
-    <button class="modal-close" style="position:static;" onclick="toggleCheatsheet()">✕</button>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--text-dim);">
-    <div>
-      <h5 style="color:var(--copper);margin:0 0 4px;font-family:'JetBrains Mono',monospace;">Decoder Rule</h5>
-      <p style="margin:0;">Expands $n$ binary address lines $\to 2^n$ distinct outputs. Exactly 1 output is HIGH at a time.</p>
-    </div>
-    <div>
-      <h5 style="color:var(--copper);margin:0 0 4px;font-family:'JetBrains Mono',monospace;">Encoder Rule</h5>
-      <p style="margin:0;">Compresses $2^n$ input lines $\to n$ output bits. Priority encoders resolve multiple active inputs by picking the highest index.</p>
-    </div>
-    <div>
-      <h5 style="color:var(--copper);margin:0 0 4px;font-family:'JetBrains Mono',monospace;">Key Expressions</h5>
-      <p style="margin:0;font-family:'JetBrains Mono',monospace;color:var(--trace);">1:2 Dec: D0 = E·A', D1 = E·A<br>2:4 Dec: Di = E·m_i<br>4:2 Enc: A1 = Y3+Y2, A0 = Y3+Y2'Y1</p>
-    </div>
   </div>
 </div>
 
@@ -1159,142 +1104,6 @@ function processVoiceCmd(c){
   else if(c.includes('hub')||c.includes('home')){showSection('hub');}
 }
 
-/* ── Live K-Map Generator ── */
-function openKMapModal(){
-  document.getElementById('kmapModal').classList.add('open');
-  const activeSec=document.querySelector('.lab-section.active');
-  const id=activeSec?activeSec.id.replace('sec-',''):'dec12';
-  let html='';
-
-  if(id==='dec12'){
-    const curA=stateDec12.a;
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">1:2 Decoder maps 1 address line A to minterms D₀ and D₁:</p>';
-    html+='<div style="display:flex;gap:16px;flex-wrap:wrap;">';
-    html+=`<div class="kmap-card" style="flex:1;min-width:200px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output D₀</span><span class="kmap-expr-badge">D₀ = E · A'</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">E \\ A</th><th>0</th><th>1</th></tr>
-      <tr><th>1</th><td class="kmap-cell active ${curA===0?'live-state':''}">1 (D₀)</td><td class="kmap-cell ${curA===1?'live-state':''}">0</td></tr></table>
-      <div class="kmap-loop-badge">🔍 Minterm m₀ (A=0)</div>
-    </div>`;
-    html+=`<div class="kmap-card" style="flex:1;min-width:200px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output D₁</span><span class="kmap-expr-badge">D₁ = E · A</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">E \\ A</th><th>0</th><th>1</th></tr>
-      <tr><th>1</th><td class="kmap-cell ${curA===0?'live-state':''}">0</td><td class="kmap-cell active ${curA===1?'live-state':''}">1 (D₁)</td></tr></table>
-      <div class="kmap-loop-badge">🔍 Minterm m₁ (A=1)</div>
-    </div>`;
-    html+='</div>';
-  }else if(id==='dec24'){
-    const curA1=stateDec24.a1, curA0=stateDec24.a0;
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">2:4 Decoder Minterm Grid (Address lines A₁, A₀):</p>';
-    html+=`<div class="kmap-card">
-      <div class="kmap-card-header"><span class="kmap-card-title">Complete 2-Variable Minterm K-Map</span><span class="kmap-expr-badge">Dᵢ = E · mᵢ</span></div>
-      <table class="kmap-grid">
-        <tr><th class="axis-hdr">A₁ \\ A₀</th><th>0</th><th>1</th></tr>
-        <tr><th>0</th><td class="kmap-cell active ${curA1===0&&curA0===0?'live-state':''}">D₀<br><small style="font-size:9px;">(00)</small></td><td class="kmap-cell active ${curA1===0&&curA0===1?'live-state':''}">D₁<br><small style="font-size:9px;">(01)</small></td></tr>
-        <tr><th>1</th><td class="kmap-cell active ${curA1===1&&curA0===0?'live-state':''}">D₂<br><small style="font-size:9px;">(10)</small></td><td class="kmap-cell active ${curA1===1&&curA0===1?'live-state':''}">D₃<br><small style="font-size:9px;">(11)</small></td></tr>
-      </table>
-      <div class="kmap-loop-badge">⚡ Pulsing ring highlights active simulator state (A₁=${curA1}, A₀=${curA0})</div>
-    </div>`;
-  }else if(id==='dec38'){
-    const curA2=stateDec38.a2, curA1=stateDec38.a1, curA0=stateDec38.a0;
-    const activeIdx = (curA2<<2)|(curA1<<1)|curA0;
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">3:8 Decoder 3-Variable Gray-Code K-Map (A₂ \\ A₁A₀):</p>';
-    html+=`<div class="kmap-card">
-      <div class="kmap-card-header"><span class="kmap-card-title">3-Variable Gray-Code Minterm K-Map</span><span class="kmap-expr-badge">8 Unique Minterms</span></div>
-      <table class="kmap-grid">
-        <tr><th class="axis-hdr">A₂ \\ A₁A₀</th><th>00</th><th>01</th><th>11</th><th>10</th></tr>
-        <tr><th>0</th>
-          <td class="kmap-cell active ${activeIdx===0?'live-state':''}">D₀<br><small style="font-size:9px;">(000)</small></td>
-          <td class="kmap-cell active ${activeIdx===1?'live-state':''}">D₁<br><small style="font-size:9px;">(001)</small></td>
-          <td class="kmap-cell active ${activeIdx===3?'live-state':''}">D₃<br><small style="font-size:9px;">(011)</small></td>
-          <td class="kmap-cell active ${activeIdx===2?'live-state':''}">D₂<br><small style="font-size:9px;">(010)</small></td>
-        </tr>
-        <tr><th>1</th>
-          <td class="kmap-cell active ${activeIdx===4?'live-state':''}">D₄<br><small style="font-size:9px;">(100)</small></td>
-          <td class="kmap-cell active ${activeIdx===5?'live-state':''}">D₅<br><small style="font-size:9px;">(101)</small></td>
-          <td class="kmap-cell active ${activeIdx===7?'live-state':''}">D₇<br><small style="font-size:9px;">(111)</small></td>
-          <td class="kmap-cell active ${activeIdx===6?'live-state':''}">D₆<br><small style="font-size:9px;">(110)</small></td>
-        </tr>
-      </table>
-      <div class="kmap-loop-badge">⚡ Active state: Address A₂A₁A₀ = ${curA2}${curA1}${curA0} (D${activeIdx})</div>
-    </div>`;
-  }else if(id==='enc21'){
-    const curY1=stateEnc21[1], curY0=stateEnc21[0];
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">2:1 Encoder Output Karnaugh Maps:</p>';
-    html+='<div style="display:flex;gap:16px;flex-wrap:wrap;">';
-    html+=`<div class="kmap-card" style="flex:1;min-width:220px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output A</span><span class="kmap-expr-badge">A = Y₁</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">Y₁ \\ Y₀</th><th>0</th><th>1</th></tr>
-      <tr><th>0</th><td class="kmap-cell ${curY1===0&&curY0===0?'live-state':''}">0</td><td class="kmap-cell ${curY1===0&&curY0===1?'live-state':''}">0</td></tr>
-      <tr><th>1</th><td class="kmap-cell active ${curY1===1&&curY0===0?'live-state':''}">1</td><td class="kmap-cell active ${curY1===1&&curY0===1?'live-state':''}">1 <small>(Amb)</small></td></tr></table>
-      <div class="kmap-loop-badge">⭕ Loop: Horizontal Pair (Y₁=1)</div>
-    </div>`;
-    html+=`<div class="kmap-card" style="flex:1;min-width:220px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Valid V</span><span class="kmap-expr-badge">V = Y₁ + Y₀</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">Y₁ \\ Y₀</th><th>0</th><th>1</th></tr>
-      <tr><th>0</th><td class="kmap-cell ${curY1===0&&curY0===0?'live-state':''}">0</td><td class="kmap-cell active ${curY1===0&&curY0===1?'live-state':''}">1</td></tr>
-      <tr><th>1</th><td class="kmap-cell active ${curY1===1&&curY0===0?'live-state':''}">1</td><td class="kmap-cell active ${curY1===1&&curY0===1?'live-state':''}">1</td></tr></table>
-      <div class="kmap-loop-badge">⭕ Loop: 3-cell Grouping (OR Gate)</div>
-    </div>`;
-    html+='</div>';
-  }else if(id==='enc42std'){
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">4:2 Standard Encoder Equations:</p>';
-    html+='<div style="display:flex;gap:16px;flex-wrap:wrap;">';
-    html+=`<div class="kmap-card" style="flex:1;min-width:220px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output A₁</span><span class="kmap-expr-badge">A₁ = Y₃ + Y₂</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">Y₃ \\ Y₂</th><th>0</th><th>1</th></tr>
-      <tr><th>0</th><td class="kmap-cell">0</td><td class="kmap-cell active">1</td></tr>
-      <tr><th>1</th><td class="kmap-cell active">1</td><td class="kmap-cell active">1</td></tr></table>
-    </div>`;
-    html+=`<div class="kmap-card" style="flex:1;min-width:220px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output A₀</span><span class="kmap-expr-badge">A₀ = Y₃ + Y₁</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">Y₃ \\ Y₁</th><th>0</th><th>1</th></tr>
-      <tr><th>0</th><td class="kmap-cell">0</td><td class="kmap-cell active">1</td></tr>
-      <tr><th>1</th><td class="kmap-cell active">1</td><td class="kmap-cell active">1</td></tr></table>
-    </div>`;
-    html+='</div>';
-  }else if(id==='enc82'){
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">8:2 Encoder Logical Expressions:</p>';
-    html+=`<div class="kmap-card">
-      <div class="kmap-card-header"><span class="kmap-card-title">Group Reduction Expressions</span><span class="kmap-expr-badge">8 Input Lines</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--copper);font-weight:bold;font-size:12px;">A₁</span><code style="color:var(--trace);">Y₇ + Y₆ + Y₅ + Y₄</code><span class="kmap-loop-badge" style="margin:0;">Group 2 &amp; 3</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--copper);font-weight:bold;font-size:12px;">A₀</span><code style="color:var(--trace);">Y₇ + Y₆ + Y₃ + Y₂</code><span class="kmap-loop-badge" style="margin:0;">Group 1 &amp; 3</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--good);font-weight:bold;font-size:12px;">V</span><code style="color:var(--good);">Y₇ + Y₆ + Y₅ + Y₄ + Y₃ + Y₂ + Y₁ + Y₀</code><span class="kmap-loop-badge" style="margin:0;">Any Active Line</span></div>
-      </div>
-    </div>`;
-  }else if(id==='enc42'){
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">4:2 Priority Encoder Reduced K-Maps:</p>';
-    html+='<div style="display:flex;gap:16px;flex-wrap:wrap;">';
-    html+=`<div class="kmap-card" style="flex:1;min-width:220px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output A₁</span><span class="kmap-expr-badge">A₁ = Y₃ + Y₂</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">Y₃ \\ Y₂</th><th>0</th><th>1</th></tr>
-      <tr><th>0</th><td class="kmap-cell">0</td><td class="kmap-cell active">1</td></tr>
-      <tr><th>1</th><td class="kmap-cell active">1</td><td class="kmap-cell active">1</td></tr></table>
-      <div class="kmap-loop-badge">⭕ Loop: Quad/Pair (Y₃=1 || Y₂=1)</div>
-    </div>`;
-    html+=`<div class="kmap-card" style="flex:1;min-width:220px;">
-      <div class="kmap-card-header"><span class="kmap-card-title">Output A₀</span><span class="kmap-expr-badge">A₀ = Y₃ + Y₂'Y₁</span></div>
-      <table class="kmap-grid"><tr><th class="axis-hdr">Y₃ \\ Y₂Y₁</th><th>00</th><th>01</th><th>11</th><th>10</th></tr>
-      <tr><th>0</th><td class="kmap-cell">0</td><td class="kmap-cell active">1</td><td class="kmap-cell">0</td><td class="kmap-cell">0</td></tr>
-      <div class="kmap-loop-badge">⭕ Loop: Bottom Row (Y₃=1) + Cell (0,01)</div>
-    </div>`;
-    html+='</div>';
-  }else if(id==='enc83'){
-    html='<p style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">8:3 Priority Encoder Reduced K-Map Expressions:</p>';
-    html+=`<div class="kmap-card">
-      <div class="kmap-card-header"><span class="kmap-card-title">Priority Reduction Expressions</span><span class="kmap-expr-badge">8 Input Lines</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--copper);font-weight:bold;font-size:12px;">A₂</span><code style="color:var(--trace);">Y₇ + Y₆ + Y₅ + Y₄</code><span class="kmap-loop-badge" style="margin:0;">Group Upper 4</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--copper);font-weight:bold;font-size:12px;">A₁</span><code style="color:var(--trace);">Y₇ + Y₆ + Y₅'Y₄'(Y₃ + Y₂)</code><span class="kmap-loop-badge" style="margin:0;">Group Pairs</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--copper);font-weight:bold;font-size:12px;">A₀</span><code style="color:var(--trace);">Y₇ + Y₆'Y₅ + Y₆'Y₅'Y₄'Y₃ + Y₆'Y₅'Y₄'Y₃'Y₂'Y₁</code><span class="kmap-loop-badge" style="margin:0;">Odd Inputs</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:#0d121c;padding:8px 12px;border-radius:6px;border:1px solid #1a2233;"><span style="color:var(--good);font-weight:bold;font-size:12px;">V</span><code style="color:var(--good);">Y₇ + Y₆ + Y₅ + Y₄ + Y₃ + Y₂ + Y₁ + Y₀</code><span class="kmap-loop-badge" style="margin:0;">Any Active Line</span></div>
-      </div>
-    </div>`;
-  }
-  document.getElementById('kmapContent').innerHTML=html;
-}
-function closeKMapModal(){document.getElementById('kmapModal').classList.remove('open');}
 
 function toggleCircuitInput(type, key){
   if(type==='dec12') toggleDec12(key);
@@ -1907,11 +1716,6 @@ function initHScrollHint(wrap){
     if(fade) fade.classList.add('faded');
   }, { passive:true });
 }
-
-/* ── Tour & Cheatsheet Drawers ── */
-function openTourModal(){document.getElementById('tourModal').classList.add('open');}
-function closeTourModal(){document.getElementById('tourModal').classList.remove('open');}
-function toggleCheatsheet(){document.getElementById('cheatsheetDrawer').classList.toggle('open');}
 
 /* ═══════ HELPER UTILITIES ═══════ */
 function sH(id,on){const el=document.getElementById(id);if(el)el.classList.toggle('hot',!!on);}
