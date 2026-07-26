@@ -16,7 +16,7 @@
   .lab-group h3 { margin-top:0; margin-bottom:16px; color:var(--copper); text-transform:uppercase; font-size:14px; letter-spacing:0.08em; border-bottom:1px solid var(--panel-border); padding-bottom:8px; }
   .card-list { display:flex; flex-direction:column; gap:14px; }
   .card-item { background:var(--bg-alt); border:1px solid var(--panel-border); border-radius:8px; padding:16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:all 0.2s cubic-bezier(0.4,0,0.2,1); }
-  .card-item:hover { border-color:var(--trace); transform:translateX(4px); box-shadow:0 4px 15px rgba(0,240,255,0.08); }
+  .card-item:hover { border-color:var(--trace); box-shadow:0 4px 15px rgba(0,240,255,0.08); }
   .card-content h4 { margin:0 0 6px; font-size:16px; color:var(--text); }
   .card-content p { margin:0; font-size:13px; color:var(--text-dim); }
   .arrow { color:var(--trace); font-weight:bold; font-size:18px; }
@@ -179,8 +179,17 @@
     transform-style:preserve-3d;
     transition:transform .35s var(--ease-premium), box-shadow .35s var(--ease-premium), border-color .35s ease;
   }
-  .panel:hover, .lab-group:hover{
+  .panel:hover{
     transform:perspective(900px) rotateX(2.5deg) translateY(-6px);
+    border-color:var(--trace-dim);
+    box-shadow:0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(0,240,255,.06), 0 0 28px rgba(0,240,255,.07);
+  }
+  /* .lab-group intentionally has no transform on hover: it wraps clickable
+     .card-item buttons, and a geometry-shifting hover lift here compounds
+     with the card's own hover transform, moving the card's hitbox out from
+     under the cursor mid-click and causing clicks (especially near card
+     edges) to land on the parent instead of the card. Glow only, no move. */
+  .lab-group:hover{
     border-color:var(--trace-dim);
     box-shadow:0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(0,240,255,.06), 0 0 28px rgba(0,240,255,.07);
   }
@@ -197,8 +206,8 @@
     transform:translateX(-120%); transition:transform .6s var(--ease-premium);
   }
   .card-item:hover::before{ transform:translateX(120%); }
-  .card-item:hover{ transform:perspective(700px) rotateY(-4deg) translateX(6px) translateY(-2px); box-shadow:0 10px 26px rgba(0,240,255,.12); }
-  .card-item:active{ transform:perspective(700px) rotateY(2deg) scale(0.98); }
+  .card-item:hover{ border-color:var(--trace); box-shadow:0 10px 26px rgba(0,240,255,.12); }
+  .card-item:active{ filter:brightness(0.94); }
   .card-item .arrow{ display:inline-block; transition:transform .3s var(--ease-spring); }
   .card-item:hover .arrow{ transform:translateX(5px); }
 
