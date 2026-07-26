@@ -229,6 +229,19 @@ header.hero::before {
   animation: heroScan 7s ease-in-out infinite;
   opacity: 0.65;
 }
+header.hero::after {
+  /* Signature motif: a row of IC leads, like the solder pins on the real
+     chip packages used throughout this lab, marking the seam between the
+     hero and the workspace below it. */
+  content: "";
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+  width: min(60%, 460px); height: 6px;
+  background-image: repeating-linear-gradient(90deg,
+    var(--copper) 0px, var(--copper) 5px,
+    transparent 5px, transparent 18px);
+  opacity: 0.75;
+  filter: drop-shadow(0 0 3px var(--copper-dim));
+}
 @keyframes heroScan {
   0% { left: -30%; }
   50% { left: 100%; }
@@ -241,9 +254,9 @@ header.hero::before {
 }
 .chip-eyebrow::before { content: "●"; color: var(--trace); animation: blink 1.6s infinite; }
 @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
-header.hero h1 { font-size: clamp(28px, 5.5vw, 46px); margin: 0 0 14px; font-weight: 800; line-height: 1.08; letter-spacing: -0.01em; }
+header.hero h1 { font-size: clamp(30px, 6vw, 52px); margin: 0 0 14px; font-weight: 800; line-height: 1.05; letter-spacing: -0.025em; }
 header.hero h1 span { color: var(--trace); text-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
-header.hero p.sub { max-width: 720px; margin: 0 auto; color: var(--text-dim); font-size: 16px; }
+header.hero p.sub { max-width: 680px; margin: 0 auto; color: var(--text-dim); font-size: 16.5px; line-height: 1.65; }
 
 /* ── Sleek Top Navigation Bar ── */
 nav.tabs {
