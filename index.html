@@ -165,21 +165,22 @@
   }
   #topLoader.active{ opacity:1; }
 
-  /* Section entrance motion (replays every navigation) */
-  .lab-section.active{ animation:sectionIn .55s var(--ease-premium) both; }
+  /* Section entrance motion (replays every navigation) — 3D tilt-up */
+  .lab-section.active{ animation:sectionIn .6s var(--ease-premium) both; transform-style:preserve-3d; }
   @keyframes sectionIn{
-    0%{ opacity:0; transform:translateY(16px) scale(.985); filter:blur(3px); }
-    100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+    0%{ opacity:0; transform:perspective(1400px) rotateX(-7deg) translateY(22px) scale(.97); filter:blur(2px); }
+    100%{ opacity:1; transform:perspective(1400px) rotateX(0deg) translateY(0) scale(1); filter:blur(0); }
   }
   .hero{ animation:heroIn .6s var(--ease-premium) both; }
   @keyframes heroIn{ from{ opacity:0; transform:translateY(-12px); } to{ opacity:1; transform:translateY(0); } }
 
-  /* Panels & cards — premium lift on hover */
+  /* Panels & cards — premium 3D lift on hover */
   .panel, .lab-group, .asm-card, .login-card{
+    transform-style:preserve-3d;
     transition:transform .35s var(--ease-premium), box-shadow .35s var(--ease-premium), border-color .35s ease;
   }
   .panel:hover, .lab-group:hover{
-    transform:translateY(-4px);
+    transform:perspective(900px) rotateX(2.5deg) translateY(-6px);
     border-color:var(--trace-dim);
     box-shadow:0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(0,240,255,.06), 0 0 28px rgba(0,240,255,.07);
   }
@@ -188,15 +189,16 @@
   .reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s var(--ease-premium), transform .7s var(--ease-premium); }
   .reveal.in-view{ opacity:1; transform:translateY(0); }
 
-  /* Dashboard cards — sweep shine + directional hover */
-  .card-item{ position:relative; overflow:hidden; transition:transform .3s var(--ease-premium), box-shadow .3s ease; }
+  /* Dashboard cards — sweep shine + directional 3D hover */
+  .card-item{ position:relative; overflow:hidden; transition:transform .3s var(--ease-premium), box-shadow .3s ease; transform-style:preserve-3d; }
   .card-item::before{
     content:''; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(120deg,transparent,rgba(0,240,255,.10),transparent);
     transform:translateX(-120%); transition:transform .6s var(--ease-premium);
   }
   .card-item:hover::before{ transform:translateX(120%); }
-  .card-item:hover{ transform:translateX(6px) translateY(-2px); box-shadow:0 10px 26px rgba(0,240,255,.12); }
+  .card-item:hover{ transform:perspective(700px) rotateY(-4deg) translateX(6px) translateY(-2px); box-shadow:0 10px 26px rgba(0,240,255,.12); }
+  .card-item:active{ transform:perspective(700px) rotateY(2deg) scale(0.98); }
   .card-item .arrow{ display:inline-block; transition:transform .3s var(--ease-spring); }
   .card-item:hover .arrow{ transform:translateX(5px); }
 
@@ -205,9 +207,9 @@
     position:relative; overflow:hidden;
     transition:transform .22s var(--ease-premium), box-shadow .25s ease, filter .2s ease, border-color .25s ease;
   }
-  .hub-btn:hover, .util-btn:hover, .nav-group button:hover:not(.nav-locked){ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,240,255,.10); }
-  .asm-btn:hover, .login-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,240,255,.20); filter:brightness(1.08); }
-  .asm-btn:active, .login-btn:active, .hub-btn:active, .util-btn:active, .nav-group button:active{ transform:translateY(0) scale(.96); }
+  .hub-btn:hover, .util-btn:hover, .nav-group button:hover:not(.nav-locked){ transform:perspective(300px) rotateX(-6deg) translateY(-2px); box-shadow:0 8px 18px rgba(0,240,255,.10); }
+  .asm-btn:hover, .login-btn:hover{ transform:perspective(400px) rotateX(-4deg) translateY(-2px); box-shadow:0 10px 24px rgba(0,240,255,.20); filter:brightness(1.08); }
+  .asm-btn:active, .login-btn:active, .hub-btn:active, .util-btn:active, .nav-group button:active{ transform:perspective(300px) rotateX(10deg) scale(.95); }
   .ripple-el{ position:absolute; border-radius:50%; pointer-events:none; background:rgba(0,240,255,.35); transform:scale(0); animation:rippleAnim .65s ease-out forwards; }
   @keyframes rippleAnim{ to{ transform:scale(2.8); opacity:0; } }
 
@@ -220,10 +222,11 @@
   }
   @keyframes underlineIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
 
-  /* Toggle switches — spring-eased knob + glow when on */
-  .switch{ transition:background-color .3s var(--ease-premium), box-shadow .3s ease; }
-  .switch::after{ transition:transform .32s var(--ease-spring) !important; }
+  /* Toggle switches — spring-eased 3D coin-flip knob + glow when on */
+  .switch{ perspective:80px; transition:background-color .3s var(--ease-premium), box-shadow .3s ease, transform .12s ease; }
+  .switch::after{ transition:left .32s var(--ease-spring), background-color .2s ease, transform .32s var(--ease-spring); transform-style:preserve-3d; }
   .switch.on{ box-shadow:0 0 14px rgba(0,240,255,.45); }
+  .switch:active{ transform:perspective(200px) rotateX(14deg) scale(.95); }
 
   /* LEDs & bulbs — soft pulse while active */
   .led-btn.on .bulb, .bulb.on{ animation:bulbPulse 1.8s ease-in-out infinite; }
@@ -387,6 +390,49 @@
     .hero h1{ font-size:22px; }
     .asm-result-score .big{ font-size:42px; }
   }
+
+  /* ══════════════════════════════════════════════════════════
+     LOCK TOAST — replaces blocking alert() for locked-workspace
+     messages. Non-blocking, animated 3D entrance, auto-dismiss.
+     ══════════════════════════════════════════════════════════ */
+  #lockToastLayer{
+    position:fixed; top:18px; left:50%; z-index:5000;
+    display:flex; flex-direction:column; gap:10px; align-items:center;
+    pointer-events:none; width:100%; padding:0 16px;
+  }
+  .lock-toast{
+    pointer-events:auto; max-width:420px; width:100%;
+    background:var(--panel); border:1px solid var(--copper-dim); border-left:4px solid var(--copper);
+    border-radius:10px; padding:14px 16px; box-shadow:0 14px 34px rgba(0,0,0,.5), 0 0 0 1px rgba(255,157,0,.06);
+    font-family:'Work Sans',sans-serif; color:var(--text);
+    transform-style:preserve-3d; transform:perspective(700px) rotateX(-40deg) translateY(-16px); transform-origin:top center;
+    opacity:0; animation:toastIn .45s cubic-bezier(0.16,1,0.3,1) forwards;
+    position:relative;
+  }
+  .lock-toast.leaving{ animation:toastOut .35s cubic-bezier(0.4,0,1,1) forwards; }
+  @keyframes toastIn{
+    0%{ opacity:0; transform:perspective(700px) rotateX(-40deg) translateY(-16px); }
+    100%{ opacity:1; transform:perspective(700px) rotateX(0deg) translateY(0); }
+  }
+  @keyframes toastOut{
+    0%{ opacity:1; transform:perspective(700px) rotateX(0deg) translateY(0) scale(1); }
+    100%{ opacity:0; transform:perspective(700px) rotateX(24deg) translateY(-10px) scale(0.96); }
+  }
+  .lock-toast strong{
+    display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--copper); margin-bottom:6px;
+  }
+  .lock-toast p{ margin:0; font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+  .lock-toast .toast-close{
+    position:absolute; top:10px; right:10px; background:none; border:none; color:var(--text-dim);
+    cursor:pointer; font-size:15px; line-height:1; padding:4px; border-radius:4px; transition:color .15s ease;
+  }
+  .lock-toast .toast-close:hover{ color:var(--danger); }
+  .lock-toast .toast-bar{
+    position:absolute; left:0; bottom:0; height:2px; background:var(--copper); border-radius:0 0 0 10px;
+    animation:toastTimer 4.2s linear forwards;
+  }
+  @keyframes toastTimer{ from{ width:100%; } to{ width:0%; } }
 </style>
 </head>
 <body>
@@ -411,6 +457,8 @@
 </div>
 
 <div id="siteContent">
+
+<div id="lockToastLayer" aria-live="polite"></div>
 
 <!-- ═══════════ SHARED NAV ═══════════ -->
 <nav class="tabs" id="mainNav" aria-label="Lab navigation">
@@ -937,11 +985,12 @@ const TOPIC_LABELS = {
 };
 
 function getTopicCompleted(topicId) {
-  return localStorage.getItem('ecd_completed_' + topicId) === 'true';
+  try { return localStorage.getItem('ecd_completed_' + topicId) === 'true'; }
+  catch(e) { return false; }
 }
 
 function setTopicCompleted(topicId) {
-  localStorage.setItem('ecd_completed_' + topicId, 'true');
+  try { localStorage.setItem('ecd_completed_' + topicId, 'true'); } catch(e) {}
   updateNavLockStates();
 }
 
@@ -1025,10 +1074,38 @@ function updateAssessmentLockState() {
   }
 }
 
+/* Non-blocking, animated replacement for alert() — used for lock
+   notices so a locked click always gives visible feedback (a native
+   alert() can be silently suppressed in embedded/sandboxed previews,
+   which made locked nav clicks look like they "did nothing"). */
+function showLockToast(title, message){
+  const layer = document.getElementById('lockToastLayer');
+  if(!layer) { alert(title + '\n' + message); return; }
+  const el = document.createElement('div');
+  el.className = 'lock-toast';
+  el.setAttribute('role', 'alert');
+  el.innerHTML = `
+    <button class="toast-close" aria-label="Dismiss">✕</button>
+    <strong>🔒 ${title}</strong>
+    <p>${message}</p>
+    <div class="toast-bar"></div>
+  `;
+  const dismiss = () => {
+    if(el.classList.contains('leaving')) return;
+    el.classList.add('leaving');
+    el.style.animationFillMode = 'forwards';
+    setTimeout(() => el.remove(), 380);
+  };
+  el.querySelector('.toast-close').onclick = dismiss;
+  layer.appendChild(el);
+  if(typeof playSynthTone === 'function') playSynthTone(300);
+  setTimeout(dismiss, 4200);
+}
+
 function goToAssessment() {
   if (!allTopicsCompleted()) {
     const remaining = TOPIC_SEQUENCE.filter(id => !getTopicCompleted(id)).map(id => TOPIC_LABELS[id]);
-    alert(`🔒 Assessment Locked\nComplete the diagnostic test for every decoder and encoder workspace before starting the assessment.\n\nStill needed:\n- ${remaining.join('\n- ')}`);
+    showLockToast('Assessment Locked', `Complete the diagnostic test for every decoder and encoder workspace first. Still needed: ${remaining.join(', ')}.`);
     return;
   }
   location.href = 'assessment.html';
@@ -1037,7 +1114,7 @@ function goToAssessment() {
 function resetProgress() {
   if (confirm("Are you sure you want to reset your laboratory progress? This will lock all advanced topics again.")) {
     TOPIC_SEQUENCE.forEach(id => {
-      localStorage.removeItem('ecd_completed_' + id);
+      try { localStorage.removeItem('ecd_completed_' + id); } catch(e) {}
     });
     alert("Progress reset. Reloading laboratory...");
     window.location.reload();
@@ -1049,7 +1126,7 @@ function showSection(id){
     const idx = TOPIC_SEQUENCE.indexOf(id);
     const prevTopic = TOPIC_SEQUENCE[idx - 1];
     const prevLabel = TOPIC_LABELS[prevTopic];
-    alert(`🔒 Workspace Locked\nPlease complete the validation test for "${prevLabel}" to unlock this workspace!`);
+    showLockToast('Workspace Locked', `Complete the validation test for "${prevLabel}" to unlock this workspace.`);
     return;
   }
 
