@@ -146,6 +146,14 @@
 <main id="main-content">
   <div class="asm-shell">
 
+    <!-- LOCKED SCREEN (shown until every decoder/encoder diagnostic test is passed in the Hub) -->
+    <div class="asm-card asm-start" id="screenLocked" style="display:none;">
+      <h3>🔒 Assessment Locked</h3>
+      <p>This assessment unlocks once you've passed the diagnostic validation test for every decoder and encoder workspace in the Hub.</p>
+      <div id="lockedProgressList" style="text-align:left; max-width:380px; margin:0 auto 24px; font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:2.1;"></div>
+      <button class="asm-btn" onclick="location.href='index.html'">← Back to Hub</button>
+    </div>
+
     <!-- START SCREEN -->
     <div class="asm-card asm-start" id="screenStart">
       <h3>Ready to test yourself?</h3>
@@ -210,7 +218,7 @@
 
 <script>
 const QUESTIONS = [
-  { topic:'dec12', label:'1:2 Decoder', q:'In a 1:2 decoder, how many output lines are active (HIGH) at any one time?', opts:['0','Exactly 1','2','Depends on Enable only'], correct:1, explain:'A decoder always activates exactly one output line — the one whose index matches the binary input code.' },
+  { topic:'dec12', label:'1:2 Decoder', q:'In a 1:2 decoder with Enable = 1, how many output lines are active (HIGH) at any one time?', opts:['0','Exactly 1','2','Depends on Enable only'], correct:1, explain:'When enabled, a decoder always activates exactly one output line — the one whose index matches the binary input code. (With Enable = 0, all outputs are forced LOW instead.)' },
   { topic:'dec12', label:'1:2 Decoder', q:'For a 1:2 decoder, if input A = 1, which output goes HIGH?', opts:['D0','D1','Both D0 and D1','Neither'], correct:1, explain:'D1 = A, so when A = 1, output D1 is HIGH and D0 (= A′) is LOW.' },
 
   { topic:'dec24', label:'2:4 Decoder', q:'A 2:4 decoder has how many input and output lines?', opts:['4 inputs, 2 outputs','2 inputs, 4 outputs','2 inputs, 2 outputs','3 inputs, 4 outputs'], correct:1, explain:'A 2:4 decoder takes a 2-bit binary code (A1 A0) and drives one of 4 output lines (D0–D3).' },
@@ -268,6 +276,45 @@ const TOPIC_ORDER = [
 const BEST_KEY = 'ecd_assessment_best_v1';
 const LOCK_KEY = 'ecd_assessment_active';
 
+// The assessment stays locked until every decoder/encoder workspace's
+// diagnostic test (set by the Hub in index.html) has been passed.
+const REQUIRED_TOPICS = ['dec12', 'dec24', 'dec38', 'enc21', 'enc42std', 'enc82', 'enc42', 'enc83'];
+const REQUIRED_TOPIC_LABELS = {
+  dec12: '1:2 Decoder',
+  dec24: '2:4 Decoder',
+  dec38: '3:8 Decoder',
+  enc21: '2:1 Encoder',
+  enc42std: '4:2 Standard Encoder',
+  enc82: '8:2 Encoder',
+  enc42: '4:2 Priority Encoder',
+  enc83: '8:3 Priority Encoder'
+};
+
+function isTopicDone(id){
+  try { return localStorage.getItem('ecd_completed_' + id) === 'true'; } catch(e){ return false; }
+}
+function assessmentIsUnlocked(){
+  return REQUIRED_TOPICS.every(isTopicDone);
+}
+function renderLockedScreen(){
+  const list = document.getElementById('lockedProgressList');
+  if(!list) return;
+  list.innerHTML = REQUIRED_TOPICS.map(id => {
+    const done = isTopicDone(id);
+    const color = done ? 'var(--good)' : 'var(--danger)';
+    const icon = done ? '✅' : '🔒';
+    return `<div style="color:${color};">${icon} ${REQUIRED_TOPIC_LABELS[id]}</div>`;
+  }).join('');
+}
+function applyAssessmentLockGate(){
+  if(assessmentIsUnlocked()) return true;
+  renderLockedScreen();
+  document.getElementById('screenStart').style.display = 'none';
+  document.getElementById('screenLocked').style.display = 'block';
+  return false;
+}
+const assessmentUnlocked = applyAssessmentLockGate();
+
 // This page never persists progress across a reload, so any stale lock
 // from a previous tab/crash should not keep the other lab pages locked out.
 try { localStorage.removeItem(LOCK_KEY); } catch(e){}
@@ -304,6 +351,7 @@ function showBestPreview(){
 showBestPreview();
 
 function startAssessment(){
+  if (!assessmentUnlocked) { applyAssessmentLockGate(); return; }
   order = shuffledIndices(QUESTIONS.length);
   current = 0;
   answers = new Array(QUESTIONS.length).fill(null); // null = unanswered

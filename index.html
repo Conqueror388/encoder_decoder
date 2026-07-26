@@ -274,17 +274,17 @@
     /* Nav bar: brand on its own line, topic tabs become a
        horizontally-scrollable strip (no more squeezed/wrapped
        buttons), utility icons wrap under it */
-    .tabs{ display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px 12px; }
+    nav.tabs{ display:flex !important; flex-direction:column !important; align-items:stretch !important; justify-content:flex-start !important; gap:8px !important; padding:10px 12px !important; }
     .nav-brand{ text-align:center; font-size:13px; }
     .nav-group{
-      display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; overflow-y:hidden;
+      display:flex !important; flex-wrap:nowrap !important; gap:8px; overflow-x:auto !important; overflow-y:hidden;
       -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; padding-bottom:4px;
       scrollbar-width:thin;
-      width:100%;
-      min-width:0; /* lets this flex item shrink so overflow-x can actually scroll,
+      width:100% !important;
+      min-width:0 !important; /* lets this flex item shrink so overflow-x can actually scroll,
                       instead of the box just growing wider than the screen */
     }
-    .nav-group button{ flex:0 0 auto; scroll-snap-align:start; white-space:nowrap; font-size:12px; padding:9px 12px; }
+    .nav-group button{ flex:0 0 auto !important; scroll-snap-align:start; white-space:nowrap !important; font-size:12px; padding:9px 12px; }
     .nav-utility{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
     .nav-utility .util-btn{ font-size:11.5px; padding:8px 10px; }
 
@@ -426,7 +426,7 @@
     <button id="btn-nav-enc42" onclick="showSection('enc42')">4:2 P.Enc</button>
     <button id="btn-nav-enc83" onclick="showSection('enc83')">8:3 P.Enc</button>
     <button id="btn-nav-sandbox" onclick="showSection('sandbox')" style="color:var(--copper);">🛠️ Sandbox</button>
-    <button id="btn-nav-assessment" onclick="location.href='assessment.html'" style="color:var(--trace);">Assessment</button>
+    <button id="btn-nav-assessment" onclick="goToAssessment()" style="color:var(--trace);">Assessment</button>
   </div>
   <div class="nav-utility">
     <button class="util-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀ Theme</button>
@@ -480,8 +480,8 @@
   </section>
   <section style="margin-bottom:40px;">
     <h2 class="section-title">Interactive Assessment</h2>
-    <p class="lead">21-question timed assessment covering all 6 circuits with instant feedback and a topic-wise breakdown.</p>
-    <div class="card-item" onclick="location.href='assessment.html'" style="background:var(--panel);border:1px solid var(--trace-dim);max-width:520px;box-shadow:0 0 20px rgba(0,240,255,0.07);">
+    <p class="lead">21-question timed assessment covering all 6 circuits with instant feedback and a topic-wise breakdown. <strong style="color:var(--copper);">Locked until you pass the diagnostic test for every decoder and encoder workspace above.</strong></p>
+    <div class="card-item" id="assessmentLaunchCard" onclick="goToAssessment()" style="background:var(--panel);border:1px solid var(--trace-dim);max-width:520px;box-shadow:0 0 20px rgba(0,240,255,0.07);">
       <div class="card-content"><h4 style="color:var(--trace);">Launch Assessment</h4><p>21 questions · 20 min · instant feedback · personal best</p></div>
       <div class="arrow" style="font-size:24px;">→</div>
     </div>
@@ -978,7 +978,7 @@ function updateNavLockStates() {
       }
     }
     
-    const cards = document.querySelectorAll(`[onclick="showSection('${id}')"]`);
+    const cards = document.querySelectorAll(`.card-item[onclick="showSection('${id}')"]`);
     cards.forEach(card => {
       if (!unlocked) {
         card.classList.add('card-locked');
@@ -993,6 +993,45 @@ function updateNavLockStates() {
       }
     });
   });
+
+  updateAssessmentLockState();
+}
+
+function allTopicsCompleted() {
+  return TOPIC_SEQUENCE.every(id => getTopicCompleted(id));
+}
+
+function updateAssessmentLockState() {
+  const ready = allTopicsCompleted();
+  const navBtn = document.getElementById('btn-nav-assessment');
+  if (navBtn) {
+    let text = navBtn.textContent.replace('🔒 ', '').replace('🔒', '').trim();
+    navBtn.classList.toggle('nav-locked', !ready);
+    navBtn.textContent = ready ? text : '🔒 ' + text;
+    if (ready) navBtn.removeAttribute('aria-disabled'); else navBtn.setAttribute('aria-disabled', 'true');
+  }
+  const card = document.getElementById('assessmentLaunchCard');
+  if (card) {
+    card.classList.toggle('card-locked', !ready);
+    const arrow = card.querySelector('.arrow');
+    if (arrow) arrow.textContent = ready ? '→' : '🔒';
+    const sub = card.querySelector('.card-content p');
+    if (sub) {
+      const remaining = TOPIC_SEQUENCE.filter(id => !getTopicCompleted(id)).length;
+      sub.textContent = ready
+        ? '21 questions · 20 min · instant feedback · personal best'
+        : `Locked — finish ${remaining} more diagnostic test${remaining === 1 ? '' : 's'} in the Hub to unlock`;
+    }
+  }
+}
+
+function goToAssessment() {
+  if (!allTopicsCompleted()) {
+    const remaining = TOPIC_SEQUENCE.filter(id => !getTopicCompleted(id)).map(id => TOPIC_LABELS[id]);
+    alert(`🔒 Assessment Locked\nComplete the diagnostic test for every decoder and encoder workspace before starting the assessment.\n\nStill needed:\n- ${remaining.join('\n- ')}`);
+    return;
+  }
+  location.href = 'assessment.html';
 }
 
 function resetProgress() {
@@ -1040,18 +1079,6 @@ function showSection(id){
 
 /* ── Audio Synthesizer (Web Audio API) ── */
 let audioCtx=null, audioSynthEnabled=true;
-function toggleAudioSynth(){
-  audioSynthEnabled=!audioSynthEnabled;
-  const btn=document.getElementById('btnAudioToggle');
-  if(btn){
-    btn.textContent=audioSynthEnabled?'🎵 Audio Synth: ON':'🎵 Audio Synth: OFF';
-    btn.classList.toggle('active',audioSynthEnabled);
-  }
-  if(audioSynthEnabled && !audioCtx){
-    const AC=window.AudioContext||window.webkitAudioContext;
-    if(AC)audioCtx=new AC();
-  }
-}
 function playSynthTone(freq=440){
   if(!audioSynthEnabled)return;
   if(!audioCtx){
@@ -1078,44 +1105,6 @@ function playFailSound() {
   playSynthTone(220); // A3
   setTimeout(() => playSynthTone(196), 150); // G3
 }
-
-/* ── Voice Control (Web Speech API) ── */
-let voiceRec=null, voiceActive=false;
-function toggleVoiceControl(){
-  const btn=document.getElementById('btnVoiceControl');
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('Speech Recognition is not supported in this browser. Please use Chrome or Edge.');return;}
-  voiceActive=!voiceActive;
-  if(btn){
-    btn.classList.toggle('active',voiceActive);
-  }
-  if(voiceActive){
-    if(btn) btn.textContent='🎙️ Listening...';
-    voiceRec=new SR(); voiceRec.continuous=true; voiceRec.interimResults=false;
-    voiceRec.onresult=(e)=>{
-      const cmd=e.results[e.results.length-1][0].transcript.toLowerCase().trim();
-      processVoiceCmd(cmd);
-    };
-    voiceRec.onend=()=>{if(voiceActive)voiceRec.start();};
-    voiceRec.start();
-  }else{
-    if(btn) btn.textContent='🎙️ Voice Control';
-    if(voiceRec){voiceRec.stop(); voiceRec=null;}
-  }
-}
-function processVoiceCmd(c){
-  if(c.includes('dec')||c.includes('decoder')){
-    if(c.includes('1')||c.includes('one'))showSection('dec12');
-    else if(c.includes('2')||c.includes('two'))showSection('dec24');
-    else if(c.includes('3')||c.includes('three'))showSection('dec38');
-  }else if(c.includes('enc')||c.includes('encoder')){
-    if(c.includes('2')||c.includes('two'))showSection('enc21');
-    else if(c.includes('4')||c.includes('four'))showSection('enc42');
-    else if(c.includes('8')||c.includes('eight'))showSection('enc83');
-  }else if(c.includes('assessment')||c.includes('test')){location.href='assessment.html';}
-  else if(c.includes('hub')||c.includes('home')){showSection('hub');}
-}
-
 
 function toggleCircuitInput(type, key){
   if(type==='dec12') toggleDec12(key);
@@ -1639,65 +1628,6 @@ function showExportCode(fmt){
 function copyExportCode(){
   const txt=document.getElementById('exportCodeText').textContent;
   navigator.clipboard.writeText(txt).then(()=>alert('Code copied to clipboard!'));
-}
-
-/* ── Fault Injection Debugger Mode ── */
-let faultModeActive=false, activeFault=null;
-function toggleFaultMode(){
-  faultModeActive=!faultModeActive;
-  const btn=document.getElementById('btnFaultMode');
-  if(btn){
-    btn.textContent=faultModeActive?'🐛 Debug Faults: ON':'🐛 Debug Faults: OFF';
-    btn.classList.toggle('active',faultModeActive);
-  }
-  if(faultModeActive){
-    activeFault='STUCK_A1_0';
-    alert('Fault injected: A hardware defect has occurred in the active circuit. Test the inputs to identify the fault!');
-  }else{
-    activeFault=null;
-    alert('Fault cleared. Normal circuit operation restored.');
-  }
-}
-
-/* ── Timed Speed Sprint Challenge Game ── */
-function startSprintChallenge(){
-  let target=Math.floor(Math.random()*4);
-  const targetLabel=['D0','D1','D2','D3'][target];
-  showSection('dec24');
-  alert(`⏱️ Speed Sprint Challenge!\nGoal: Activate output ${targetLabel} on the 2:4 Decoder in minimum time!`);
-}
-
-/* ── Sandbox Custom Gate Simulator ── */
-const stateSandbox={in1:0,in2:0,gate:'AND'};
-function toggleSandbox(p){
-  stateSandbox[p]=stateSandbox[p]?0:1;
-  document.getElementById('sw-sb-'+p).classList.toggle('on',stateSandbox[p]===1);
-  renderSandbox();
-}
-function setSandboxGate(g){
-  stateSandbox.gate=g;
-  ['and','or','nand','nor','xor'].forEach(k=>document.getElementById('sb-gate-'+k).classList.remove('active'));
-  document.getElementById('sb-gate-'+g.toLowerCase()).classList.add('active');
-  document.getElementById('sb-gate-text').textContent=g;
-  renderSandbox();
-}
-function renderSandbox(){
-  const{in1,in2,gate}=stateSandbox;
-  let out=0;
-  if(gate==='AND')out=in1&&in2?1:0;
-  else if(gate==='OR')out=in1||in2?1:0;
-  else if(gate==='NAND')out=!(in1&&in2)?1:0;
-  else if(gate==='NOR')out=!(in1||in2)?1:0;
-  else if(gate==='XOR')out=in1!==in2?1:0;
-
-  document.getElementById('sb-wire-a').className.baseVal=`wire ${in1?'hot':''}`;
-  document.getElementById('sb-wire-b').className.baseVal=`wire ${in2?'hot':''}`;
-  document.getElementById('sb-gate-body').className.baseVal=`gate-body ${out?'hot':''}`;
-  document.getElementById('sb-wire-out').className.baseVal=`wire ${out?'hot':''}`;
-  document.getElementById('sb-led').setAttribute('fill',out?'var(--led-on)':'var(--led-off)');
-  document.getElementById('lbl-sb-out').textContent=`Output = ${out}`;
-  document.getElementById('led-sb-out').parentElement.classList.toggle('on',out===1);
-  playSynthTone(out?523:261);
 }
 
 /* ── Init all renders ── */
