@@ -53,6 +53,12 @@
   .login-error { color:var(--copper); background:rgba(255,157,0,0.1); border:1px solid var(--copper-dim); border-radius:8px; padding:9px 12px; font-size:12.5px; margin-bottom:16px; display:none; font-family:'JetBrains Mono',monospace; }
   .login-error.show { display:block; }
   .login-hint { margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); border-top:1px dashed var(--panel-border); padding-top:16px; }
+  .login-mode-toggle { display:inline-flex; gap:4px; background:var(--bg-alt); padding:4px; border:1px solid var(--panel-border); border-radius:10px; margin-bottom:20px; }
+  .login-mode-btn { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; padding:8px 16px; border-radius:7px; border:none; background:transparent; color:var(--text-dim); cursor:pointer; transition:all 0.15s ease; }
+  .login-mode-btn:hover { color:var(--trace); }
+  .login-mode-btn.active { background:var(--panel); color:var(--trace); box-shadow:0 2px 8px rgba(0,240,255,0.1); }
+  #loginModeAdminBtn.active { color:var(--copper); }
+  .admin-badge-pill { display:inline-block; margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#1a1210; background:var(--copper); padding:4px 12px; border-radius:999px; font-weight:700; letter-spacing:.05em; }
 
   /* Section visibility */
   .lab-section { display:none; }
@@ -165,21 +171,22 @@
   }
   #topLoader.active{ opacity:1; }
 
-  /* Section entrance motion (replays every navigation) */
-  .lab-section.active{ animation:sectionIn .55s var(--ease-premium) both; }
+  /* Section entrance motion (replays every navigation) — 3D tilt-up */
+  .lab-section.active{ animation:sectionIn .6s var(--ease-premium) both; transform-style:preserve-3d; }
   @keyframes sectionIn{
-    0%{ opacity:0; transform:translateY(16px) scale(.985); filter:blur(3px); }
-    100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+    0%{ opacity:0; transform:perspective(1400px) rotateX(-7deg) translateY(22px) scale(.97); filter:blur(2px); }
+    100%{ opacity:1; transform:perspective(1400px) rotateX(0deg) translateY(0) scale(1); filter:blur(0); }
   }
   .hero{ animation:heroIn .6s var(--ease-premium) both; }
   @keyframes heroIn{ from{ opacity:0; transform:translateY(-12px); } to{ opacity:1; transform:translateY(0); } }
 
-  /* Panels & cards — premium lift on hover */
+  /* Panels & cards — premium 3D lift on hover */
   .panel, .lab-group, .asm-card, .login-card{
+    transform-style:preserve-3d;
     transition:transform .35s var(--ease-premium), box-shadow .35s var(--ease-premium), border-color .35s ease;
   }
   .panel:hover, .lab-group:hover{
-    transform:translateY(-4px);
+    transform:perspective(900px) rotateX(2.5deg) translateY(-6px);
     border-color:var(--trace-dim);
     box-shadow:0 16px 36px rgba(0,0,0,.45), 0 0 0 1px rgba(0,240,255,.06), 0 0 28px rgba(0,240,255,.07);
   }
@@ -188,15 +195,16 @@
   .reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s var(--ease-premium), transform .7s var(--ease-premium); }
   .reveal.in-view{ opacity:1; transform:translateY(0); }
 
-  /* Dashboard cards — sweep shine + directional hover */
-  .card-item{ position:relative; overflow:hidden; transition:transform .3s var(--ease-premium), box-shadow .3s ease; }
+  /* Dashboard cards — sweep shine + directional 3D hover */
+  .card-item{ position:relative; overflow:hidden; transition:transform .3s var(--ease-premium), box-shadow .3s ease; transform-style:preserve-3d; }
   .card-item::before{
     content:''; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(120deg,transparent,rgba(0,240,255,.10),transparent);
     transform:translateX(-120%); transition:transform .6s var(--ease-premium);
   }
   .card-item:hover::before{ transform:translateX(120%); }
-  .card-item:hover{ transform:translateX(6px) translateY(-2px); box-shadow:0 10px 26px rgba(0,240,255,.12); }
+  .card-item:hover{ transform:perspective(700px) rotateY(-4deg) translateX(6px) translateY(-2px); box-shadow:0 10px 26px rgba(0,240,255,.12); }
+  .card-item:active{ transform:perspective(700px) rotateY(2deg) scale(0.98); }
   .card-item .arrow{ display:inline-block; transition:transform .3s var(--ease-spring); }
   .card-item:hover .arrow{ transform:translateX(5px); }
 
@@ -205,9 +213,9 @@
     position:relative; overflow:hidden;
     transition:transform .22s var(--ease-premium), box-shadow .25s ease, filter .2s ease, border-color .25s ease;
   }
-  .hub-btn:hover, .util-btn:hover, .nav-group button:hover:not(.nav-locked){ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,240,255,.10); }
-  .asm-btn:hover, .login-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,240,255,.20); filter:brightness(1.08); }
-  .asm-btn:active, .login-btn:active, .hub-btn:active, .util-btn:active, .nav-group button:active{ transform:translateY(0) scale(.96); }
+  .hub-btn:hover, .util-btn:hover, .nav-group button:hover:not(.nav-locked){ transform:perspective(300px) rotateX(-6deg) translateY(-2px); box-shadow:0 8px 18px rgba(0,240,255,.10); }
+  .asm-btn:hover, .login-btn:hover{ transform:perspective(400px) rotateX(-4deg) translateY(-2px); box-shadow:0 10px 24px rgba(0,240,255,.20); filter:brightness(1.08); }
+  .asm-btn:active, .login-btn:active, .hub-btn:active, .util-btn:active, .nav-group button:active{ transform:perspective(300px) rotateX(10deg) scale(.95); }
   .ripple-el{ position:absolute; border-radius:50%; pointer-events:none; background:rgba(0,240,255,.35); transform:scale(0); animation:rippleAnim .65s ease-out forwards; }
   @keyframes rippleAnim{ to{ transform:scale(2.8); opacity:0; } }
 
@@ -220,10 +228,11 @@
   }
   @keyframes underlineIn{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
 
-  /* Toggle switches — spring-eased knob + glow when on */
-  .switch{ transition:background-color .3s var(--ease-premium), box-shadow .3s ease; }
-  .switch::after{ transition:transform .32s var(--ease-spring) !important; }
+  /* Toggle switches — spring-eased 3D coin-flip knob + glow when on */
+  .switch{ perspective:80px; transition:background-color .3s var(--ease-premium), box-shadow .3s ease, transform .12s ease; }
+  .switch::after{ transition:left .32s var(--ease-spring), background-color .2s ease, transform .32s var(--ease-spring); transform-style:preserve-3d; }
   .switch.on{ box-shadow:0 0 14px rgba(0,240,255,.45); }
+  .switch:active{ transform:perspective(200px) rotateX(14deg) scale(.95); }
 
   /* LEDs & bulbs — soft pulse while active */
   .led-btn.on .bulb, .bulb.on{ animation:bulbPulse 1.8s ease-in-out infinite; }
@@ -387,6 +396,49 @@
     .hero h1{ font-size:22px; }
     .asm-result-score .big{ font-size:42px; }
   }
+
+  /* ══════════════════════════════════════════════════════════
+     LOCK TOAST — replaces blocking alert() for locked-workspace
+     messages. Non-blocking, animated 3D entrance, auto-dismiss.
+     ══════════════════════════════════════════════════════════ */
+  #lockToastLayer{
+    position:fixed; top:18px; left:50%; z-index:5000;
+    display:flex; flex-direction:column; gap:10px; align-items:center;
+    pointer-events:none; width:100%; padding:0 16px;
+  }
+  .lock-toast{
+    pointer-events:auto; max-width:420px; width:100%;
+    background:var(--panel); border:1px solid var(--copper-dim); border-left:4px solid var(--copper);
+    border-radius:10px; padding:14px 16px; box-shadow:0 14px 34px rgba(0,0,0,.5), 0 0 0 1px rgba(255,157,0,.06);
+    font-family:'Work Sans',sans-serif; color:var(--text);
+    transform-style:preserve-3d; transform:perspective(700px) rotateX(-40deg) translateY(-16px); transform-origin:top center;
+    opacity:0; animation:toastIn .45s cubic-bezier(0.16,1,0.3,1) forwards;
+    position:relative;
+  }
+  .lock-toast.leaving{ animation:toastOut .35s cubic-bezier(0.4,0,1,1) forwards; }
+  @keyframes toastIn{
+    0%{ opacity:0; transform:perspective(700px) rotateX(-40deg) translateY(-16px); }
+    100%{ opacity:1; transform:perspective(700px) rotateX(0deg) translateY(0); }
+  }
+  @keyframes toastOut{
+    0%{ opacity:1; transform:perspective(700px) rotateX(0deg) translateY(0) scale(1); }
+    100%{ opacity:0; transform:perspective(700px) rotateX(24deg) translateY(-10px) scale(0.96); }
+  }
+  .lock-toast strong{
+    display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace;
+    font-size:12.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--copper); margin-bottom:6px;
+  }
+  .lock-toast p{ margin:0; font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+  .lock-toast .toast-close{
+    position:absolute; top:10px; right:10px; background:none; border:none; color:var(--text-dim);
+    cursor:pointer; font-size:15px; line-height:1; padding:4px; border-radius:4px; transition:color .15s ease;
+  }
+  .lock-toast .toast-close:hover{ color:var(--danger); }
+  .lock-toast .toast-bar{
+    position:absolute; left:0; bottom:0; height:2px; background:var(--copper); border-radius:0 0 0 10px;
+    animation:toastTimer 4.2s linear forwards;
+  }
+  @keyframes toastTimer{ from{ width:100%; } to{ width:0%; } }
 </style>
 </head>
 <body>
@@ -396,21 +448,45 @@
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <span class="chip-eyebrow">ECE · Digital Electronics Lab</span>
-    <h2>Welcome</h2>
-    <p class="login-sub">Enter your name to open the workspace.</p>
+    <h2 id="loginHeading">Welcome</h2>
+    <p class="login-sub" id="loginSub">Enter your name to open the workspace.</p>
+
+    <div class="login-mode-toggle" role="tablist" aria-label="Login mode">
+      <button type="button" class="login-mode-btn active" id="loginModeStudentBtn" role="tab" aria-selected="true" onclick="setLoginMode('student')">🎓 Student</button>
+      <button type="button" class="login-mode-btn" id="loginModeAdminBtn" role="tab" aria-selected="false" onclick="setLoginMode('admin')">🛡️ Admin</button>
+    </div>
+
     <div class="login-error" id="loginError">Please enter your name to continue.</div>
+
+    <!-- Student login -->
     <form id="loginForm" onsubmit="return handleLogin(event)">
       <div class="login-field">
         <label for="loginUser">Your Name</label>
-        <input type="text" id="loginUser" placeholder="Ex: Rahul, Priya, 25UAD001" autocomplete="name" required />
+        <input type="text" id="loginUser" placeholder="Ex: Rahul, Priya, 25UAD001" autocomplete="name" />
       </div>
       <button type="submit" class="login-btn">Enter Lab →</button>
     </form>
-    <div class="login-hint">Digital Electronics Lab &middot; Interactive Learning Platform</div>
+
+    <!-- Admin login -->
+    <form id="adminLoginForm" onsubmit="return handleAdminLogin(event)" style="display:none;">
+      <div class="login-field">
+        <label for="loginAdminUser">Admin Username</label>
+        <input type="text" id="loginAdminUser" placeholder="admin" autocomplete="username" />
+      </div>
+      <div class="login-field">
+        <label for="loginAdminPass">Admin Password</label>
+        <input type="password" id="loginAdminPass" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button type="submit" class="login-btn" style="background:var(--copper);">🛡️ Enter as Admin →</button>
+    </form>
+
+    <div class="login-hint" id="loginHint">Digital Electronics Lab &middot; Interactive Learning Platform</div>
   </div>
 </div>
 
 <div id="siteContent">
+
+<div id="lockToastLayer" aria-live="polite"></div>
 
 <!-- ═══════════ SHARED NAV ═══════════ -->
 <nav class="tabs" id="mainNav" aria-label="Lab navigation">
@@ -553,7 +629,7 @@
         <!-- E Bus & Connections -->
         <circle id="diag-dec12-dot-e" cx="100" cy="160" r="2.5" class="conn-dot"/>
         <path id="diag-dec12-w-e-up" d="M 100 160 V 70 H 320" class="wire"/>
-        <path id="diag-dec12-w-e-down" d="M 100 160 V 140 H 320" class="wire"/>
+        <path id="diag-dec12-w-e-down" d="M 100 160 H 320" class="wire"/>
 
         <!-- AND Gate 0 (D0) -->
         <path id="diag-dec12-gate-and0" d="M 320 40 H 340 A 20 20 0 0 1 340 80 H 320 Z" class="gate-body"/>
@@ -860,8 +936,6 @@
       <button class="ic-sel-btn" id="ic-btn-enc82" onclick="selectSandboxIC('enc82')">8:2 Encoder</button>
       <button class="ic-sel-btn" id="ic-btn-enc42" onclick="selectSandboxIC('enc42')">4:2 Priority</button>
       <button class="ic-sel-btn" id="ic-btn-enc83" onclick="selectSandboxIC('enc83')">8:3 Priority</button>
-      <button class="ic-sel-btn" id="ic-btn-mux41" onclick="selectSandboxIC('mux41')">4:1 MUX</button>
-      <button class="ic-sel-btn" id="ic-btn-demux14" onclick="selectSandboxIC('demux14')">1:4 DEMUX</button>
     </div>
     <div class="ic-tip-bar">
       💡 <strong>How to wire:</strong> <strong>Drag</strong> a <span style="color:#ff8822">switch hole</span> → drop on the matching <span style="color:#ff8822">IC input pin</span>. <strong>Drag</strong> an <span style="color:#22cc66">IC output pin</span> → drop on the matching <span style="color:#22cc66">LED</span>. Toggle wired switches to see live logic. Use <strong>Auto-Wire</strong> to skip manual wiring.
@@ -919,8 +993,83 @@ function toggleTheme(){const h=document.documentElement,c=h.getAttribute('data-t
 
 /* ── Login ── */
 const NAME_KEY='ecd_lab_user_name';
-function unlockSite(){document.getElementById('loginOverlay').style.display='none';document.getElementById('siteContent').style.display='block';try{const n=sessionStorage.getItem(NAME_KEY)||'';if(n)document.getElementById('welcomeBanner').innerHTML='Welcome, <strong>'+n+'</strong>! Select a lab workspace below.';}catch(e){}}
-function handleLogin(e){e.preventDefault();const u=document.getElementById('loginUser').value.trim(),err=document.getElementById('loginError');if(u.length>0){try{sessionStorage.setItem(NAME_KEY,u);}catch(e){}err.classList.remove('show');unlockSite();}else{err.classList.add('show');document.getElementById('loginUser').focus();}return false;}
+const ADMIN_FLAG_KEY='ecd_lab_is_admin';
+const ADMIN_USERNAME='admin';
+const ADMIN_PASSWORD='ece123';
+
+function isAdminUser(){
+  try{ return sessionStorage.getItem(ADMIN_FLAG_KEY)==='true'; }catch(e){ return false; }
+}
+
+function setLoginMode(mode){
+  const isAdmin = mode==='admin';
+  document.getElementById('loginModeStudentBtn').classList.toggle('active', !isAdmin);
+  document.getElementById('loginModeStudentBtn').setAttribute('aria-selected', String(!isAdmin));
+  document.getElementById('loginModeAdminBtn').classList.toggle('active', isAdmin);
+  document.getElementById('loginModeAdminBtn').setAttribute('aria-selected', String(isAdmin));
+  document.getElementById('loginForm').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('adminLoginForm').style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('loginHeading').textContent = isAdmin ? 'Admin Access' : 'Welcome';
+  document.getElementById('loginSub').textContent = isAdmin
+    ? 'Sign in with admin credentials to unlock every workspace.'
+    : 'Enter your name to open the workspace.';
+  document.getElementById('loginHint').textContent = isAdmin
+    ? 'Admin accounts have full access to every decoder, encoder, and the assessment.'
+    : 'Digital Electronics Lab · Interactive Learning Platform';
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function unlockSite(){
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('siteContent').style.display='block';
+  try{
+    const admin = isAdminUser();
+    const n = sessionStorage.getItem(NAME_KEY) || '';
+    const banner = document.getElementById('welcomeBanner');
+    if(admin){
+      banner.innerHTML = 'Welcome, <strong>Admin</strong>! <span class="admin-badge-pill">🛡️ Full Access</span> — every workspace and the assessment are unlocked.';
+    } else if(n){
+      banner.innerHTML = 'Welcome, <strong>'+n+'</strong>! Select a lab workspace below.';
+    }
+  }catch(e){}
+  updateNavLockStates();
+}
+
+function handleLogin(e){
+  e.preventDefault();
+  const u=document.getElementById('loginUser').value.trim(),err=document.getElementById('loginError');
+  if(u.length>0){
+    try{ sessionStorage.setItem(NAME_KEY,u); sessionStorage.setItem(ADMIN_FLAG_KEY,'false'); }catch(e){}
+    err.classList.remove('show');
+    unlockSite();
+  }else{
+    err.textContent='Please enter your name to continue.';
+    err.classList.add('show');
+    document.getElementById('loginUser').focus();
+  }
+  return false;
+}
+
+function handleAdminLogin(e){
+  e.preventDefault();
+  const u=document.getElementById('loginAdminUser').value.trim();
+  const p=document.getElementById('loginAdminPass').value;
+  const err=document.getElementById('loginError');
+  if(u===ADMIN_USERNAME && p===ADMIN_PASSWORD){
+    try{
+      sessionStorage.setItem(NAME_KEY,'Admin');
+      sessionStorage.setItem(ADMIN_FLAG_KEY,'true');
+    }catch(e){}
+    err.classList.remove('show');
+    unlockSite();
+  }else{
+    err.textContent='Incorrect admin username or password.';
+    err.classList.add('show');
+    document.getElementById('loginAdminPass').focus();
+  }
+  return false;
+}
+
 window.addEventListener('load',()=>{try{if(sessionStorage.getItem(NAME_KEY))unlockSite();}catch(e){}});
 
 /* ── Section Navigation & Progression ── */
@@ -947,6 +1096,7 @@ function setTopicCompleted(topicId) {
 
 function isTopicUnlocked(id) {
   if (id === 'hub' || id === 'sandbox' || id === 'assessment') return true;
+  if (typeof isAdminUser === 'function' && isAdminUser()) return true;
   const idx = TOPIC_SEQUENCE.indexOf(id);
   if (idx <= 0) return true;
   const prevTopic = TOPIC_SEQUENCE[idx - 1];
@@ -998,6 +1148,7 @@ function updateNavLockStates() {
 }
 
 function allTopicsCompleted() {
+  if (typeof isAdminUser === 'function' && isAdminUser()) return true;
   return TOPIC_SEQUENCE.every(id => getTopicCompleted(id));
 }
 
@@ -1025,10 +1176,38 @@ function updateAssessmentLockState() {
   }
 }
 
+/* Non-blocking, animated replacement for alert() — used for lock
+   notices so a locked click always gives visible feedback (a native
+   alert() can be silently suppressed in embedded/sandboxed previews,
+   which made locked nav clicks look like they "did nothing"). */
+function showLockToast(title, message){
+  const layer = document.getElementById('lockToastLayer');
+  if(!layer) { alert(title + '\n' + message); return; }
+  const el = document.createElement('div');
+  el.className = 'lock-toast';
+  el.setAttribute('role', 'alert');
+  el.innerHTML = `
+    <button class="toast-close" aria-label="Dismiss">✕</button>
+    <strong>🔒 ${title}</strong>
+    <p>${message}</p>
+    <div class="toast-bar"></div>
+  `;
+  const dismiss = () => {
+    if(el.classList.contains('leaving')) return;
+    el.classList.add('leaving');
+    el.style.animationFillMode = 'forwards';
+    setTimeout(() => el.remove(), 380);
+  };
+  el.querySelector('.toast-close').onclick = dismiss;
+  layer.appendChild(el);
+  if(typeof playSynthTone === 'function') playSynthTone(300);
+  setTimeout(dismiss, 4200);
+}
+
 function goToAssessment() {
   if (!allTopicsCompleted()) {
     const remaining = TOPIC_SEQUENCE.filter(id => !getTopicCompleted(id)).map(id => TOPIC_LABELS[id]);
-    alert(`🔒 Assessment Locked\nComplete the diagnostic test for every decoder and encoder workspace before starting the assessment.\n\nStill needed:\n- ${remaining.join('\n- ')}`);
+    showLockToast('Assessment Locked', `Complete the diagnostic test for every decoder and encoder workspace first. Still needed: ${remaining.join(', ')}.`);
     return;
   }
   location.href = 'assessment.html';
@@ -1049,7 +1228,7 @@ function showSection(id){
     const idx = TOPIC_SEQUENCE.indexOf(id);
     const prevTopic = TOPIC_SEQUENCE[idx - 1];
     const prevLabel = TOPIC_LABELS[prevTopic];
-    alert(`🔒 Workspace Locked\nPlease complete the validation test for "${prevLabel}" to unlock this workspace!`);
+    showLockToast('Workspace Locked', `Complete the validation test for "${prevLabel}" to unlock this workspace.`);
     return;
   }
 
@@ -2924,32 +3103,6 @@ const SB_DEFS = {
       V:"Y7 + Y6 + Y5 + Y4 + Y3 + Y2 + Y1 + Y0"
     }
   },
-  mux41: {
-    name:'4:1 Multiplexer', icLabel:'74LS153', color:'#33e0a0',
-    inputs:['E','S1','S0','D0','D1','D2','D3'], outputs:['Y'],
-    logic(sw){
-      const E=sw.E|0;
-      if(!E) return{Y:0};
-      const S1=sw.S1|0,S0=sw.S0|0,i=(S1<<1)|S0;
-      return{Y:sw['D'+i]|0};
-    },
-    equations:{
-      Y:"E · (S1' · S0' · D0 + S1' · S0 · D1 + S1 · S0' · D2 + S1 · S0 · D3)"
-    }
-  },
-  demux14: {
-    name:'1:4 Demultiplexer', icLabel:'74LS139 (DEMUX)', color:'#33e0a0',
-    inputs:['E','S1','S0','D'], outputs:['Y0','Y1','Y2','Y3'],
-    logic(sw){
-      const E=sw.E|0,r={Y0:0,Y1:0,Y2:0,Y3:0};
-      if(!E) return r;
-      const S1=sw.S1|0,S0=sw.S0|0,i=(S1<<1)|S0;
-      r['Y'+i]=sw.D|0; return r;
-    },
-    equations:{
-      Y0:"E · S1' · S0' · D", Y1:"E · S1' · S0 · D", Y2:"E · S1 · S0' · D", Y3:"E · S1 · S0 · D"
-    }
-  }
 };
 
 /* ── Wire colour palettes ── */

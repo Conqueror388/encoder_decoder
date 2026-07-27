@@ -90,6 +90,28 @@
   .asm-best strong{ color:var(--copper); }
   .asm-result-actions{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
 
+  .asm-cert-box{
+    background:linear-gradient(135deg, rgba(255,157,0,0.06), rgba(0,240,255,0.04));
+    border:1px solid var(--copper-dim); border-radius:12px;
+    padding:22px 24px; margin:0 0 26px; text-align:center;
+  }
+  .asm-cert-box h4{
+    margin:0 0 8px; font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--copper);
+    text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .asm-cert-box p{ margin:0 0 16px; font-size:13px; color:var(--text-dim); }
+  .cert-name-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; align-items:center; }
+  .cert-name-row input{
+    flex:1 1 260px; max-width:320px; background:var(--bg-alt); border:1px solid var(--panel-border);
+    border-radius:8px; padding:12px 14px; color:var(--text); font-family:'Work Sans',sans-serif; font-size:14px;
+  }
+  .cert-name-row input:focus{ outline:none; border-color:var(--trace); }
+  .cert-name-error{
+    display:none; margin-top:10px; color:var(--copper); font-size:12.5px; font-family:'JetBrains Mono',monospace;
+  }
+  .cert-name-error.show{ display:block; }
+  @media (max-width:520px){ .cert-name-row{ flex-direction:column; } .cert-name-row input{ max-width:100%; width:100%; } }
+
   .asm-focus-banner{
     max-width:760px; margin:0 auto 20px; text-align:center; font-family:'JetBrains Mono',monospace;
     font-size:12px; letter-spacing:0.04em; color:var(--copper); border:1px solid var(--copper-dim);
@@ -157,10 +179,10 @@
     <!-- START SCREEN -->
     <div class="asm-card asm-start" id="screenStart">
       <h3>Ready to test yourself?</h3>
-      <p>21 questions across all six circuits — 1:2, 2:4 &amp; 3:8 decoders and 2:1, 4:2 &amp; 8:3 encoders. A mix of multiple-choice, truth-table completion, and logical-expression questions, each with instant feedback and a short explanation before you move on.</p>
+      <p>30 questions across all six circuits — 1:2, 2:4 &amp; 3:8 decoders and 2:1, 4:2 &amp; 8:3 encoders. A mix of multiple-choice, truth-table completion, and logical-expression questions, each with instant feedback and a short explanation before you move on.</p>
       <div class="asm-meta-row">
-        <div class="asm-meta"><div class="num">21</div><div class="lbl">Questions</div></div>
-        <div class="asm-meta"><div class="num">20:00</div><div class="lbl">Time Limit</div></div>
+        <div class="asm-meta"><div class="num">30</div><div class="lbl">Questions</div></div>
+        <div class="asm-meta"><div class="num">25:00</div><div class="lbl">Time Limit</div></div>
         <div class="asm-meta"><div class="num">6</div><div class="lbl">Topics</div></div>
       </div>
       <p style="font-size:12.5px; color:var(--text-dim); margin-top:-8px;">Once you begin, the hub navigation will be hidden until you finish — focus mode, no peeking at the labs.</p>
@@ -172,7 +194,7 @@
     <div class="asm-card" id="screenQuiz" style="display:none;">
       <div class="asm-topbar">
         <div class="asm-progress-label" id="progressLabel" aria-live="polite">Question 1 of 21</div>
-        <div class="asm-timer" id="timerDisplay" aria-label="Time remaining" role="timer">20:00</div>
+        <div class="asm-timer" id="timerDisplay" aria-label="Time remaining" role="timer">25:00</div>
         <span class="sr-only" id="timerAnnounce" aria-live="assertive" aria-atomic="true"></span>
       </div>
       <div class="asm-progress-track" role="progressbar" aria-label="Assessment progress" aria-valuemin="0" aria-valuemax="21" aria-valuenow="0"><div class="asm-progress-fill" id="progressFill"></div></div>
@@ -203,6 +225,17 @@
       <div class="asm-appreciation" id="appreciationBox"></div>
       <div class="asm-breakdown" id="breakdownWrap"></div>
       <div class="asm-best" id="bestFinal"></div>
+
+      <div class="asm-cert-box" id="certBox">
+        <h4>🎓 Course Completion Certificate</h4>
+        <p>Confirm the name to print on your certificate for <strong>Encoders &amp; Decoders</strong>, then download it as an image.</p>
+        <div class="cert-name-row">
+          <input type="text" id="certNameInput" placeholder="Enter your full name" />
+          <button class="asm-btn" onclick="downloadCertificate()">🎓 Download Certificate</button>
+        </div>
+        <div class="cert-name-error" id="certNameError">Please enter a name to print on the certificate.</div>
+      </div>
+
       <div class="asm-result-actions">
         <button class="asm-btn" onclick="startAssessment()">Retake Assessment</button>
         <button class="asm-btn ghost" onclick="location.href='index.html'">Back to Hub</button>
@@ -262,9 +295,24 @@ const QUESTIONS = [
       rows:[ ['Y4','1','0','0'], ['Y6','?','?','?'], ['Y7','1','1','1'] ] },
     opts:['0 1 1','1 1 0','1 0 1','0 0 1'], correct:1,
     explain:'6 in binary is 110, so the hidden row is A2 A1 A0 = 1 1 0.' },
+
+  { topic:'dec12', label:'1:2 Decoder', q:'In a 1:2 decoder, when Enable (E) = 0, what are the states of D0 and D1?', opts:['Both HIGH','D0 HIGH, D1 LOW','Both LOW','Depends on A'], correct:2, explain:'Enable acts as a master gate — with E = 0, both AND gates output LOW regardless of A, so D0 and D1 are both forced LOW.' },
+  { topic:'dec12', label:'1:2 Decoder', q:'How many address input lines does a 1:2 decoder have, not counting Enable?', opts:['0','1','2','3'], correct:1, explain:'A 1:2 decoder has exactly one address input, A, which alone is enough to select between its 2 outputs (2¹ = 2).' },
+
+  { topic:'dec24', label:'2:4 Decoder', q:'How many AND gates are needed to generate the four outputs of a 2:4 decoder (not counting the NOT gates used for complements)?', opts:['1','2','4','8'], correct:2, explain:'Each output D0–D3 is produced by its own 3-input AND gate (two address literals ANDed with Enable), so 4 AND gates are needed in total.' },
+
+  { topic:'dec38', label:'3:8 Decoder', q:'For a 3:8 decoder with Enable = 1, if A2 A1 A0 = 011, which output goes HIGH?', opts:['D2','D3','D4','D6'], correct:1, explain:'011 in binary equals 3, so output D3 = A2′·A1·A0 goes HIGH.' },
+
+  { topic:'enc21', label:'2:1 Encoder', q:"In a 2:1 encoder's truth table, what does an 'X' in the output column typically represent?", opts:['A forced HIGH state','A don\'t-care / undefined output','An error condition only','A valid LOW state'], correct:1, explain:"When neither input is active (Y1=Y0=0), there is nothing to encode, so the output is undefined — commonly marked X (don't care) in the truth table." },
+  { topic:'enc21', label:'2:1 Encoder', q:'Which single logic gate type is sufficient to generate the Valid (V) output of a 2:1 encoder?', opts:['AND gate','OR gate','NOT gate','XOR gate'], correct:1, explain:'V = Y1 + Y0 is a simple 2-input OR operation, so one OR gate is all that\'s needed.' },
+
+  { topic:'enc42', label:'4:2 Encoder', q:'On a 4:2 priority encoder, if Y2 = 1 and Y1 = 1 at the same time (Y3 = 0), which input wins and what is A1 A0?', opts:['Y1 wins, A1A0 = 01','Y2 wins, A1A0 = 10','Both win, A1A0 = 11','Y2 wins, A1A0 = 01'], correct:1, explain:'Y2 has higher priority than Y1, so Y2 wins, giving A1 A0 = 10 regardless of Y1.' },
+  { topic:'enc42', label:'4:2 Encoder', q:'What does the Valid (V) output of a 4:2 priority encoder indicate?', opts:['That Y3 specifically is active','That at least one input line is currently active','That exactly two inputs are active','That no inputs are active'], correct:1, explain:'V = Y3+Y2+Y1+Y0 goes HIGH whenever any input line is active, signalling that the encoded output is meaningful.' },
+
+  { topic:'enc83', label:'8:3 Encoder', q:'If both Y3 and Y5 are active at the same time on an 8:3 priority encoder, which input determines the output code?', opts:['Y3, since it comes first','Y5, since it has the higher index','Neither — the output is invalid','Both — the outputs are averaged'], correct:1, explain:'Priority encoders always let the highest-indexed active input win, so Y5 (index 5) overrides Y3 (index 3).' },
 ];
 
-const TOTAL_TIME = 1200; // 20 minutes in seconds
+const TOTAL_TIME = 1500; // 25 minutes in seconds
 const TOPIC_ORDER = [
   {key:'dec12', label:'1:2 Decoder'},
   {key:'dec24', label:'2:4 Decoder'},
@@ -293,7 +341,11 @@ const REQUIRED_TOPIC_LABELS = {
 function isTopicDone(id){
   try { return localStorage.getItem('ecd_completed_' + id) === 'true'; } catch(e){ return false; }
 }
+function isAdminSession(){
+  try { return sessionStorage.getItem('ecd_lab_is_admin') === 'true'; } catch(e){ return false; }
+}
 function assessmentIsUnlocked(){
+  if (isAdminSession()) return true;
   return REQUIRED_TOPICS.every(isTopicDone);
 }
 function renderLockedScreen(){
@@ -588,6 +640,211 @@ function finishAssessment(){
   }
   const best = Math.max(score, prevBest);
   document.getElementById('bestFinal').innerHTML = `Personal best on this device: <strong>${best}/${QUESTIONS.length}</strong>`;
+
+  // Save this attempt's result for the certificate, and pre-fill the
+  // name field from the logged-in session if one exists.
+  lastAttempt = { score, total: QUESTIONS.length, pct };
+  const certInput = document.getElementById('certNameInput');
+  const certErr = document.getElementById('certNameError');
+  if(certInput){
+    if(!certInput.value.trim()){
+      certInput.value = getStoredUserName();
+    }
+    certErr.classList.remove('show');
+  }
+}
+
+/* ── Course Completion Certificate ── */
+let lastAttempt = { score: 0, total: 0, pct: 0 };
+
+function getStoredUserName(){
+  try {
+    const n = sessionStorage.getItem('ecd_lab_user_name');
+    return (n && n !== 'Admin') ? n : (n || '');
+  } catch(e){ return ''; }
+}
+
+async function downloadCertificate(){
+  const input = document.getElementById('certNameInput');
+  const errEl = document.getElementById('certNameError');
+  const name = input.value.trim();
+
+  if(!name){
+    errEl.classList.add('show');
+    input.focus();
+    return;
+  }
+  errEl.classList.remove('show');
+
+  try { if(document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+
+  const W = 1600, H = 1131;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#080b12');
+  bgGrad.addColorStop(1, '#0d1119');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  const glow = ctx.createRadialGradient(W/2, H*0.35, 50, W/2, H*0.35, W*0.6);
+  glow.addColorStop(0, 'rgba(0,240,255,0.10)');
+  glow.addColorStop(1, 'rgba(0,240,255,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Borders
+  ctx.strokeStyle = '#ff9d00';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(40, 40, W-80, H-80);
+  ctx.strokeStyle = 'rgba(0,240,255,0.55)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(58, 58, W-116, H-116);
+
+  // Corner brackets
+  function corner(x, y, dx, dy){
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x, y + dy*44);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x + dx*44, y);
+    ctx.stroke();
+  }
+  corner(80, 80, 1, 1);
+  corner(W-80, 80, -1, 1);
+  corner(80, H-80, 1, -1);
+  corner(W-80, H-80, -1, -1);
+
+  ctx.textAlign = 'center';
+
+  // Eyebrow
+  ctx.fillStyle = '#ff9d00';
+  ctx.font = '600 22px "JetBrains Mono", monospace';
+  ctx.fillText('ECE · DIGITAL ELECTRONICS LAB', W/2, 155);
+
+  // Title
+  ctx.fillStyle = '#e7edf5';
+  ctx.font = '800 60px "JetBrains Mono", monospace';
+  ctx.shadowColor = 'rgba(0,240,255,0.5)';
+  ctx.shadowBlur = 18;
+  ctx.fillText('CERTIFICATE OF COMPLETION', W/2, 232);
+  ctx.shadowBlur = 0;
+
+  // Divider
+  const divGrad = ctx.createLinearGradient(W/2-220, 0, W/2+220, 0);
+  divGrad.addColorStop(0, 'rgba(0,240,255,0)');
+  divGrad.addColorStop(0.5, '#00f0ff');
+  divGrad.addColorStop(1, 'rgba(0,240,255,0)');
+  ctx.strokeStyle = divGrad;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W/2-220, 268);
+  ctx.lineTo(W/2+220, 268);
+  ctx.stroke();
+
+  // "This certifies that"
+  ctx.fillStyle = '#8a97ab';
+  ctx.font = '500 26px "Work Sans", sans-serif';
+  ctx.fillText('This certifies that', W/2, 336);
+
+  // Name (auto-shrink to fit width)
+  let nameFontSize = 68;
+  ctx.font = `800 ${nameFontSize}px "Work Sans", sans-serif`;
+  while(ctx.measureText(name).width > W-280 && nameFontSize > 28){
+    nameFontSize -= 2;
+    ctx.font = `800 ${nameFontSize}px "Work Sans", sans-serif`;
+  }
+  ctx.fillStyle = '#ff9d00';
+  ctx.shadowColor = 'rgba(255,157,0,0.4)';
+  ctx.shadowBlur = 14;
+  ctx.fillText(name, W/2, 428);
+  ctx.shadowBlur = 0;
+
+  const nameWidth = ctx.measureText(name).width;
+  ctx.strokeStyle = 'rgba(255,157,0,0.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - Math.max(nameWidth/2+40, 220), 458);
+  ctx.lineTo(W/2 + Math.max(nameWidth/2+40, 220), 458);
+  ctx.stroke();
+
+  // Completion line
+  ctx.fillStyle = '#8a97ab';
+  ctx.font = '500 24px "Work Sans", sans-serif';
+  ctx.fillText('has successfully completed the interactive assessment on', W/2, 518);
+
+  // Topic
+  ctx.fillStyle = '#00f0ff';
+  ctx.font = '800 46px "JetBrains Mono", monospace';
+  ctx.shadowColor = 'rgba(0,240,255,0.45)';
+  ctx.shadowBlur = 14;
+  ctx.fillText('ENCODERS & DECODERS', W/2, 588);
+  ctx.shadowBlur = 0;
+
+  ctx.fillStyle = '#8a97ab';
+  ctx.font = '400 18px "Work Sans", sans-serif';
+  ctx.fillText('Digital Electronics Interactive Lab', W/2, 618);
+
+  // Score + date
+  const dateStr = new Date().toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+  ctx.fillStyle = '#e7edf5';
+  ctx.font = '600 24px "JetBrains Mono", monospace';
+  ctx.fillText(`Score: ${lastAttempt.score}/${lastAttempt.total}  (${lastAttempt.pct}% correct)`, W/2, 680);
+
+  ctx.fillStyle = '#8a97ab';
+  ctx.font = '400 20px "Work Sans", sans-serif';
+  ctx.fillText(`Issued on ${dateStr}`, W/2, 712);
+
+  // Seal
+  const sealX = W-260, sealY = H-220, sealR = 90;
+  const sealGrad = ctx.createRadialGradient(sealX, sealY, 10, sealX, sealY, sealR);
+  sealGrad.addColorStop(0, '#ffcf80');
+  sealGrad.addColorStop(1, '#ff9d00');
+  ctx.beginPath();
+  ctx.arc(sealX, sealY, sealR, 0, Math.PI*2);
+  ctx.fillStyle = sealGrad;
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#1a1210';
+  ctx.stroke();
+  ctx.fillStyle = '#1a1210';
+  ctx.font = '800 34px "JetBrains Mono", monospace';
+  ctx.fillText('✓', sealX, sealY+14);
+  ctx.font = '700 12px "JetBrains Mono", monospace';
+  ctx.fillText('VERIFIED', sealX, sealY+36);
+
+  // Signature block
+  ctx.textAlign = 'left';
+  ctx.strokeStyle = 'rgba(148,163,184,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(180, H-190);
+  ctx.lineTo(480, H-190);
+  ctx.stroke();
+  ctx.fillStyle = '#e7edf5';
+  ctx.font = '700 20px "JetBrains Mono", monospace';
+  ctx.fillText('Digital Electronics Lab', 180, H-160);
+  ctx.fillStyle = '#8a97ab';
+  ctx.font = '400 15px "Work Sans", sans-serif';
+  ctx.fillText('Quantum Void Interactive Workspace', 180, H-138);
+
+  // Certificate ID
+  ctx.textAlign = 'center';
+  const certId = 'ECD-' + Date.now().toString(36).toUpperCase();
+  ctx.fillStyle = '#4c5b70';
+  ctx.font = '400 14px "JetBrains Mono", monospace';
+  ctx.fillText(`Certificate ID: ${certId}`, W/2, H-70);
+
+  // Trigger download
+  const safeName = name.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'certificate';
+  const link = document.createElement('a');
+  link.download = `Encoders_Decoders_Certificate_${safeName}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
 function toggleTheme(){
   const html = document.documentElement;
